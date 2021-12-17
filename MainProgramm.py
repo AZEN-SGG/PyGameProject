@@ -9,7 +9,22 @@ FPS = 30  # Не трогать! На этом всё работает!
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
-faced = False
+faced_bool = False
+
+
+def faced():  # Отображает надпись и завершает программу
+    global faced_bool
+    faced_bool = True
+
+    font = pygame.font.Font(None, 50)
+    text = font.render("Игра окончена", True, (100, 255, 100))  # Нужно дописать про пробел
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    screen.blit(text, (text_x, text_y))
+    pygame.draw.rect(screen, (0, 255, 0), (text_x - 10, text_y - 10,
+                                           text_w + 20, text_h + 20), 1)
 
 
 class Board:
@@ -77,8 +92,7 @@ class Tumbleweed(pygame.sprite.Sprite):
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            global faced
-            faced = True
+            faced()
 
         elif self.rect.x > WIDTH:
             self.rect.x = -50
@@ -121,7 +135,7 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            if not faced:
+            if not faced_bool:
                 if event.key == pygame.K_w:
                     player.go_up()
 
@@ -134,15 +148,20 @@ while running:
                 elif event.key == pygame.K_a:
                     player.go_left()
 
+                elif event.key == pygame.K_SPACE:
+                    player.change_rect()
+
             else:
-                if event.key == pygame.K_SPACE:
-                    running = False
+                running = False
 
     # Обновление
     screen.fill((222, 184, 135))
 
-    if not faced:
+    if not faced_bool:
         all_sprites.update()
+
+    else:
+        faced()
 
     # Рендеринг
     all_sprites.draw(screen)
