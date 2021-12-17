@@ -2,12 +2,11 @@ import pygame
 import os
 
 WIDTH = 650
-HEIGHT = 800
+HEIGHT = 650
 FPS = 60
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
-
 
 
 class Player(pygame.sprite.Sprite):
@@ -16,6 +15,12 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
+
+    def render(self, screen):
+        for j in range(HEIGHT):
+            for i in range(WIDTH):
+                pygame.draw.rect(screen, 'white',
+                                 (i * 50, j * 50, 50, 50), 1)
 
     def update(self):
         self.rect.x += 5
@@ -51,6 +56,8 @@ while running:
     # Рендеринг
     screen.fill('black')
     all_sprites.draw(screen)
+    # Вывод клетчатого поля
+    player.render(screen)
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
 
