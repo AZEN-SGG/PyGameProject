@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_image
-        self.image.set_colorkey('white')
+        self.image.set_colorkey('green')
 
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT - 25)
@@ -61,6 +61,23 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= 50
 
 
+class Tumbleweed(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = tumbleweed_image
+        self.image.set_colorkey('white')
+
+        self.rect = self.image.get_rect()
+        self.rect.center = (0, HEIGHT - 175)
+
+    def update(self):
+        if self.rect.x == WIDTH - 50:
+            self.rect.x = 0
+
+        else:
+            self.rect.x += 25
+
+
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
@@ -77,7 +94,11 @@ board = Board()
 player_image = pygame.image.load(os.path.join(data_folder, 'bigger_player.png')).convert()
 player = Player()
 
+tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
+tumbleweed = Tumbleweed()
+
 all_sprites.add(player)
+all_sprites.add(tumbleweed)
 
 # Цикл игры
 running = True
@@ -106,11 +127,12 @@ while running:
     screen.fill((222, 184, 135))
     # Обновление
     all_sprites.update()
+    board.render(screen)
 
     # Рендеринг
     all_sprites.draw(screen)
     # Вывод клетчатого поля
-    board.render(screen)
+
 
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
