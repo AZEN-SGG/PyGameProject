@@ -1,12 +1,15 @@
 import pygame
+import random
 import os
 
 WIDTH = 650
 HEIGHT = 650
-FPS = 30
+FPS = 30  # Не трогать! На этом всё работает!
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
+
+faced = False
 
 
 class Board:
@@ -62,20 +65,26 @@ class Player(pygame.sprite.Sprite):
 
 
 class Tumbleweed(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = tumbleweed_image
         self.image.set_colorkey('white')
 
         self.rect = self.image.get_rect()
-        self.rect.center = (0, HEIGHT - 175)
+        self.rect.center = (x, y)
+
+        self.speed = random.randint(5, 8)
 
     def update(self):
-        if self.rect.x == WIDTH - 50:
-            self.rect.x = 0
+        if pygame.sprite.collide_mask(self, player):
+            global faced
+            faced = True
+
+        elif self.rect.x > WIDTH:
+            self.rect.x = -50
 
         else:
-            self.rect.x += 25
+            self.rect.x += self.speed
 
 
 # Создаем игру и окно
@@ -89,16 +98,16 @@ clock = pygame.time.Clock()
 
 all_sprites = pygame.sprite.Group()
 
-board = Board()
-
 player_image = pygame.image.load(os.path.join(data_folder, 'bigger_player.png')).convert()
 player = Player()
 
 tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
-tumbleweed = Tumbleweed()
+tumbleweed = Tumbleweed(0, HEIGHT - 175)
+tumbleweed2 = Tumbleweed(0, HEIGHT - 275)
 
 all_sprites.add(player)
 all_sprites.add(tumbleweed)
+all_sprites.add(tumbleweed2)
 
 # Цикл игры
 running = True
@@ -112,27 +121,32 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                player.go_up()
+            if not faced:
+                if event.key == pygame.K_w:
+                    player.go_up()
 
-            elif event.key == pygame.K_s:
-                player.go_down()
+                elif event.key == pygame.K_s:
+                    player.go_down()
 
-            elif event.key == pygame.K_d:
-                player.go_right()
+                elif event.key == pygame.K_d:
+                    player.go_right()
 
-            elif event.key == pygame.K_a:
-                player.go_left()
+                elif event.key == pygame.K_a:
+                    player.go_left()
 
-    screen.fill((222, 184, 135))
+            else:
+                if event.key == pygame.K_SPACE:
+                    running = False
+
     # Обновление
-    all_sprites.update()
-    board.render(screen)
+    screen.fill((222, 184, 135))
+
+    if not faced:
+        all_sprites.update()
 
     # Рендеринг
     all_sprites.draw(screen)
     # Вывод клетчатого поля
-
 
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
