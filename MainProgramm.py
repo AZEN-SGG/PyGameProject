@@ -88,7 +88,7 @@ class Tumbleweed(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
-        self.speed = random.randint(5, 8)
+        self.speed = random.randint(5, 7)
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
@@ -99,6 +99,68 @@ class Tumbleweed(pygame.sprite.Sprite):
 
         else:
             self.rect.x += self.speed
+
+
+class Bear(pygame.sprite.Sprite):
+    def __init__(self, x, y,
+                 DIRECTION='Right',
+                 SPEED=0):  # При создании объекта класса, надо указать координаты и направление спрайта
+        pygame.sprite.Sprite.__init__(self)
+        self.image = bear_stand_image
+        self.image.set_colorkey('white')
+
+        self.status = 1
+        self.DIRECTION = DIRECTION
+
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+        if SPEED == 0:
+            self.SPEED = random.randint(5, 7)
+
+        else:
+            self.SPEED = SPEED
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            faced()
+
+        elif self.DIRECTION == 'Right':
+            if self.rect.x > WIDTH:
+                self.rect.x = -50
+
+            else:
+                self.bear_go()
+                self.rect.x += self.SPEED
+
+        else:
+            if self.rect.x < -50:
+                self.rect.x = WIDTH + 50
+
+            else:
+                self.bear_go()
+                self.rect.x -= self.SPEED
+
+    def bear_go(self):
+        if self.status == 1:
+            self.image = bear_go_image
+            self.image.set_colorkey('white')
+            self.status = 2
+
+        elif self.status == 2:
+            self.image = bear_stand_image
+            self.image.set_colorkey('white')
+            self.status = 3
+
+        elif self.status == 3:
+            self.image = bear_back_image
+            self.image.set_colorkey('white')
+            self.status = 4
+
+        else:
+            self.image = bear_stand_image
+            self.image.set_colorkey('white')
+            self.status = 1
 
 
 # Создаем игру и окно
@@ -119,9 +181,15 @@ tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')
 tumbleweed = Tumbleweed(0, HEIGHT - 175)
 tumbleweed2 = Tumbleweed(0, HEIGHT - 275)
 
+bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
+bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).convert()
+bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
+bear = Bear(WIDTH, HEIGHT - 375)
+
 all_sprites.add(player)
 all_sprites.add(tumbleweed)
 all_sprites.add(tumbleweed2)
+all_sprites.add(bear)
 
 # Цикл игры
 running = True
