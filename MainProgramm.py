@@ -2,7 +2,7 @@ import pygame
 import random
 import os
 
-WIDTH = 650
+WIDTH = 750
 HEIGHT = 650
 FPS = 30  # Не трогать! На этом всё работает!
 
@@ -53,20 +53,13 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.image.set_colorkey('green')
 
-        self.COORDINATS = (300, 600)
+        self.COORDINATS = (350, 600)
 
         self.rect = self.image.get_rect()
         self.rect.center = WIDTH / 2, HEIGHT - 25
 
         print(self.rect.y)
         print(self.rect.x)
-
-    def change_rect(self):
-        self.image = player_image
-        self.image.set_colorkey('green')
-
-        self.rect.y = 600
-        self.rect.x = 300
 
     def update(self):
         pass
@@ -112,24 +105,29 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= 50
 
 
-class Tumbleweed(pygame.sprite.Sprite):
+class Enemy(pygame.sprite.Sprite):  # Основной класс для врагов
     def __init__(self, x, y, DIRECTION='Right', SPEED=0):
         pygame.sprite.Sprite.__init__(self)
-        self.image = tumbleweed_image
-        self.image.set_colorkey('white')
 
         self.COORDINATS = (x - 25, y - 25)
         self.DIRECTION = DIRECTION
         self.status = 1
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
 
         if SPEED == 0:
             self.SPEED = random.randint(5, 7)
 
         else:
             self.SPEED = SPEED
+
+
+class Tumbleweed(Enemy):
+    def __init__(self, x, y, DIRECTION='Right', SPEED=0):
+        Enemy.__init__(self, x, y, DIRECTION, SPEED)
+        self.image = tumbleweed_image
+        self.image.set_colorkey('white')
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
@@ -166,26 +164,16 @@ class Tumbleweed(pygame.sprite.Sprite):
             self.status = 1
 
 
-class Bear(pygame.sprite.Sprite):
+class Bear(Enemy):
     def __init__(self, x, y,
                  DIRECTION='Right',
                  SPEED=0):  # При создании объекта класса, надо указать координаты и направление спрайта
-        pygame.sprite.Sprite.__init__(self)
+        Enemy.__init__(self, x, y, DIRECTION, SPEED)
         self.image = bear_stand_image
         self.image.set_colorkey('white')
 
-        self.status = 1
-        self.DIRECTION = DIRECTION
-        self.COORDINATS = (x - 25, y - 25)
-
         self.rect = self.image.get_rect()
         self.rect.center = x, y
-
-        if SPEED == 0:
-            self.SPEED = random.randint(5, 7)
-
-        else:
-            self.SPEED = SPEED
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
@@ -252,8 +240,24 @@ tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')
 tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
 tumbleweed_back_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_back.png')).convert()
 tumbleweed_right_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_right.png')).convert()
-tumbleweed = Tumbleweed(0, HEIGHT - 175)
-second_tumbleweed = Tumbleweed(0, HEIGHT - 275)
+
+first_tumbleweed = Tumbleweed(0, HEIGHT - 175, 'Right', 6)
+first_second_tumbleweed = Tumbleweed(650, HEIGHT - 175, 'Right', 6)
+first_third_tumbleweed = Tumbleweed(50, HEIGHT - 175, 'Right', 6)
+first_fourth_tumbleweed = Tumbleweed(200, HEIGHT - 175, 'Right', 6)
+first_fifth_tumbleweed = Tumbleweed(250, HEIGHT - 175, 'Right', 6)
+first_sixth_tumbleweed = Tumbleweed(400, HEIGHT - 175, 'Right', 6)
+first_seventh_tumbleweed = Tumbleweed(450, HEIGHT - 175, 'Right', 6)
+first_eighth_tumbleweed = Tumbleweed(600, HEIGHT - 175, 'Right', 6)
+
+second_tumbleweed = Tumbleweed(100, HEIGHT - 275, 'Right', 6)
+second_second_tumbleweed = Tumbleweed(750, HEIGHT - 275, 'Right', 6)
+second_third_tumbleweed = Tumbleweed(150, HEIGHT - 275, 'Right', 6)
+second_fourth_tumbleweed = Tumbleweed(300, HEIGHT - 275, 'Right', 6)
+second_fifth_tumbleweed = Tumbleweed(350, HEIGHT - 275, 'Right', 6)
+second_sixth_tumbleweed = Tumbleweed(500, HEIGHT - 275, 'Right', 6)
+second_seventh_tumbleweed = Tumbleweed(550, HEIGHT - 275, 'Right', 6)
+second_eighth_tumbleweed = Tumbleweed(700, HEIGHT - 275, 'Right', 6)
 
 bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
 bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).convert()
@@ -261,8 +265,24 @@ bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).
 bear = Bear(0, HEIGHT - 375)
 
 add_sprite(player)
-add_sprite(tumbleweed)
+add_sprite(first_tumbleweed)
+add_sprite(first_second_tumbleweed)
+add_sprite(first_third_tumbleweed)
+add_sprite(first_fourth_tumbleweed)
+add_sprite(first_fifth_tumbleweed)
+add_sprite(first_sixth_tumbleweed)
+add_sprite(first_seventh_tumbleweed)
+add_sprite(first_eighth_tumbleweed)
+
 add_sprite(second_tumbleweed)
+add_sprite(second_second_tumbleweed)
+add_sprite(second_third_tumbleweed)
+add_sprite(second_fourth_tumbleweed)
+add_sprite(second_fifth_tumbleweed)
+add_sprite(second_sixth_tumbleweed)
+add_sprite(second_seventh_tumbleweed)
+add_sprite(second_eighth_tumbleweed)
+
 add_sprite(bear)
 
 # Цикл игры
@@ -304,13 +324,11 @@ while running:
     if not faced_bool:
         all_sprites.update()
 
-    else:
-        faced()
-
     # Рендеринг
     all_sprites.draw(screen)
     # Вывод клетчатого поля
-
+    if faced_bool:
+        faced()
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
 
