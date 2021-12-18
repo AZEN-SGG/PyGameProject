@@ -47,6 +47,10 @@ class Player(pygame.sprite.Sprite):
         print(self.rect.y)
         print(self.rect.x)
 
+    def change_rect(self):
+        self.rect.y = HEIGHT - 50
+        self.rect.x = WIDTH // 2
+
     def update(self):
         pass
 
@@ -148,20 +152,22 @@ while running:
                 elif event.key == pygame.K_a:
                     player.go_left()
 
-                elif event.key == pygame.K_SPACE:
-                    player.change_rect()
+                # elif event.key == pygame.K_SPACE:
+                # player.change_rect()
 
             else:
-                running = False
+                if event.key == pygame.K_SPACE:
+                    player.change_rect()
+                    faced_bool = False
 
     # Обновление
     screen.fill((222, 184, 135))
 
-    if not faced_bool:
-        all_sprites.update()
+    # if not faced_bool:
+    all_sprites.update()
 
-    else:
-        faced()
+    # else:
+    # faced()
 
     # Рендеринг
     all_sprites.draw(screen)
