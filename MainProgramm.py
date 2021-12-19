@@ -39,6 +39,10 @@ def return_back():
         sprites[sprite].rect.y = coordinats[sprite][1]
 
 
+def get_point():
+    pass
+
+
 class Board:
     def render(self, screen):
         for y in range(HEIGHT):
@@ -217,6 +221,44 @@ class Bear(Enemy):
             self.status = 1
 
 
+class Point(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, x, y, level: int = 1):
+        pygame.sprite.Sprite.__init__(self)
+        self.level = level
+        self.COORDINATS = (x - 25, y - 25)
+
+        if level == 1:
+            self.image = point_image
+            self.image.set_colorkey('white')
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            pass
+
+
+class Score:  # Класс счёта
+    def __init__(self, screen, points: str = '000000',
+                 color=(139, 69, 19)):  # При создании объекта класса надо задать счёт и цвет очков
+        self.points = points  # Создаю переменную очки в которую надо записывать счёт
+        self.screen = screen
+        self.color = color
+        self.font = pygame.font.Font(None, 45)
+
+    def update(self, color=(139, 69, 19)):  # Этот метод позволит обновлять счёт
+        text = self.font.render(self.points, True, color)  # Рисую счёт - коричневый цвет
+        text_w = text.get_width()
+        text_h = text.get_height()
+        text_x = 15
+        text_y = 15
+        screen.blit(text, (text_x, text_y))
+        pygame.draw.rect(screen, (139, 69, 19), (text_x - 5, text_y - 5,
+                                                 text_w + 10, text_h + 5), 1)
+
+
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
@@ -236,11 +278,14 @@ player_right_image = pygame.image.load(os.path.join(data_folder, 'bigger_right_p
 player_back_image = pygame.image.load(os.path.join(data_folder, 'bigger_back_player.png')).convert()
 player = Player()
 
+score = Score(screen)
+
 tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
 tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
 tumbleweed_back_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_back.png')).convert()
 tumbleweed_right_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_right.png')).convert()
 
+# Создаю восемь объектов класса перекати поел которые расположены в самом низу
 first_tumbleweed = Tumbleweed(0, HEIGHT - 175, 'Right', 6)
 first_second_tumbleweed = Tumbleweed(650, HEIGHT - 175, 'Right', 6)
 first_third_tumbleweed = Tumbleweed(50, HEIGHT - 175, 'Right', 6)
@@ -250,19 +295,26 @@ first_sixth_tumbleweed = Tumbleweed(400, HEIGHT - 175, 'Right', 6)
 first_seventh_tumbleweed = Tumbleweed(450, HEIGHT - 175, 'Right', 6)
 first_eighth_tumbleweed = Tumbleweed(600, HEIGHT - 175, 'Right', 6)
 
-second_tumbleweed = Tumbleweed(100, HEIGHT - 275, 'Right', 6)
-second_second_tumbleweed = Tumbleweed(750, HEIGHT - 275, 'Right', 6)
-second_third_tumbleweed = Tumbleweed(150, HEIGHT - 275, 'Right', 6)
-second_fourth_tumbleweed = Tumbleweed(300, HEIGHT - 275, 'Right', 6)
-second_fifth_tumbleweed = Tumbleweed(350, HEIGHT - 275, 'Right', 6)
-second_sixth_tumbleweed = Tumbleweed(500, HEIGHT - 275, 'Right', 6)
-second_seventh_tumbleweed = Tumbleweed(550, HEIGHT - 275, 'Right', 6)
-second_eighth_tumbleweed = Tumbleweed(700, HEIGHT - 275, 'Right', 6)
+# Создаю восемь объектов класса перекати поел которые вторые снизу
+second_tumbleweed = Tumbleweed(100, HEIGHT - 275, 'Right', 7)
+second_second_tumbleweed = Tumbleweed(750, HEIGHT - 275, 'Right', 7)
+second_third_tumbleweed = Tumbleweed(150, HEIGHT - 275, 'Right', 7)
+second_fourth_tumbleweed = Tumbleweed(300, HEIGHT - 275, 'Right', 7)
+second_fifth_tumbleweed = Tumbleweed(350, HEIGHT - 275, 'Right', 7)
+second_sixth_tumbleweed = Tumbleweed(500, HEIGHT - 275, 'Right', 7)
+second_seventh_tumbleweed = Tumbleweed(550, HEIGHT - 275, 'Right', 7)
+second_eighth_tumbleweed = Tumbleweed(700, HEIGHT - 275, 'Right', 7)
 
+# Создаю изображения медведя
 bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
 bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).convert()
 bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
-bear = Bear(0, HEIGHT - 375)
+
+# Создаю объект класса медведь
+bear = Bear(0, HEIGHT - 375, 'Left')
+
+point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
+point = Point(25, HEIGHT - 125)
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
@@ -284,6 +336,7 @@ add_sprite(second_seventh_tumbleweed)
 add_sprite(second_eighth_tumbleweed)
 
 add_sprite(bear)
+add_sprite(point)
 
 # Цикл игры
 running = True
@@ -325,6 +378,7 @@ while running:
         all_sprites.update()
 
     # Рендеринг
+    score.update()
     all_sprites.draw(screen)
     # Вывод клетчатого поля
     if faced_bool:
