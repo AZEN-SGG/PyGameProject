@@ -38,6 +38,10 @@ def return_back():
         sprites[sprite].rect.x = coordinats[sprite][0]
         sprites[sprite].rect.y = coordinats[sprite][1]
 
+        if sprites[sprite].type == 'Point':
+            sprites[sprite].hide = False
+            score.points = '000000'
+
 
 # При вызове функции можно задать количество очков которые прибавляются в счёту
 def get_point(this_point, add_points: int = 100):
@@ -64,6 +68,7 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_image
         self.image.set_colorkey('green')
+        self.type = 'Player'
 
         self.COORDINATS = (350, 600)
 
@@ -124,6 +129,7 @@ class Enemy(pygame.sprite.Sprite):  # Основной класс для вра�
         self.COORDINATS = (x - 25, y - 25)
         self.DIRECTION = DIRECTION
         self.status = 1
+        self.type = 'Enemy'  # Задаёт класс
 
         if SPEED == 0:
             self.SPEED = random.randint(5, 7)
@@ -137,6 +143,7 @@ class Tumbleweed(Enemy):
         Enemy.__init__(self, x, y, DIRECTION, SPEED)
         self.image = tumbleweed_image
         self.image.set_colorkey('white')
+        self.type = 'Tumbleweed'  # Задаёт класс
 
         self.rect = self.image.get_rect()
         self.rect.center = x, y
@@ -183,6 +190,7 @@ class Bear(Enemy):
         Enemy.__init__(self, x, y, DIRECTION, SPEED)
         self.image = bear_stand_image
         self.image.set_colorkey('white')
+        self.type = 'Bear'  # Задаёт класс
 
         self.rect = self.image.get_rect()
         self.rect.center = x, y
@@ -236,6 +244,7 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
         self.level = level
         self.hide = False  # Переменная отвечает за показывание картинки
         self.COORDINATS = (x - 25, y - 25)
+        self.type = 'Point'  # Задаёт класс
 
         if level == 1:
             self.image = point_image
@@ -252,6 +261,10 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
             self.image = white_image
             self.image.set_colorkey('white')
 
+        else:
+            self.image = point_image
+            self.image.set_colorkey('white')
+
 
 class Score:  # Класс счёта
     def __init__(self, screen, points: str = '000000',
@@ -260,6 +273,7 @@ class Score:  # Класс счёта
         self.screen = screen
         self.color = color
         self.font = pygame.font.Font(None, 45)
+        self.type = 'Score'  # Задаёт класс
 
     def update(self, color=(139, 69, 19)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.points, True, color)  # Рисую счёт - коричневый цвет
