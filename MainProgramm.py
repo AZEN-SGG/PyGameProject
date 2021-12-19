@@ -10,6 +10,7 @@ game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
 faced_bool = False
+win_bool = False
 
 
 def faced():  # Отображает надпись и завершает программу
@@ -24,6 +25,22 @@ def faced():  # Отображает надпись и завершает про
     text_h = text.get_height()
     screen.blit(text, (text_x, text_y))
     pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
+                                           text_w + 20, text_h + 20), 1)
+
+
+# Отображает сообщение о выигрыше
+def win():
+    global win_bool  # переменная отвечающая за работоспособность спрайтов
+    win_bool = True  # При win_bool равном правде все спрайты останавливаются
+
+    font = pygame.font.Font(None, 50)
+    text = font.render("Вы выиграли", True, (0, 255, 0))  # Нужно дописать про пробел
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    screen.blit(text, (text_x, text_y))
+    pygame.draw.rect(screen, (0, 255, 0), (text_x - 10, text_y - 10,
                                            text_w + 20, text_h + 20), 1)
 
 
@@ -86,7 +103,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('green')
 
         if self.rect.y == 0:
-            pass
+            win()
 
         else:
             self.rect.y -= 50
@@ -144,6 +161,7 @@ class Tumbleweed(Enemy):
         self.image = tumbleweed_image
         self.image.set_colorkey('white')
         self.type = 'Tumbleweed'  # Задаёт класс
+        self.status = 1
 
         self.rect = self.image.get_rect()
         self.rect.center = x, y
@@ -158,23 +176,23 @@ class Tumbleweed(Enemy):
         else:
             self.rect.x += self.SPEED
 
-        if self.status == 1:
+        if 8 > self.status >= 1:
             self.image = tumbleweed_left_image
             self.image.set_colorkey('white')
 
-            self.status = 2
+            self.status += 1
 
-        elif self.status == 2:
+        elif 15 > self.status >= 8:
             self.image = tumbleweed_back_image
             self.image.set_colorkey('white')
 
-            self.status = 3
+            self.status += 1
 
-        elif self.status == 3:
+        elif 22 >= self.status >= 15:
             self.image = tumbleweed_right_image
             self.image.set_colorkey('white')
 
-            self.status = 4
+            self.status += 1
 
         else:
             self.image = tumbleweed_image
@@ -378,7 +396,7 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            if not faced_bool:
+            if not faced_bool and not win_bool:
                 if event.key == pygame.K_w or event.key == pygame.K_UP:
                     player.go_up()
 
@@ -395,14 +413,19 @@ while running:
                 if event.key == pygame.K_SPACE:
                     return_back()
                     faced_bool = False
+                    win_bool = False
 
                 else:
-                    faced()
+                    if win_bool:
+                        win()
+
+                    else:
+                        faced()
 
     # Обновление
     screen.fill((222, 184, 135))
 
-    if not faced_bool:
+    if not faced_bool and not win_bool:
         all_sprites.update()
 
     # Рендеринг
@@ -411,6 +434,9 @@ while running:
     # Вывод клетчатого поля
     if faced_bool:
         faced()
+
+    if win_bool:
+        win()
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
 
