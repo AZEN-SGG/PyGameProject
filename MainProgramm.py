@@ -219,14 +219,14 @@ class Bear(Enemy):
 
         elif self.DIRECTION == 'Right':
             if self.rect.x > WIDTH:
-                self.rect.x = -50
+                self.rect.x = -100
 
             else:
                 self.bear_go()
                 self.rect.x += self.SPEED
 
         else:
-            if self.rect.x < -50:
+            if self.rect.x < -100:
                 self.rect.x = WIDTH + 50
 
             else:
@@ -356,7 +356,7 @@ bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).c
 bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
 
 # Создаю объект класса медведь
-bear = Bear(0, HEIGHT - 375, 'Left')
+bear = Bear(0, HEIGHT - 375, 'Right')
 
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
