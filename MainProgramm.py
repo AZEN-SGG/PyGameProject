@@ -39,8 +39,16 @@ def return_back():
         sprites[sprite].rect.y = coordinats[sprite][1]
 
 
-def get_point():
-    pass
+# При вызове функции можно задать количество очков которые прибавляются в счёту
+def get_point(this_point, add_points: int = 100):
+    this_point.hide = True
+    points = str(int(score.points) + add_points)
+
+    if len(points) < 6:
+        points = '0' * (6 - len(points)) + points
+
+    score.points = points
+    score.update()
 
 
 class Board:
@@ -226,6 +234,7 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
     def __init__(self, x, y, level: int = 1):
         pygame.sprite.Sprite.__init__(self)
         self.level = level
+        self.hide = False  # Переменная отвечает за показывание картинки
         self.COORDINATS = (x - 25, y - 25)
 
         if level == 1:
@@ -237,7 +246,11 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            pass
+            get_point(self)
+
+        if self.hide:  # Если равен правде, то деньги не будут показываться
+            self.image = white_image
+            self.image.set_colorkey('white')
 
 
 class Score:  # Класс счёта
@@ -296,14 +309,14 @@ first_seventh_tumbleweed = Tumbleweed(450, HEIGHT - 175, 'Right', 6)
 first_eighth_tumbleweed = Tumbleweed(600, HEIGHT - 175, 'Right', 6)
 
 # Создаю восемь объектов класса перекати поел которые вторые снизу
-second_tumbleweed = Tumbleweed(100, HEIGHT - 275, 'Right', 7)
-second_second_tumbleweed = Tumbleweed(750, HEIGHT - 275, 'Right', 7)
-second_third_tumbleweed = Tumbleweed(150, HEIGHT - 275, 'Right', 7)
-second_fourth_tumbleweed = Tumbleweed(300, HEIGHT - 275, 'Right', 7)
-second_fifth_tumbleweed = Tumbleweed(350, HEIGHT - 275, 'Right', 7)
-second_sixth_tumbleweed = Tumbleweed(500, HEIGHT - 275, 'Right', 7)
-second_seventh_tumbleweed = Tumbleweed(550, HEIGHT - 275, 'Right', 7)
-second_eighth_tumbleweed = Tumbleweed(700, HEIGHT - 275, 'Right', 7)
+second_tumbleweed = Tumbleweed(100, HEIGHT - 225, 'Right', 7)
+second_second_tumbleweed = Tumbleweed(750, HEIGHT - 225, 'Right', 7)
+second_third_tumbleweed = Tumbleweed(150, HEIGHT - 225, 'Right', 7)
+second_fourth_tumbleweed = Tumbleweed(300, HEIGHT - 225, 'Right', 7)
+second_fifth_tumbleweed = Tumbleweed(350, HEIGHT - 225, 'Right', 7)
+second_sixth_tumbleweed = Tumbleweed(500, HEIGHT - 225, 'Right', 7)
+second_seventh_tumbleweed = Tumbleweed(550, HEIGHT - 225, 'Right', 7)
+second_eighth_tumbleweed = Tumbleweed(700, HEIGHT - 225, 'Right', 7)
 
 # Создаю изображения медведя
 bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
@@ -314,6 +327,7 @@ bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).
 bear = Bear(0, HEIGHT - 375, 'Left')
 
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
+white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
 point = Point(25, HEIGHT - 125)
 
 add_sprite(player)
@@ -351,16 +365,16 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if not faced_bool:
-                if event.key == pygame.K_w:
+                if event.key == pygame.K_w or event.key == pygame.K_UP:
                     player.go_up()
 
-                elif event.key == pygame.K_s:
+                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                     player.go_down()
 
-                elif event.key == pygame.K_d:
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     player.go_right()
 
-                elif event.key == pygame.K_a:
+                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     player.go_left()
 
             else:
