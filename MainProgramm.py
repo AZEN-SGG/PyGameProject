@@ -46,23 +46,23 @@ def win():
                                            text_w + 20, text_h + 20), 1)
 
 
-def add_sprite(sprite):
-    all_sprites.add(sprite)
-    sprites.append(sprite)
-    coordinats.append(sprite.COORDINATS)
+def add_sprite(sprite):  # Добавление спрайтов
+    all_sprites.add(sprite)  # Обновление спрайтов
+    sprites.append(sprite)  # Добавляет в одну папку все спрайты
+    coordinats.append(sprite.COORDINATS)  # Координаты
 
 
-def return_back():
+def return_back():  # Победа или поражение -> возвращение назад
     for sprite in range(len(sprites)):
         sprites[sprite].rect.x = coordinats[sprite][0]
         sprites[sprite].rect.y = coordinats[sprite][1]
         sprites[sprite].status = 1
 
-        if sprites[sprite].type == 'Point':
+        if sprites[sprite].type == 'Point':  # Мешочек с золотом
             sprites[sprite].hide = False
             score.points = '000000'
 
-        if sprites[sprite].type == 'Bullet':
+        if sprites[sprite].type == 'Bullet':  # Пулька
             sprites[sprite].delay = sprites[sprite].INITIAL_DELAY
             sprites[sprite].image = white_image
             sprites[sprite].image.set_colorkey('white')
@@ -100,9 +100,6 @@ class Player(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.rect.center = WIDTH / 2, HEIGHT - 25
-
-        print(self.rect.y)
-        print(self.rect.x)
 
     def update(self):
         if self.status == 1:
