@@ -161,18 +161,29 @@ class Robber(Enemy):
     def __init__(self, x, y, DIRECTION='Right'):
         Enemy.__init__(self, x, y, DIRECTION)
 
-        self.image = tumbleweed_image
+        if self.DIRECTION == 'Right':
+            self.image = right_robber_image
+
+        else:
+            self.image = left_robber_image
+
         self.image.set_colorkey('white')
         self.type = 'Robber'
         self.status = 1
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
 
     def update(self):
         pass
 
 
 class Bullet(Enemy):
-    def __init__(self, x, y, DIRECTION='Right', SPEED=0):
+    # При инициализации пули надо ОБЯЗАТЕЛЬНО указать местоположение пули и где она будет появляться
+    # Также можно указать направление пули, а также скорость, направление НЕ РАБОТАЕТ!
+    def __init__(self, x, y, WHERE_BULLET, DIRECTION='Right', SPEED=0):
         Enemy.__init__(self, x, y, DIRECTION, SPEED)
+        self.WHERE_BULLET = WHERE_BULLET
 
         self.image = bullet_image
         self.image.set_colorkey('white')
@@ -187,14 +198,14 @@ class Bullet(Enemy):
 
         elif self.DIRECTION == 'Right':
             if self.rect.x >= WIDTH:
-                self.rect.x = where_bullet[0]
+                self.rect.x = self.WHERE_BULLET[0]
 
             else:
                 self.rect.x += self.SPEED
 
         elif self.DIRECTION == 'Left':
             if self.rect.x <= 0:
-                self.rect.x = where_bullet[0]
+                self.rect.x = self.WHERE_BULLET[0]
 
             else:
                 self.rect.x -= self.SPEED
@@ -413,6 +424,9 @@ tumbleweed_right_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed
 
 bullet_image = pygame.image.load(os.path.join(data_folder, 'bullet.png')).convert()
 
+right_robber_image = pygame.image.load(os.path.join(data_folder, 'right_robber.png')).convert()
+left_robber_image = pygame.image.load(os.path.join(data_folder, 'left_robber.png')).convert()
+
 # Создаю восемь объектов класса перекати поел которые средние
 first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
 first_second_tumbleweed = Tumbleweed(650, 375, 'Right', 6)
@@ -454,12 +468,11 @@ point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert(
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
 point = Point(75, 575, 500)
 
-# Эта переменная указывает куда возвращаться пулям
-where_bullet = (50, 125)
+# Создаю пули
+first_first_bullet = Bullet(50, 125, (50, 125), 'Right', 10)
+first_second_bullet = Bullet(375, 125, (50, 125), 'Right', 10)
 
-# Создаю пулю
-first_first_bullet = Bullet(50, 125, 'Right', 10)
-first_second_bullet = Bullet(375, 125, 'Right', 10)
+first_robber = Robber(25, 125, 'Right')
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
@@ -492,6 +505,8 @@ add_sprite(point)
 
 add_sprite(first_first_bullet)
 add_sprite(first_second_bullet)
+
+add_sprite(first_robber)
 
 # Цикл игры
 running = True
