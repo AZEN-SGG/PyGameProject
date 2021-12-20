@@ -56,10 +56,16 @@ def return_back():
     for sprite in range(len(sprites)):
         sprites[sprite].rect.x = coordinats[sprite][0]
         sprites[sprite].rect.y = coordinats[sprite][1]
+        sprites[sprite].status = 1
 
         if sprites[sprite].type == 'Point':
             sprites[sprite].hide = False
             score.points = '000000'
+
+        if sprites[sprite].type == 'Bullet':
+            sprites[sprite].delay = sprites[sprite].INITIAL_DELAY
+            sprites[sprite].image = white_image
+            sprites[sprite].image.set_colorkey('white')
 
 
 # При вызове функции можно задать количество очков которые прибавляются в счёту
@@ -85,6 +91,7 @@ class Board:
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
+        self.status = 1
         self.image = player_image
         self.image.set_colorkey('green')
         self.type = 'Player'
@@ -98,9 +105,12 @@ class Player(pygame.sprite.Sprite):
         print(self.rect.x)
 
     def update(self):
-        pass
+        if self.status == 1:
+            self.image = player_image
+            self.image.set_colorkey('green')
 
     def go_up(self):
+        self.status = 1
         self.image = player_image
         self.image.set_colorkey('green')
 
@@ -111,6 +121,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y -= 50
 
     def go_down(self):
+        self.status = 2
         self.image = player_back_image
         self.image.set_colorkey('green')
 
@@ -121,6 +132,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y += 50
 
     def go_right(self):
+        self.status = 3
         self.image = player_right_image
         self.image.set_colorkey('green')
 
@@ -131,6 +143,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += 50
 
     def go_left(self):
+        self.status = 4
         self.image = player_left_image
         self.image.set_colorkey('green')
 
@@ -169,25 +182,6 @@ class Robber(Enemy):
 
         self.image.set_colorkey('white')
         self.type = 'Robber'
-        self.status = 1
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        pass
-
-
-class Bullet(Enemy):
-    # При инициализации пули надо ОБЯЗАТЕЛЬНО указать местоположение пули и где она будет появляться
-    # Также можно указать направление пули, а также скорость, направление НЕ РАБОТАЕТ!
-    def __init__(self, x, y, WHERE_BULLET, DIRECTION='Right', SPEED=0):
-        Enemy.__init__(self, x, y, DIRECTION, SPEED)
-        self.WHERE_BULLET = WHERE_BULLET
-
-        self.image = bullet_image
-        self.image.set_colorkey('white')
-        self.type = 'Bullet'
 
         self.rect = self.image.get_rect()
         self.rect.center = x, y
@@ -196,28 +190,64 @@ class Bullet(Enemy):
         if pygame.sprite.collide_mask(self, player):
             faced()
 
-        elif self.DIRECTION == 'Right':
-            if self.rect.x >= WIDTH:
-                self.rect.x = self.WHERE_BULLET[0]
 
-            else:
-                self.rect.x += self.SPEED
+class Bullet(Enemy):
+    # При инициализации пули надо ОБЯЗАТЕЛЬНО указать местоположение пули и где она будет появляться
+    # Также можно указать число кадров после которых пуля появиться
+    # Направление пули, а также скорость, направление НЕ РАБОТАЕТ!
+    def __init__(self, x, y, WHERE_BULLET, delay: int = 0, DIRECTION='Right', SPEED=0):
+        Enemy.__init__(self, x, y, DIRECTION, SPEED)
+        self.WHERE_BULLET = WHERE_BULLET
+        self.delay = delay
+        self.INITIAL_DELAY = delay
 
-        elif self.DIRECTION == 'Left':
-            if self.rect.x <= 0:
-                self.rect.x = self.WHERE_BULLET[0]
+        if self.delay == 0:
+            self.image = bullet_image
+            self.image.set_colorkey('white')
 
-            else:
-                self.rect.x -= self.SPEED
+        else:
+            self.image = white_image
+            self.image.set_colorkey('white')
+
+        self.type = 'Bullet'
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if self.delay == 0:
+            if self.image == white_image:
+                self.image = bullet_image
+                self.image.set_colorkey('white')
+
+            if pygame.sprite.collide_mask(self, player):
+                faced()
+
+            elif self.DIRECTION == 'Right':
+                if self.rect.x >= WIDTH:
+                    self.rect.x = self.WHERE_BULLET[0]
+
+                else:
+                    self.rect.x += self.SPEED
+
+            elif self.DIRECTION == 'Left':
+                if self.rect.x <= 0:
+                    self.rect.x = self.WHERE_BULLET[0]
+
+                else:
+                    self.rect.x -= self.SPEED
+
+        else:
+            self.delay -= 1
 
 
 class Tumbleweed(Enemy):
     def __init__(self, x, y, DIRECTION='Right', SPEED=0):
         Enemy.__init__(self, x, y, DIRECTION, SPEED)
+        self.type = 'Tumbleweed'  # Задаёт класс
+
         self.image = tumbleweed_image
         self.image.set_colorkey('white')
-        self.type = 'Tumbleweed'  # Задаёт класс
-        self.status = 1
 
         self.rect = self.image.get_rect()
         self.rect.center = x, y
@@ -231,33 +261,6 @@ class Tumbleweed(Enemy):
 
         else:
             self.rect.x += self.SPEED
-
-        if 25 > self.status >= 1:
-            self.image = tumbleweed_left_image
-            self.image.set_colorkey('white')
-
-            self.status += 1
-
-        elif 39 > self.status >= 25:
-            self.image = tumbleweed_back_image
-            self.image.set_colorkey('white')
-
-            self.status += 1
-
-        elif 63 >= self.status >= 39:
-            self.image = tumbleweed_right_image
-            self.image.set_colorkey('white')
-
-            self.status += 1
-
-        else:
-            self.image = tumbleweed_image
-            self.image.set_colorkey('white')
-
-            while self.status != 88:
-                self.status += 1
-
-            self.status = 1
 
 
 class Bear(Enemy):
@@ -325,6 +328,7 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
         self.COORDINATS = (x - 25, y - 25)
         self.type = 'Point'  # Задаёт класс
         self.money: int = money
+        self.status = 1
 
         if level == 1:
             self.image = point_image
@@ -354,6 +358,7 @@ class Score:  # Класс счёта
         self.color = color
         self.font = pygame.font.Font(None, 45)
         self.type = 'Score'  # Задаёт класс
+        self.status = 1
 
     def update(self, color=(139, 69, 19)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.points, True, color)  # Рисую счёт - коричневый цвет
@@ -366,7 +371,7 @@ class Score:  # Класс счёта
                                                  text_w + 10, text_h + 5), 1)
 
 
-class Key(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
+class Key(pygame.sprite.Sprite):
     # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
     def __init__(self, x, y, money: int = 100, level: int = 1):
         pygame.sprite.Sprite.__init__(self)
@@ -469,10 +474,18 @@ white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert(
 point = Point(75, 575, 500)
 
 # Создаю пули
-first_first_bullet = Bullet(50, 125, (50, 125), 'Right', 10)
-first_second_bullet = Bullet(375, 125, (50, 125), 'Right', 10)
+first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 10)
+first_second_bullet = Bullet(50, 125, (50, 125), 36, 'Right', 10)
+
+second_first_bullet = Bullet(50, 175, (50, 175), 24, 'Right', 10)
+second_second_bullet = Bullet(50, 175, (50, 175), 60, 'Right', 10)
+
+third_first_bullet = Bullet(50, 75, (50, 75), 48, 'Right', 10)
+third_second_bullet = Bullet(50, 75, (50, 75), 84, 'Right', 10)
 
 first_robber = Robber(25, 125, 'Right')
+second_robber = Robber(25, 175, 'Right')
+third_robber = Robber(25, 75, 'Right')
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
@@ -506,7 +519,15 @@ add_sprite(point)
 add_sprite(first_first_bullet)
 add_sprite(first_second_bullet)
 
+add_sprite(second_first_bullet)
+add_sprite(second_second_bullet)
+
+add_sprite(third_first_bullet)
+add_sprite(third_second_bullet)
+
 add_sprite(first_robber)
+add_sprite(second_robber)
+add_sprite(third_robber)
 
 # Цикл игры
 running = True
