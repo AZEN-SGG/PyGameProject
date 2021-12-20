@@ -401,7 +401,7 @@ class Key(pygame.sprite.Sprite):
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
-pygame.display.set_caption("Across The Road")
+pygame.display.set_caption("Adventure experience")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
