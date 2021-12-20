@@ -6,6 +6,8 @@ WIDTH = 750
 HEIGHT = 650
 FPS = 30  # Не трогать! На этом всё работает!
 
+number_frames = 0
+
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
@@ -155,6 +157,49 @@ class Enemy(pygame.sprite.Sprite):  # Основной класс для вра�
             self.SPEED = SPEED
 
 
+class Robber(Enemy):
+    def __init__(self, x, y, DIRECTION='Right'):
+        Enemy.__init__(self, x, y, DIRECTION)
+
+        self.image = tumbleweed_image
+        self.image.set_colorkey('white')
+        self.type = 'Robber'
+        self.status = 1
+
+    def update(self):
+        pass
+
+
+class Bullet(Enemy):
+    def __init__(self, x, y, DIRECTION='Right', SPEED=0):
+        Enemy.__init__(self, x, y, DIRECTION, SPEED)
+
+        self.image = bullet_image
+        self.image.set_colorkey('white')
+        self.type = 'Bullet'
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            faced()
+
+        elif self.DIRECTION == 'Right':
+            if self.rect.x >= WIDTH:
+                self.rect.x = where_bullet[0]
+
+            else:
+                self.rect.x += self.SPEED
+
+        elif self.DIRECTION == 'Left':
+            if self.rect.x <= 0:
+                self.rect.x = where_bullet[0]
+
+            else:
+                self.rect.x -= self.SPEED
+
+
 class Tumbleweed(Enemy):
     def __init__(self, x, y, DIRECTION='Right', SPEED=0):
         Enemy.__init__(self, x, y, DIRECTION, SPEED)
@@ -176,19 +221,19 @@ class Tumbleweed(Enemy):
         else:
             self.rect.x += self.SPEED
 
-        if 8 > self.status >= 1:
+        if 25 > self.status >= 1:
             self.image = tumbleweed_left_image
             self.image.set_colorkey('white')
 
             self.status += 1
 
-        elif 15 > self.status >= 8:
+        elif 39 > self.status >= 25:
             self.image = tumbleweed_back_image
             self.image.set_colorkey('white')
 
             self.status += 1
 
-        elif 22 >= self.status >= 15:
+        elif 63 >= self.status >= 39:
             self.image = tumbleweed_right_image
             self.image.set_colorkey('white')
 
@@ -197,6 +242,9 @@ class Tumbleweed(Enemy):
         else:
             self.image = tumbleweed_image
             self.image.set_colorkey('white')
+
+            while self.status != 88:
+                self.status += 1
 
             self.status = 1
 
@@ -256,13 +304,16 @@ class Bear(Enemy):
 
 
 class Point(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
-    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
-    def __init__(self, x, y, level: int = 1):
+    # При создании объекта класса надо задать координаты, сколько даёт денег,
+    # Есть ли ключ (Если да, то указать ключ) и уровень
+    def __init__(self, x, y, money: int = 100, HAVE_KEY=False, level: int = 1):
         pygame.sprite.Sprite.__init__(self)
+        self.HAVE_KEY = HAVE_KEY
         self.level = level
         self.hide = False  # Переменная отвечает за показывание картинки
         self.COORDINATS = (x - 25, y - 25)
         self.type = 'Point'  # Задаёт класс
+        self.money: int = money
 
         if level == 1:
             self.image = point_image
@@ -273,7 +324,7 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            get_point(self)
+            get_point(self, self.money)
 
         if self.hide:  # Если равен правде, то деньги не будут показываться
             self.image = white_image
@@ -304,6 +355,36 @@ class Score:  # Класс счёта
                                                  text_w + 10, text_h + 5), 1)
 
 
+class Key(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, x, y, money: int = 100, level: int = 1):
+        pygame.sprite.Sprite.__init__(self)
+        self.level = level
+        self.hide = False  # Переменная отвечает за показывание картинки
+        self.COORDINATS = (x - 25, y - 25)
+        self.type = 'Point'  # Задаёт класс
+        self.money: int = money
+
+        if level == 1:
+            self.image = point_image
+            self.image.set_colorkey('white')
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            get_point(self, self.money)
+
+        if self.hide:  # Если равен правде, то деньги не будут показываться
+            self.image = white_image
+            self.image.set_colorkey('white')
+
+        else:
+            self.image = point_image
+            self.image.set_colorkey('white')
+
+
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
@@ -330,25 +411,36 @@ tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_
 tumbleweed_back_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_back.png')).convert()
 tumbleweed_right_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_right.png')).convert()
 
-# Создаю восемь объектов класса перекати поел которые расположены в самом низу
-first_tumbleweed = Tumbleweed(0, HEIGHT - 175, 'Right', 6)
-first_second_tumbleweed = Tumbleweed(650, HEIGHT - 175, 'Right', 6)
-first_third_tumbleweed = Tumbleweed(50, HEIGHT - 175, 'Right', 6)
-first_fourth_tumbleweed = Tumbleweed(200, HEIGHT - 175, 'Right', 6)
-first_fifth_tumbleweed = Tumbleweed(250, HEIGHT - 175, 'Right', 6)
-first_sixth_tumbleweed = Tumbleweed(400, HEIGHT - 175, 'Right', 6)
-first_seventh_tumbleweed = Tumbleweed(450, HEIGHT - 175, 'Right', 6)
-first_eighth_tumbleweed = Tumbleweed(600, HEIGHT - 175, 'Right', 6)
+bullet_image = pygame.image.load(os.path.join(data_folder, 'bullet.png')).convert()
 
-# Создаю восемь объектов класса перекати поел которые вторые снизу
-second_tumbleweed = Tumbleweed(100, HEIGHT - 225, 'Right', 7)
-second_second_tumbleweed = Tumbleweed(750, HEIGHT - 225, 'Right', 7)
-second_third_tumbleweed = Tumbleweed(150, HEIGHT - 225, 'Right', 7)
-second_fourth_tumbleweed = Tumbleweed(300, HEIGHT - 225, 'Right', 7)
-second_fifth_tumbleweed = Tumbleweed(350, HEIGHT - 225, 'Right', 7)
-second_sixth_tumbleweed = Tumbleweed(500, HEIGHT - 225, 'Right', 7)
-second_seventh_tumbleweed = Tumbleweed(550, HEIGHT - 225, 'Right', 7)
-second_eighth_tumbleweed = Tumbleweed(700, HEIGHT - 225, 'Right', 7)
+# Создаю восемь объектов класса перекати поел которые средние
+first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
+first_second_tumbleweed = Tumbleweed(650, 375, 'Right', 6)
+first_third_tumbleweed = Tumbleweed(50, 375, 'Right', 6)
+first_fourth_tumbleweed = Tumbleweed(200, 375, 'Right', 6)
+first_fifth_tumbleweed = Tumbleweed(250, 375, 'Right', 6)
+first_sixth_tumbleweed = Tumbleweed(400, 375, 'Right', 6)
+first_seventh_tumbleweed = Tumbleweed(450, 375, 'Right', 6)
+first_eighth_tumbleweed = Tumbleweed(600, 375, 'Right', 6)
+
+# Создаю восемь объектов класса перекати поел которые самые верхние
+second_tumbleweed = Tumbleweed(100, 325, 'Right', 7)
+second_second_tumbleweed = Tumbleweed(750, 325, 'Right', 7)
+second_third_tumbleweed = Tumbleweed(150, 325, 'Right', 7)
+second_fourth_tumbleweed = Tumbleweed(300, 325, 'Right', 7)
+second_fifth_tumbleweed = Tumbleweed(350, 325, 'Right', 7)
+second_sixth_tumbleweed = Tumbleweed(500, 325, 'Right', 7)
+second_seventh_tumbleweed = Tumbleweed(550, 325, 'Right', 7)
+second_eighth_tumbleweed = Tumbleweed(700, 325, 'Right', 7)
+
+# Создаю семь объектов класса перекати поел которые самые нижние
+third_first_tumbleweed = Tumbleweed(50, 475, 'Right', 8)
+third_second_tumbleweed = Tumbleweed(100, 475, 'Right', 8)
+third_third_tumbleweed = Tumbleweed(300, 475, 'Right', 8)
+third_fourth_tumbleweed = Tumbleweed(350, 475, 'Right', 8)
+third_fifth_tumbleweed = Tumbleweed(400, 475, 'Right', 8)
+third_sixth_tumbleweed = Tumbleweed(600, 475, 'Right', 8)
+third_seventh_tumbleweed = Tumbleweed(650, 475, 'Right', 8)
 
 # Создаю изображения медведя
 bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
@@ -356,11 +448,18 @@ bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).c
 bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
 
 # Создаю объект класса медведь
-bear = Bear(0, HEIGHT - 375, 'Right')
+# bear = Bear(0, HEIGHT - 375, 'Right') Пока медведь нам не нужен
 
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
-point = Point(25, HEIGHT - 125)
+point = Point(75, 575, 500)
+
+# Эта переменная указывает куда возвращаться пулям
+where_bullet = (50, 125)
+
+# Создаю пулю
+first_first_bullet = Bullet(50, 125, 'Right', 10)
+first_second_bullet = Bullet(375, 125, 'Right', 10)
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
@@ -381,8 +480,18 @@ add_sprite(second_sixth_tumbleweed)
 add_sprite(second_seventh_tumbleweed)
 add_sprite(second_eighth_tumbleweed)
 
-add_sprite(bear)
+add_sprite(third_first_tumbleweed)
+add_sprite(third_second_tumbleweed)
+add_sprite(third_third_tumbleweed)
+add_sprite(third_fourth_tumbleweed)
+add_sprite(third_fifth_tumbleweed)
+add_sprite(third_sixth_tumbleweed)
+add_sprite(third_seventh_tumbleweed)
+
 add_sprite(point)
+
+add_sprite(first_first_bullet)
+add_sprite(first_second_bullet)
 
 # Цикл игры
 running = True
@@ -390,6 +499,7 @@ while running:
     # Держим цикл на правильной скорости
     clock.tick(FPS)
     # Ввод процесса (события)
+
     for event in pygame.event.get():
         # check for closing window
         if event.type == pygame.QUIT:
@@ -437,6 +547,8 @@ while running:
 
     if win_bool:
         win()
+
+    number_frames += 1
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
 
