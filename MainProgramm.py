@@ -62,7 +62,10 @@ def return_back():  # Победа или поражение -> возвраще
             sprites[sprite].hide = False
             score.points = '000000'
 
-        if sprites[sprite].type == 'Bullet':  # Пулька
+        elif sprites[sprite].type == 'Key':
+            sprites[sprite].hide = False
+
+        elif sprites[sprite].type == 'Bullet':  # Пулька
             sprites[sprite].delay = sprites[sprite].INITIAL_DELAY
             sprites[sprite].image = white_image
             sprites[sprite].image.set_colorkey('white')
@@ -149,6 +152,9 @@ class Player(pygame.sprite.Sprite):
 
         else:
             self.rect.x -= 50
+
+    def go_into_bush(self):
+        pass
 
 
 class Enemy(pygame.sprite.Sprite):  # Основной класс для врагов
@@ -317,24 +323,44 @@ class Bear(Enemy):
 class Point(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
     # При создании объекта класса надо задать координаты, сколько даёт денег,
     # Есть ли ключ (Если да, то указать ключ) и уровень
-    def __init__(self, x, y, money: int = 100, HAVE_KEY=False, level: int = 1):
+    def __init__(self, x, y, money: int = 100, have_key=False, status: int = 1):
         pygame.sprite.Sprite.__init__(self)
-        self.HAVE_KEY = HAVE_KEY
-        self.level = level
+        self.have_key = have_key
         self.hide = False  # Переменная отвечает за показывание картинки
         self.COORDINATS = (x - 25, y - 25)
         self.type = 'Point'  # Задаёт класс
         self.money: int = money
-        self.status = 1
+        self.status = status
 
-        if level == 1:
-            self.image = point_image
+        if self.have_key is not False:
+            self.image = white_image
             self.image.set_colorkey('white')
+
+        else:
+            if status == 1:
+                self.image = point_image
+                self.image.set_colorkey('white')
+
+            else:
+                self.image = white_image
+                self.image.set_colorkey('white')
 
         self.rect = self.image.get_rect()
         self.rect.center = x, y
 
     def update(self):
+        if self.have_key is not False:
+            if self.have_key.hide:
+                self.reaction()
+
+            else:
+                self.image = white_image
+                self.image.set_colorkey('white')
+
+        else:
+            self.reaction()
+
+    def reaction(self):
         if pygame.sprite.collide_mask(self, player):
             get_point(self, self.money)
 
@@ -370,16 +396,53 @@ class Score:  # Класс счёта
 
 class Key(pygame.sprite.Sprite):
     # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
-    def __init__(self, x, y, money: int = 100, level: int = 1):
+    def __init__(self, x, y, status: int = 1):
         pygame.sprite.Sprite.__init__(self)
-        self.level = level
         self.hide = False  # Переменная отвечает за показывание картинки
         self.COORDINATS = (x - 25, y - 25)
-        self.type = 'Point'  # Задаёт класс
-        self.money: int = money
+        self.type = 'Key'  # Задаёт класс
+        self.status = status
 
-        if level == 1:
-            self.image = point_image
+        if status == 1:
+            self.image = key_image
+            self.image.set_colorkey('white')
+
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if not self.hide:
+            if self.image == white_image:
+                if self.status == 1:
+                    self.image = key_image
+                    self.image.set_colorkey('white')
+
+            if pygame.sprite.collide_mask(self, player):
+                self.bring_key()
+
+    def bring_key(self):
+        self.hide = True
+
+        self.image = white_image
+        self.image.set_colorkey('white')
+
+
+class Hedge(pygame.sprite.Sprite):
+    # Класс переграда
+    # При создании объекта класса надо указать координаты и статус
+    # Статус - Картинка объекта
+    def __init__(self, x, y, status: int = 1):
+        pygame.sprite.Sprite.__init__(self)
+        self.status = status
+        self.COORDINATS = (x - 25, y - 25)
+        self.type = 'Hedge'  # Задаёт класс
+
+        if self.status == 1:
+            self.image = cactus_image
+            self.image.set_colorkey('white')
+
+        else:
+            self.image = thorny_bush_image
             self.image.set_colorkey('white')
 
         self.rect = self.image.get_rect()
@@ -387,18 +450,11 @@ class Key(pygame.sprite.Sprite):
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            get_point(self, self.money)
+            faced()
 
-        if self.hide:  # Если равен правде, то деньги не будут показываться
-            self.image = white_image
-            self.image.set_colorkey('white')
-
-        else:
-            self.image = point_image
-            self.image.set_colorkey('white')
+    # Создаем игру и окно
 
 
-# Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption("Adventure experience")
@@ -428,6 +484,9 @@ bullet_image = pygame.image.load(os.path.join(data_folder, 'bullet.png')).conver
 
 right_robber_image = pygame.image.load(os.path.join(data_folder, 'right_robber.png')).convert()
 left_robber_image = pygame.image.load(os.path.join(data_folder, 'left_robber.png')).convert()
+
+cactus_image = pygame.image.load(os.path.join(data_folder, 'cactus.png')).convert()
+thorny_bush_image = pygame.image.load(os.path.join(data_folder, 'thorny_bush.png')).convert()
 
 # Создаю восемь объектов класса перекати поел которые средние
 first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
@@ -466,9 +525,13 @@ bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).
 # Создаю объект класса медведь
 # bear = Bear(0, HEIGHT - 375, 'Right') Пока медведь нам не нужен
 
+key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
+key = Key(475, 25)
+
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
 point = Point(75, 575, 500)
+high_point = Point(675, 175, 1000, key)
 
 # Создаю пули
 first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 10)
@@ -483,6 +546,19 @@ third_second_bullet = Bullet(50, 75, (50, 75), 84, 'Right', 10)
 first_robber = Robber(25, 125, 'Right')
 second_robber = Robber(25, 175, 'Right')
 third_robber = Robber(25, 75, 'Right')
+
+first_cactus = Hedge(25, 525, 1)
+second_cactus = Hedge(25, 575, 1)
+third_cactus = Hedge(25, 625, 1)
+fourth_cactus = Hedge(75, 525, 1)
+fifth_cactus = Hedge(75, 625, 1)
+sixth_cactus = Hedge(125, 625, 1)
+seventh_cactus = Hedge(175, 525, 1)
+eighth_cactus = Hedge(175, 575, 1)
+ninth_cactus = Hedge(175, 625, 1)
+tenth_cactus = Hedge(225, 525, 1)
+eleventh_cactus = Hedge(225, 575, 1)
+twelvth_cactus = Hedge(225, 625, 1)
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
@@ -511,7 +587,9 @@ add_sprite(third_fifth_tumbleweed)
 add_sprite(third_sixth_tumbleweed)
 add_sprite(third_seventh_tumbleweed)
 
+add_sprite(key)
 add_sprite(point)
+add_sprite(high_point)
 
 add_sprite(first_first_bullet)
 add_sprite(first_second_bullet)
@@ -525,6 +603,19 @@ add_sprite(third_second_bullet)
 add_sprite(first_robber)
 add_sprite(second_robber)
 add_sprite(third_robber)
+
+add_sprite(first_cactus)
+add_sprite(second_cactus)
+add_sprite(third_cactus)
+add_sprite(fourth_cactus)
+add_sprite(fifth_cactus)
+add_sprite(sixth_cactus)
+add_sprite(seventh_cactus)
+add_sprite(eighth_cactus)
+add_sprite(ninth_cactus)
+add_sprite(tenth_cactus)
+add_sprite(eleventh_cactus)
+add_sprite(twelvth_cactus)
 
 # Цикл игры
 running = True
