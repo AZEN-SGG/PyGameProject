@@ -529,14 +529,22 @@ second_sixth_tumbleweed = Tumbleweed(500, 325, 'Right', 7)
 second_seventh_tumbleweed = Tumbleweed(550, 325, 'Right', 7)
 second_eighth_tumbleweed = Tumbleweed(700, 325, 'Right', 7)
 
-# Создаю семь объектов класса перекати поел которые самые нижние
-third_first_tumbleweed = Tumbleweed(50, 475, 'Right', 8)
-third_second_tumbleweed = Tumbleweed(100, 475, 'Right', 8)
-third_third_tumbleweed = Tumbleweed(300, 475, 'Right', 8)
-third_fourth_tumbleweed = Tumbleweed(350, 475, 'Right', 8)
-third_fifth_tumbleweed = Tumbleweed(400, 475, 'Right', 8)
-third_sixth_tumbleweed = Tumbleweed(600, 475, 'Right', 8)
-third_seventh_tumbleweed = Tumbleweed(650, 475, 'Right', 8)
+# Создаю семь объектов класса перекати поел которые вторые нижние
+third_first_tumbleweed = Tumbleweed(50, 475, 'Right', 9)
+third_second_tumbleweed = Tumbleweed(100, 475, 'Right', 9)
+third_third_tumbleweed = Tumbleweed(300, 475, 'Right', 9)
+third_fourth_tumbleweed = Tumbleweed(350, 475, 'Right', 9)
+third_fifth_tumbleweed = Tumbleweed(400, 475, 'Right', 9)
+third_sixth_tumbleweed = Tumbleweed(600, 475, 'Right', 9)
+third_seventh_tumbleweed = Tumbleweed(650, 475, 'Right', 9)
+
+# Создаю четыре объекта класса перекати поел которые самые нижние
+fourth_first_tumbleweed = Tumbleweed(25, 525, 'Right', 10)
+fourth_second_tumbleweed = Tumbleweed(75, 525, 'Right', 10)
+fourth_third_tumbleweed = Tumbleweed(275, 525, 'Right', 10)
+fourth_fourth_tumbleweed = Tumbleweed(325, 525, 'Right', 10)
+fourth_fifth_tumbleweed = Tumbleweed(525, 525, 'Right', 10)
+fourth_sixth_tumbleweed = Tumbleweed(575, 525, 'Right', 10)
 
 # Создаю изображения медведя
 bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
@@ -602,6 +610,13 @@ add_sprite(third_fourth_tumbleweed)
 add_sprite(third_fifth_tumbleweed)
 add_sprite(third_sixth_tumbleweed)
 add_sprite(third_seventh_tumbleweed)
+
+add_sprite(fourth_first_tumbleweed)
+add_sprite(fourth_second_tumbleweed)
+add_sprite(fourth_third_tumbleweed)
+add_sprite(fourth_fourth_tumbleweed)
+add_sprite(fourth_fifth_tumbleweed)
+add_sprite(fourth_sixth_tumbleweed)
 
 add_sprite(key)
 add_sprite(point)
