@@ -14,6 +14,8 @@ data_folder = os.path.join(game_folder, 'data')
 faced_bool = False
 win_bool = False
 
+matrix = []
+
 
 def faced():  # Отображает надпись и завершает программу
     global faced_bool
@@ -51,6 +53,12 @@ def add_sprite(sprite):  # Добавление спрайтов
     sprites.append(sprite)  # Добавляет в одну папку все спрайты
     coordinats.append(sprite.COORDINATS)  # Координаты
 
+    if sprite.type != 'Bullet' and sprite.type != 'Tumbleweed':
+        x = sprite.COORDINATS[0] // 50
+        y = sprite.COORDINATS[1] // 50
+
+        matrix[y][x] = sprite.type
+
 
 def return_back():  # Победа или поражение -> возвращение назад
     for sprite in range(len(sprites)):
@@ -83,6 +91,13 @@ def get_point(this_point, add_points: int = 100):
     score.update()
 
 
+def make_matrix():
+    for y in range(13):
+        matrix.append([])
+        for x in range(15):
+            matrix[y].append('')
+
+
 class Board:
     def render(self, screen):
         for y in range(HEIGHT):
@@ -109,52 +124,56 @@ class Player(pygame.sprite.Sprite):
             self.image = player_image
             self.image.set_colorkey('green')
 
-    def go_up(self):
-        self.status = 1
-        self.image = player_image
-        self.image.set_colorkey('green')
+    def go_into_bush(self, DIRECTION):
+        print(self.rect.x)
+        print(self.rect.y)
 
-        if self.rect.y == 0:
-            win()
+        if DIRECTION == 'Right':
+            self.status = 3
+            self.image = player_right_image
+            self.image.set_colorkey('green')
+
+            if self.rect.x >= WIDTH - 50:
+                if matrix[self.rect.y // 50][0] != 'Hedge':
+                    self.rect.x = 0
+
+            else:
+                if matrix[self.rect.y // 50][self.rect.x // 50 + 1] != 'Hedge':
+                    self.rect.x += 50
+
+        elif DIRECTION == 'Left':
+            self.status = 4
+            self.image = player_left_image
+            self.image.set_colorkey('green')
+
+            if self.rect.x <= 0:
+                if matrix[self.rect.y // 50][14] != 'Hedge':
+                    self.rect.x = WIDTH - 50
+
+            else:
+                if matrix[self.rect.y // 50][self.rect.x // 50 - 1] != 'Hedge':
+                    self.rect.x -= 50
+
+        elif DIRECTION == 'Up':
+            self.status = 1
+            self.image = player_image
+            self.image.set_colorkey('green')
+
+            if self.rect.y == 0:
+                win()
+
+            else:
+                if matrix[self.rect.y // 50 - 1][self.rect.x // 50] != 'Hedge':
+                    self.rect.y -= 50
 
         else:
-            self.rect.y -= 50
+            self.status = 2
+            self.image = player_back_image
+            self.image.set_colorkey('green')
 
-    def go_down(self):
-        self.status = 2
-        self.image = player_back_image
-        self.image.set_colorkey('green')
-
-        if self.rect.y == HEIGHT - 50:
-            pass
-
-        else:
-            self.rect.y += 50
-
-    def go_right(self):
-        self.status = 3
-        self.image = player_right_image
-        self.image.set_colorkey('green')
-
-        if self.rect.x >= WIDTH - 50:
-            self.rect.x = 0
-
-        else:
-            self.rect.x += 50
-
-    def go_left(self):
-        self.status = 4
-        self.image = player_left_image
-        self.image.set_colorkey('green')
-
-        if self.rect.x <= 0:
-            self.rect.x = WIDTH - 50
-
-        else:
-            self.rect.x -= 50
-
-    def go_into_bush(self):
-        pass
+            if self.rect.y != HEIGHT - 50:
+                if matrix[self.rect.y // 50 + 1][self.rect.x // 50] != 'Hedge':
+                    self.rect.y += 50
 
 
 class Enemy(pygame.sprite.Sprite):  # Основной класс для врагов
@@ -455,6 +474,8 @@ class Hedge(pygame.sprite.Sprite):
     # Создаем игру и окно
 
 
+make_matrix()
+
 pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption("Adventure experience")
@@ -530,7 +551,7 @@ key = Key(475, 25)
 
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
-point = Point(75, 575, 500)
+point = Point(75, 625, 500)
 high_point = Point(675, 175, 1000, key)
 
 # Создаю пули
@@ -547,16 +568,11 @@ first_robber = Robber(25, 125, 'Right')
 second_robber = Robber(25, 175, 'Right')
 third_robber = Robber(25, 75, 'Right')
 
-first_cactus = Hedge(25, 525, 1)
 second_cactus = Hedge(25, 575, 1)
 third_cactus = Hedge(25, 625, 1)
-fourth_cactus = Hedge(75, 525, 1)
-fifth_cactus = Hedge(75, 625, 1)
-sixth_cactus = Hedge(125, 625, 1)
-seventh_cactus = Hedge(175, 525, 1)
+fourth_cactus = Hedge(75, 575, 1)
 eighth_cactus = Hedge(175, 575, 1)
 ninth_cactus = Hedge(175, 625, 1)
-tenth_cactus = Hedge(225, 525, 1)
 eleventh_cactus = Hedge(225, 575, 1)
 twelvth_cactus = Hedge(225, 625, 1)
 
@@ -604,18 +620,15 @@ add_sprite(first_robber)
 add_sprite(second_robber)
 add_sprite(third_robber)
 
-add_sprite(first_cactus)
 add_sprite(second_cactus)
 add_sprite(third_cactus)
 add_sprite(fourth_cactus)
-add_sprite(fifth_cactus)
-add_sprite(sixth_cactus)
-add_sprite(seventh_cactus)
 add_sprite(eighth_cactus)
 add_sprite(ninth_cactus)
-add_sprite(tenth_cactus)
 add_sprite(eleventh_cactus)
 add_sprite(twelvth_cactus)
+
+print(matrix)
 
 # Цикл игры
 running = True
@@ -632,16 +645,16 @@ while running:
         if event.type == pygame.KEYDOWN:
             if not faced_bool and not win_bool:
                 if event.key == pygame.K_w or event.key == pygame.K_UP:
-                    player.go_up()
+                    player.go_into_bush('Up')
 
                 elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                    player.go_down()
+                    player.go_into_bush('Down')
 
                 elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    player.go_right()
+                    player.go_into_bush('Right')
 
                 elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    player.go_left()
+                    player.go_into_bush('Left')
 
             else:
                 if event.key == pygame.K_SPACE:
