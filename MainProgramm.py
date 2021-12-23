@@ -17,7 +17,7 @@ win_bool = False
 matrix = []
 
 
-def faced():  # Отображает надпись и завершает программу
+def faced(life):  # Отображает надпись и завершает программу
     global faced_bool
     faced_bool = True
 
@@ -125,9 +125,6 @@ class Player(pygame.sprite.Sprite):
             self.image.set_colorkey('green')
 
     def go_into_bush(self, DIRECTION):
-        print(self.rect.x)
-        print(self.rect.y)
-
         if DIRECTION == 'Right':
             self.status = 3
             self.image = player_right_image
@@ -210,7 +207,7 @@ class Robber(Enemy):
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            faced()
+            faced(life)
 
 
 class Bullet(Enemy):
@@ -243,7 +240,7 @@ class Bullet(Enemy):
                 self.image.set_colorkey('white')
 
             if pygame.sprite.collide_mask(self, player):
-                faced()
+                faced(life)
 
             elif self.DIRECTION == 'Right':
                 if self.rect.x >= WIDTH:
@@ -276,7 +273,7 @@ class Tumbleweed(Enemy):
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            faced()
+            faced(life)
 
         elif self.rect.x > WIDTH:
             self.rect.x = -50
@@ -299,7 +296,7 @@ class Bear(Enemy):
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            faced()
+            faced(life)
 
         elif self.DIRECTION == 'Right':
             if self.rect.x > WIDTH:
@@ -469,9 +466,38 @@ class Hedge(pygame.sprite.Sprite):
 
     def update(self):
         if pygame.sprite.collide_mask(self, player):
-            faced()
+            faced(life)
 
     # Создаем игру и окно
+
+
+class Life:
+    def __init__(self, screen, score, color=(139, 69, 19)):
+        self.type = 'Life'
+        self.screen = screen
+        self.color = color
+        self.font = pygame.font.Font(None, 45)
+
+        self.life = '3'
+        self.score = score
+
+    def update(self, color=(139, 69, 19)):  # Этот метод позволит обновлять счёт
+        if int(self.score.points) >= 1000:
+            self.score.points = str(int(self.score.points) - 1000)
+            self.life = str(int(self.life) + 1)
+
+            len_points = len(self.score.points)
+            if len_points < 6:
+                self.score.points = '0' * (6 - len_points) + self.score.points
+
+        text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
+        text_w = text.get_width()
+        text_h = text.get_height()
+        text_x = 718
+        text_y = 15
+        screen.blit(text, (text_x, text_y))
+        pygame.draw.rect(screen, (139, 69, 19), (text_x - 5, text_y - 5,
+                                                 text_w + 10, text_h + 5), 1)
 
 
 make_matrix()
@@ -495,6 +521,7 @@ player_back_image = pygame.image.load(os.path.join(data_folder, 'bigger_back_pla
 player = Player()
 
 score = Score(screen)
+life = Life(screen, score)
 
 tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
 tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
@@ -507,7 +534,6 @@ right_robber_image = pygame.image.load(os.path.join(data_folder, 'right_robber.p
 left_robber_image = pygame.image.load(os.path.join(data_folder, 'left_robber.png')).convert()
 
 cactus_image = pygame.image.load(os.path.join(data_folder, 'cactus.png')).convert()
-thorny_bush_image = pygame.image.load(os.path.join(data_folder, 'thorny_bush.png')).convert()
 
 # Создаю восемь объектов класса перекати поел которые средние
 first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
@@ -643,8 +669,6 @@ add_sprite(ninth_cactus)
 add_sprite(eleventh_cactus)
 add_sprite(twelvth_cactus)
 
-print(matrix)
-
 # Цикл игры
 running = True
 while running:
@@ -682,7 +706,7 @@ while running:
                         win()
 
                     else:
-                        faced()
+                        faced(life)
 
     # Обновление
     screen.fill((222, 184, 135))
@@ -691,11 +715,12 @@ while running:
         all_sprites.update()
 
     # Рендеринг
-    score.update()
     all_sprites.draw(screen)
+    score.update()
+    life.update()
     # Вывод клетчатого поля
     if faced_bool:
-        faced()
+        faced(life)
 
     if win_bool:
         win()
