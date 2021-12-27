@@ -608,14 +608,14 @@ point = Point(75, 625, 500)
 high_point = Point(675, 175, 1000, key)
 
 # Создаю пули
-first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 10)
-first_second_bullet = Bullet(50, 125, (50, 125), 36, 'Right', 10)
+first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 9)
+first_second_bullet = Bullet(50, 125, (50, 125), 36, 'Right', 9)
 
-second_first_bullet = Bullet(50, 175, (50, 175), 24, 'Right', 10)
-second_second_bullet = Bullet(50, 175, (50, 175), 60, 'Right', 10)
+second_first_bullet = Bullet(50, 175, (50, 175), 18, 'Right', 9)
+second_second_bullet = Bullet(50, 175, (50, 175), 54, 'Right', 9)
 
-third_first_bullet = Bullet(50, 75, (50, 75), 48, 'Right', 10)
-third_second_bullet = Bullet(50, 75, (50, 75), 84, 'Right', 10)
+third_first_bullet = Bullet(50, 75, (50, 75), 58, 'Right', 9)
+third_second_bullet = Bullet(50, 75, (50, 75), 94, 'Right', 9)
 
 first_robber = Robber(25, 125, 'Right')
 second_robber = Robber(25, 175, 'Right')
@@ -655,7 +655,6 @@ third_seventh_thirny_bush = Hedge(625, 125, 2)
 third_eight_thirny_bush = Hedge(725, 125, 2)
 
 fourth_first_thirny_bush = Hedge(175, 175, 2)
-fourth_second_thirny_bush = Hedge(425, 175, 2)
 fourth_third_thirny_bush = Hedge(625, 175, 2)
 fourth_fourth_thirny_bush = Hedge(725, 175, 2)
 
@@ -758,7 +757,6 @@ add_sprite(third_seventh_thirny_bush)
 add_sprite(third_eight_thirny_bush)
 
 add_sprite(fourth_first_thirny_bush)
-add_sprite(fourth_second_thirny_bush)
 add_sprite(fourth_third_thirny_bush)
 add_sprite(fourth_fourth_thirny_bush)
 
