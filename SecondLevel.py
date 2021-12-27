@@ -26,9 +26,6 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT - 25)
 
-        print(self.rect.y)
-        print(self.rect.x)
-
     def update(self):
         pass
 
@@ -74,7 +71,7 @@ all_sprites = pygame.sprite.Group()
 
 board = Board()
 
-player_image = pygame.image.load(os.path.join(data_folder, 'bigger_player.png')).convert()
+player_image = pygame.image.load(os.path.join(data_folder, 'aqualunger.png')).convert()
 player = Player()
 
 all_sprites.add(player)
@@ -103,14 +100,13 @@ while running:
             elif event.key == pygame.K_a:
                 player.go_left()
 
-    screen.fill((222, 184, 135))
+    screen.fill((0, 0, 139))
     # Обновление
     all_sprites.update()
 
     # Рендеринг
     all_sprites.draw(screen)
-    # Вывод клетчатого поля
-    board.render(screen)
+
 
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
