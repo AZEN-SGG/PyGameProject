@@ -11,6 +11,8 @@ number_frames = 0
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
+level = 1
+
 faced_bool = False
 win_bool = False
 
@@ -20,6 +22,10 @@ matrix = []
 def faced(life):  # Отображает надпись и завершает программу
     global faced_bool
     faced_bool = True
+
+    if level == 1:
+        life.life = '3'
+        life.score.points = '000000'
 
     font = pygame.font.Font(None, 50)
     text = font.render("Игра окончена", True, (255, 0, 0))  # Нужно дописать про пробел
@@ -53,7 +59,9 @@ def add_sprite(sprite):  # Добавление спрайтов
     sprites.append(sprite)  # Добавляет в одну папку все спрайты
     coordinats.append(sprite.COORDINATS)  # Координаты
 
-    if sprite.type != 'Bullet' and sprite.type != 'Tumbleweed':
+    type = sprite.type
+
+    if type != 'Bullet' and type != 'Tumbleweed' and type != 'Life':
         x = sprite.COORDINATS[0] // 50
         y = sprite.COORDINATS[1] // 50
 
@@ -391,7 +399,7 @@ class Point(pygame.sprite.Sprite):  # Класс очков которые ес�
 
 class Score:  # Класс счёта
     def __init__(self, screen, points: str = '000000',
-                 color=(139, 69, 19)):  # При создании объекта класса надо задать счёт и цвет очков
+                 color=(237, 28, 36)):  # При создании объекта класса надо задать счёт и цвет очков
         self.points = points  # Создаю переменную очки в которую надо записывать счёт
         self.screen = screen
         self.color = color
@@ -399,15 +407,15 @@ class Score:  # Класс счёта
         self.type = 'Score'  # Задаёт класс
         self.status = 1
 
-    def update(self, color=(139, 69, 19)):  # Этот метод позволит обновлять счёт
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.points, True, color)  # Рисую счёт - коричневый цвет
         text_w = text.get_width()
         text_h = text.get_height()
         text_x = 15
         text_y = 15
         screen.blit(text, (text_x, text_y))
-        pygame.draw.rect(screen, (139, 69, 19), (text_x - 5, text_y - 5,
-                                                 text_w + 10, text_h + 5), 1)
+        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
+                                         text_w + 10, text_h + 5), 1)
 
 
 class Key(pygame.sprite.Sprite):
@@ -471,17 +479,30 @@ class Hedge(pygame.sprite.Sprite):
     # Создаем игру и окно
 
 
-class Life:
-    def __init__(self, screen, score, color=(139, 69, 19)):
+# Класс Жизнь выводит сердце на экран и количество жизней
+class Life(pygame.sprite.Sprite):
+    # При инициализации надо указать координаты сердца, изображение сердца
+    # Экран куда выводится текст и объект счёта, также можно указать цвет текста (красный по умолчанию)
+    def __init__(self, x, y, heart, screen, score, color=(237, 28, 36)):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.COORDINATS = x - 25, y - 25
+        self.image = heart
+
+        self.image.set_colorkey("green")
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+        self.status = 1
         self.type = 'Life'
         self.screen = screen
         self.color = color
-        self.font = pygame.font.Font(None, 45)
+        self.font = pygame.font.Font(None, 55)
 
         self.life = '3'
         self.score = score
 
-    def update(self, color=(139, 69, 19)):  # Этот метод позволит обновлять счёт
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         if int(self.score.points) >= 1000:
             self.score.points = str(int(self.score.points) - 1000)
             self.life = str(int(self.life) + 1)
@@ -491,13 +512,9 @@ class Life:
                 self.score.points = '0' * (6 - len_points) + self.score.points
 
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
-        text_w = text.get_width()
-        text_h = text.get_height()
-        text_x = 718
-        text_y = 15
+        text_x = 675
+        text_y = 10
         screen.blit(text, (text_x, text_y))
-        pygame.draw.rect(screen, (139, 69, 19), (text_x - 5, text_y - 5,
-                                                 text_w + 10, text_h + 5), 1)
 
 
 make_matrix()
@@ -520,8 +537,9 @@ player_right_image = pygame.image.load(os.path.join(data_folder, 'bigger_right_p
 player_back_image = pygame.image.load(os.path.join(data_folder, 'bigger_back_player.png')).convert()
 player = Player()
 
+heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
 score = Score(screen)
-life = Life(screen, score)
+life = Life(725, 25, heart_image, screen, score)
 
 tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
 tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
@@ -534,6 +552,7 @@ right_robber_image = pygame.image.load(os.path.join(data_folder, 'right_robber.p
 left_robber_image = pygame.image.load(os.path.join(data_folder, 'left_robber.png')).convert()
 
 cactus_image = pygame.image.load(os.path.join(data_folder, 'cactus.png')).convert()
+thorny_bush_image = pygame.image.load(os.path.join(data_folder, 'thorny_bush.png')).convert()
 
 # Создаю восемь объектов класса перекати поел которые средние
 first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
@@ -573,9 +592,9 @@ fourth_fifth_tumbleweed = Tumbleweed(525, 525, 'Right', 10)
 fourth_sixth_tumbleweed = Tumbleweed(575, 525, 'Right', 10)
 
 # Создаю изображения медведя
-bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
-bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).convert()
-bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
+# bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
+# bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).convert()
+# bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
 
 # Создаю объект класса медведь
 # bear = Bear(0, HEIGHT - 375, 'Right') Пока медведь нам не нужен
@@ -609,6 +628,50 @@ eighth_cactus = Hedge(175, 575, 1)
 ninth_cactus = Hedge(175, 625, 1)
 eleventh_cactus = Hedge(225, 575, 1)
 twelvth_cactus = Hedge(225, 625, 1)
+
+first_first_thirny_bush = Hedge(25, 25, 2)
+first_second_thirny_bush = Hedge(225, 75, 2)
+first_third_thirny_bush = Hedge(325, 25, 2)
+first_fourth_thirny_bush = Hedge(525, 25, 2)
+first_fifth_thirny_bush = Hedge(575, 25, 2)
+first_sixth_thirny_bush = Hedge(625, 25, 2)
+first_seventh_thirny_bush = Hedge(675, 25, 2)
+first_eight_thirny_bush = Hedge(725, 25, 2)
+
+second_first_thirny_bush = Hedge(75, 75, 2)
+second_second_thirny_bush = Hedge(125, 75, 2)
+second_third_thirny_bush = Hedge(425, 75, 2)
+second_fourth_thirny_bush = Hedge(475, 75, 2)
+second_fifth_thirny_bush = Hedge(525, 75, 2)
+second_sixth_thirny_bush = Hedge(725, 75, 2)
+
+third_first_thirny_bush = Hedge(75, 125, 2)
+third_second_thirny_bush = Hedge(225, 25, 2)
+third_third_thirny_bush = Hedge(225, 125, 2)
+third_fourth_thirny_bush = Hedge(275, 125, 2)
+third_fifth_thirny_bush = Hedge(325, 125, 2)
+third_sixth_thirny_bush = Hedge(525, 125, 2)
+third_seventh_thirny_bush = Hedge(625, 125, 2)
+third_eight_thirny_bush = Hedge(725, 125, 2)
+
+fourth_first_thirny_bush = Hedge(175, 175, 2)
+fourth_second_thirny_bush = Hedge(425, 175, 2)
+fourth_third_thirny_bush = Hedge(625, 175, 2)
+fourth_fourth_thirny_bush = Hedge(725, 175, 2)
+
+fifth_first_thirny_bush = Hedge(25, 225, 2)
+fifth_second_thirny_bush = Hedge(125, 225, 2)
+fifth_third_thirny_bush = Hedge(175, 225, 2)
+fifth_fourth_thirny_bush = Hedge(275, 225, 2)
+fifth_fifth_thirny_bush = Hedge(325, 225, 2)
+fifth_sixth_thirny_bush = Hedge(375, 225, 2)
+fifth_seventh_thirny_bush = Hedge(425, 225, 2)
+fifth_eighth_thirny_bush = Hedge(475, 225, 2)
+fifth_ninth_thirny_bush = Hedge(525, 225, 2)
+fifth_tenth_thirny_bush = Hedge(575, 225, 2)
+fifth_eleventh_thirny_bush = Hedge(625, 225, 2)
+fifth_twelvth_thirny_bush = Hedge(675, 225, 2)
+fifth_thirteenth_thirny_bush = Hedge(725, 225, 2)
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
@@ -668,6 +731,52 @@ add_sprite(eighth_cactus)
 add_sprite(ninth_cactus)
 add_sprite(eleventh_cactus)
 add_sprite(twelvth_cactus)
+
+add_sprite(first_first_thirny_bush)
+add_sprite(first_second_thirny_bush)
+add_sprite(first_third_thirny_bush)
+add_sprite(first_fourth_thirny_bush)
+add_sprite(first_fifth_thirny_bush)
+add_sprite(first_sixth_thirny_bush)
+add_sprite(first_seventh_thirny_bush)
+add_sprite(first_eight_thirny_bush)
+
+add_sprite(second_first_thirny_bush)
+add_sprite(second_second_thirny_bush)
+add_sprite(second_third_thirny_bush)
+add_sprite(second_fourth_thirny_bush)
+add_sprite(second_fifth_thirny_bush)
+add_sprite(second_sixth_thirny_bush)
+
+add_sprite(third_first_thirny_bush)
+add_sprite(third_second_thirny_bush)
+add_sprite(third_third_thirny_bush)
+add_sprite(third_fourth_thirny_bush)
+add_sprite(third_fifth_thirny_bush)
+add_sprite(third_sixth_thirny_bush)
+add_sprite(third_seventh_thirny_bush)
+add_sprite(third_eight_thirny_bush)
+
+add_sprite(fourth_first_thirny_bush)
+add_sprite(fourth_second_thirny_bush)
+add_sprite(fourth_third_thirny_bush)
+add_sprite(fourth_fourth_thirny_bush)
+
+add_sprite(fifth_first_thirny_bush)
+add_sprite(fifth_second_thirny_bush)
+add_sprite(fifth_third_thirny_bush)
+add_sprite(fifth_fourth_thirny_bush)
+add_sprite(fifth_fifth_thirny_bush)
+add_sprite(fifth_sixth_thirny_bush)
+add_sprite(fifth_seventh_thirny_bush)
+add_sprite(fifth_eighth_thirny_bush)
+add_sprite(fifth_ninth_thirny_bush)
+add_sprite(fifth_tenth_thirny_bush)
+add_sprite(fifth_eleventh_thirny_bush)
+add_sprite(fifth_twelvth_thirny_bush)
+add_sprite(fifth_thirteenth_thirny_bush)
+
+add_sprite(life)
 
 # Цикл игры
 running = True
