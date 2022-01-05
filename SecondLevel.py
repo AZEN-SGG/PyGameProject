@@ -8,18 +8,19 @@ HEIGHT = 650
 FPS = 20
 
 all_sprites = pygame.sprite.Group()
-tiles_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
+key_group = pygame.sprite.Group()
+key_star_group = pygame.sprite.Group()
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 faced_bool = False
 key_coord = choice([[575, 75], [125, 125], [75, 525], [525, 475]])
 sea_star_coord = choice([[625, 625], [525, 625]])
-key_star_coord=choice([[575,625],[575,325],[225,75],[375,325]])
+key_star_coord = choice([[575, 625], [575, 325], [225, 75], [375, 325]])
 
 matrix = [['' for _ in range(13)] for i in range(13)]
 KEY = False
+KEY_STAR = False
 
 
 def faced():  # Отображает надпись и завершает программу
@@ -108,7 +109,7 @@ class Shark(pygame.sprite.Sprite):
         if self.status == 5:
             self.rect.y -= self.SPEED
             if self.rect.y == 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 135, 150, 5, 6)
+                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 150, 150, 5, 6)
         if self.status == 6:
             self.rect.x += self.SPEED
             if self.rect.x == 400:
@@ -177,7 +178,7 @@ class Star(pygame.sprite.Sprite):
         score.add_points(1000)
 
     def change_hide(self):
-        self.hide=False
+        self.hide = False
         self.image = star_image
         self.image.set_colorkey('green')
 
@@ -216,7 +217,7 @@ class Board:
         for y in range(HEIGHT // 50):
             for x in range(WIDTH // 50):
                 # if not (abs(y - j) <= 1 and abs(x - i) <= 1):
-                # pygame.draw.rect(screen, 'black',(x * 50, y * 50, 50, 50))
+                #   pygame.draw.rect(screen, 'black',(x * 50, y * 50, 50, 50))
                 pygame.draw.rect(screen, 'white',
                                  (x * 50, y * 50, 50, 50), 1)
 
@@ -268,6 +269,8 @@ class KeyStar(pygame.sprite.Sprite):
             self.bring_key()
 
     def bring_key(self):
+        global KEY_STAR
+        KEY_STAR = True
         self.hide = True
 
         self.rect.x = 475
@@ -275,7 +278,6 @@ class KeyStar(pygame.sprite.Sprite):
         star.change_hide()
         star1.change_hide()
         star2.change_hide()
-
 
 
 class Door(pygame.sprite.Sprite):
@@ -353,6 +355,30 @@ class Player(pygame.sprite.Sprite):
                 self.rect.x -= 50
 
 
+class Life(pygame.sprite.Sprite):
+
+    def __init__(self, screen, color=(237, 28, 36)):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.COORDINATS = 575,  25
+        self.image = heart_image
+        self.image.set_colorkey("green")
+        self.rect = self.image.get_rect()
+        self.rect.center = 625,25
+
+        self.screen = screen
+        self.color = color
+        self.font = pygame.font.Font(None, 55)
+
+        self.life = '3'
+
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
+        text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
+        text_x = 575
+        text_y = 10
+        screen.blit(text, (text_x, text_y))
+
+
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
@@ -370,6 +396,11 @@ white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert(
 
 board = Board()
 
+heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
+life = Life(screen, score)
+
+all_sprites.add(life)
+
 opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
 closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
 door = Door(325, 275)
@@ -386,14 +417,15 @@ all_sprites.add(sea_star3)
 all_sprites.add(sea_star4)
 
 key_star_image = pygame.image.load(os.path.join(data_folder, 'key_star.png')).convert()
-key_star = KeyStar(key_star_coord[0],key_star_coord[1])
+key_star = KeyStar(key_star_coord[0], key_star_coord[1])
 
 all_sprites.add(key_star)
+key_star_group.add(key_star)
 
 star_image = pygame.image.load(os.path.join(data_folder, 'stars.png')).convert()
 star = Star(75, 425)
-star1=Star(425,525)
-star2=Star(225,275)
+star1 = Star(425, 525)
+star2 = Star(225, 275)
 
 all_sprites.add(star)
 all_sprites.add(star1)
@@ -401,7 +433,6 @@ all_sprites.add(star2)
 
 key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
 key = Key(key_coord[0], key_coord[1])
-
 
 player_image = pygame.image.load(os.path.join(data_folder, 'aqualunger.png')).convert()
 player_left_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_left.png')).convert()
@@ -411,6 +442,8 @@ player = Player()
 
 all_sprites.add(player)
 all_sprites.add(key)
+key_group.add(key)
+
 shark1 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 475, 7, 3)
 shark2 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 80, 7, 1)
 shark3 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 500, 7, 1)
@@ -461,7 +494,7 @@ coral35 = Coral(75, 275)
 coral36 = Coral(75, 125)
 coral37 = Coral(125, 75)
 coral38 = Coral(325, 125)
-coral39=Coral(375,275)
+coral39 = Coral(375, 275)
 
 all_sprites.add(coral1)
 all_sprites.add(coral2)
@@ -514,27 +547,36 @@ while running:
         # check for closing window
         if event.type == pygame.QUIT:
             running = False
+        if not faced_bool:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    player.go_up()
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                player.go_up()
+                elif event.key == pygame.K_s:
+                    player.go_down()
 
-            elif event.key == pygame.K_s:
-                player.go_down()
+                elif event.key == pygame.K_d:
+                    player.go_right()
 
-            elif event.key == pygame.K_d:
-                player.go_right()
+                elif event.key == pygame.K_a:
+                    player.go_left()
+        else:
+            if event.key == pygame.K_SPACE:
+                return_back()
+                faced_bool = False
 
-            elif event.key == pygame.K_a:
-                player.go_left()
 
     screen.fill((0, 0, 139))
     # Обновление
     if not faced_bool:
         all_sprites.update()
     all_sprites.draw(screen)
-    score.update()
     board.render(screen, player.get_rects())
+    score.update()
+    if KEY:
+        key_group.draw(screen)
+    if KEY_STAR:
+        key_star_group.draw(screen)
     if faced_bool:
         faced()
     # После отрисовки всего, переворачиваем экран
