@@ -290,60 +290,6 @@ class Tumbleweed(Enemy):
             self.rect.x += self.SPEED
 
 
-class Bear(Enemy):
-    def __init__(self, x, y,
-                 DIRECTION='Right',
-                 SPEED=0):  # При создании объекта класса, надо указать координаты и направление спрайта
-        Enemy.__init__(self, x, y, DIRECTION, SPEED)
-        self.image = bear_stand_image
-        self.image.set_colorkey('white')
-        self.type = 'Bear'  # Задаёт класс
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if pygame.sprite.collide_mask(self, player):
-            faced(life)
-
-        elif self.DIRECTION == 'Right':
-            if self.rect.x > WIDTH:
-                self.rect.x = -100
-
-            else:
-                self.bear_go()
-                self.rect.x += self.SPEED
-
-        else:
-            if self.rect.x < -100:
-                self.rect.x = WIDTH + 50
-
-            else:
-                self.bear_go()
-                self.rect.x -= self.SPEED
-
-    def bear_go(self):
-        if self.status == 1:
-            self.image = bear_go_image
-            self.image.set_colorkey('white')
-            self.status = 2
-
-        elif self.status == 2:
-            self.image = bear_stand_image
-            self.image.set_colorkey('white')
-            self.status = 3
-
-        elif self.status == 3:
-            self.image = bear_back_image
-            self.image.set_colorkey('white')
-            self.status = 4
-
-        else:
-            self.image = bear_stand_image
-            self.image.set_colorkey('white')
-            self.status = 1
-
-
 class Point(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
     # При создании объекта класса надо задать координаты, сколько даёт денег,
     # Есть ли ключ (Если да, то указать ключ) и уровень
@@ -591,21 +537,13 @@ fourth_fourth_tumbleweed = Tumbleweed(325, 525, 'Right', 10)
 fourth_fifth_tumbleweed = Tumbleweed(525, 525, 'Right', 10)
 fourth_sixth_tumbleweed = Tumbleweed(575, 525, 'Right', 10)
 
-# Создаю изображения медведя
-# bear_stand_image = pygame.image.load(os.path.join(data_folder, 'bear_go.png')).convert()
-# bear_go_image = pygame.image.load(os.path.join(data_folder, 'bear_stand.png')).convert()
-# bear_back_image = pygame.image.load(os.path.join(data_folder, 'bear_back.png')).convert()
-
-# Создаю объект класса медведь
-# bear = Bear(0, HEIGHT - 375, 'Right') Пока медведь нам не нужен
-
 key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
 key = Key(475, 25)
 
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
 point = Point(75, 625, 500)
-high_point = Point(675, 175, 1000, key)
+high_point = Point(675, 175, 4500, key)
 
 # Создаю пули
 first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 9)
@@ -671,6 +609,8 @@ fifth_tenth_thirny_bush = Hedge(575, 225, 2)
 fifth_eleventh_thirny_bush = Hedge(625, 225, 2)
 fifth_twelvth_thirny_bush = Hedge(675, 225, 2)
 fifth_thirteenth_thirny_bush = Hedge(725, 225, 2)
+
+# Добавляю все спрайты
 
 add_sprite(player)
 add_sprite(first_tumbleweed)
