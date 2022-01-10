@@ -55,7 +55,7 @@ def return_back():
     player.reloaded()
     key.reloaded()
     key_star.reloaded()
-    if life.give_life() < 0:
+    if life.give_life() < 0 or win_bool:
         score.discharge()
         life.alive()
         star.status_collected()
