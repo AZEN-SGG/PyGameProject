@@ -644,53 +644,59 @@ all_sprites.add(coral39)
 all_sprites.add(door)
 # Цикл игры
 running = True
-while running:
-    # Держим цикл на правильной скорости
-    clock.tick(FPS)
-    # Ввод процесса (события)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if not faced_bool and not win_bool:
-                if event.key == pygame.K_w or event.key == pygame.K_UP:
-                    player.go_up()
 
-                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                    player.go_down()
 
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    player.go_right()
+def second_level(running):
+    global KEY
+    global KEY_STAR
+    global faced_bool
+    global win_bool
 
-                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    player.go_left()
-            else:
-                if event.key == pygame.K_SPACE:
-                    return_back()
-                    faced_bool = False
-                    win_bool=False
-                    KEY_STAR = False
-                    KEY = False
+    while running:
+        # Держим цикл на правильной скорости
+        clock.tick(FPS)
+        # Ввод процесса (события)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if not faced_bool and not win_bool:
+                    if event.key == pygame.K_w or event.key == pygame.K_UP:
+                        player.go_up()
 
-    screen.fill((0, 0, 139))
-    # Обновление
-    if not faced_bool and not win_bool:
-        all_sprites.update()
-    all_sprites.draw(screen)
-    board.render(screen, player.get_rects())
-    score.update()
-    life_group.update()
-    life_group.draw(screen)
-    if KEY:
-        key_group.draw(screen)
-    if KEY_STAR:
-        key_star_group.draw(screen)
-    if faced_bool:
-        faced()
-    if win_bool:
-        win()
-    # После отрисовки всего, переворачиваем экран
-    pygame.display.flip()
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        player.go_down()
 
-pygame.quit()
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        player.go_right()
+
+                    elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        player.go_left()
+                else:
+                    if event.key == pygame.K_SPACE:
+                        return_back()
+                        faced_bool = False
+                        win_bool = False
+                        KEY_STAR = False
+                        KEY = False
+
+        screen.fill((0, 0, 139))
+        # Обновление
+        if not faced_bool and not win_bool:
+            all_sprites.update()
+        all_sprites.draw(screen)
+        board.render(screen, player.get_rects())
+        score.update()
+        life_group.update()
+        life_group.draw(screen)
+        if KEY:
+            key_group.draw(screen)
+        if KEY_STAR:
+            key_star_group.draw(screen)
+        if faced_bool:
+            faced()
+        if win_bool:
+            win()
+        # После отрисовки всего, переворачиваем экран
+        pygame.display.flip()
