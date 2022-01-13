@@ -485,7 +485,7 @@ class Life(pygame.sprite.Sprite):
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
-pygame.display.set_caption("Across The Road")
+pygame.display.set_caption("Adventure experience")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -673,6 +673,9 @@ def second_level(running):
 
                     elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                         player.go_left()
+                elif win_bool:
+                    if event.key == pygame.K_SPACE:
+                        running=False
                 else:
                     if event.key == pygame.K_SPACE:
                         return_back()
