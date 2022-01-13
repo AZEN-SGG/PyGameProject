@@ -2,7 +2,7 @@ import pygame
 import random
 import os
 
-WIDTH = 750
+WIDTH = 650
 HEIGHT = 650
 FPS = 30  # Не трогать! На этом всё работает!
 
@@ -513,7 +513,7 @@ class Life(pygame.sprite.Sprite):
                 self.score.points = '0' * (6 - len_points) + self.score.points
 
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
-        text_x = 675
+        text_x = 575
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
@@ -540,7 +540,7 @@ player = Player()
 
 heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
 score = Score(screen)
-life = Life(725, 25, heart_image, screen, score)
+life = Life(625, 25, heart_image, screen, score)
 
 life_group.add(life)
 
@@ -847,4 +847,3 @@ def first_level(running):
         number_frames += 1
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
-first_level(True)
