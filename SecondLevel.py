@@ -7,6 +7,7 @@ WIDTH = 650
 HEIGHT = 650
 FPS = 20
 
+#Создание групп спрайтов
 all_sprites = pygame.sprite.Group()
 key_group = pygame.sprite.Group()
 key_star_group = pygame.sprite.Group()
@@ -25,12 +26,12 @@ KEY = False
 KEY_STAR = False
 
 
-def win():
+def win(): #функция победы
     global win_bool  # переменная отвечающая за работоспособность спрайтов
     win_bool = True  # При win_bool равном правде все спрайты останавливаются
 
     font = pygame.font.Font(None, 50)
-    text = font.render("Вы выиграли", True, 'white')  # Нужно дописать про пробел
+    text = font.render("Вы выиграли", True, 'white')
     text_x = WIDTH // 2 - text.get_width() // 2
     text_y = HEIGHT // 2 - text.get_height() // 2
     text_w = text.get_width()
@@ -40,7 +41,7 @@ def win():
     screen.blit(text, (text_x, text_y))
 
 
-def return_back():
+def return_back(): #Возвращение спрайтов на исходные позиции
     life.take_away_life()
     shark1.reloaded()
     shark2.reloaded()
@@ -55,7 +56,7 @@ def return_back():
     player.reloaded()
     key.reloaded()
     key_star.reloaded()
-    if life.give_life() < 0 or win_bool:
+    if life.give_life() < 0: # Обнуление очков при нехватке жизней
         score.discharge()
         life.alive()
         star.status_collected()
@@ -74,12 +75,12 @@ def return_back():
     sea_star4.reloaded()
 
 
-def faced():  # Отображает надпись и завершает программу
+def faced():  # Игрок проиграл, отображение надписи
     global faced_bool
     faced_bool = True
 
     font = pygame.font.Font(None, 50)
-    text = font.render("Игра окончена", True, 'white')  # Нужно дописать про пробел
+    text = font.render("Игра окончена", True, 'white')
     text_x = WIDTH // 2 - text.get_width() // 2
     text_y = HEIGHT // 2 - text.get_height() // 2
     text_w = text.get_width()
@@ -89,7 +90,7 @@ def faced():  # Отображает надпись и завершает про
     screen.blit(text, (text_x, text_y))
 
 
-def load_image(name, color_key=None):
+def load_image(name, color_key=None): # Функция для получения фотографий
     fullname = os.path.join(name)
     try:
         image = pygame.image.load(fullname).convert()
@@ -106,17 +107,7 @@ def load_image(name, color_key=None):
     return image
 
 
-def load_level(filename):
-    filename = filename
-    with open(filename, 'r') as mapFile:
-        level_map = [line.strip() for line in mapFile]
-
-    max_width = max(map(len, level_map))
-
-    return list(map(lambda x: x.ljust(max_width, '.'), level_map))
-
-
-class Shark(pygame.sprite.Sprite):
+class Shark(pygame.sprite.Sprite): #Класс акулы
     def __init__(self, sheet, columns, rows, x, y, SPEED, status):
         super().__init__(all_sprites)
         self.frames = []
@@ -129,7 +120,7 @@ class Shark(pygame.sprite.Sprite):
         self.status = status
         self.spi = [sheet, columns, rows, x, y, SPEED, status]
 
-    def cut_sheet(self, sheet, columns, rows):
+    def cut_sheet(self, sheet, columns, rows): #получение изображения
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         for j in range(rows):
@@ -138,7 +129,7 @@ class Shark(pygame.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
 
-    def update(self):
+    def update(self): #движение акул, изменение изображения
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('red')
@@ -177,11 +168,11 @@ class Shark(pygame.sprite.Sprite):
         if pygame.sprite.collide_mask(self, player):
             faced()
 
-    def reloaded(self):
+    def reloaded(self): #возвращение на исходную позицию
         self.__init__(*self.spi)
 
 
-class SeaStar(pygame.sprite.Sprite):
+class SeaStar(pygame.sprite.Sprite): #Класс морской звезды (очки)
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = sea_star_image
@@ -201,7 +192,7 @@ class SeaStar(pygame.sprite.Sprite):
                 self.adding_points()
                 self.collected = True
 
-    def adding_points(self):
+    def adding_points(self): #добавление очков
         self.hide = True
         self.collected = True
 
@@ -217,7 +208,7 @@ class SeaStar(pygame.sprite.Sprite):
         self.collected = False
 
 
-class Star(pygame.sprite.Sprite):
+class Star(pygame.sprite.Sprite): #Класс звезды
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = white_image
@@ -236,7 +227,7 @@ class Star(pygame.sprite.Sprite):
             if pygame.sprite.collide_mask(self, player):
                 self.adding_points()
 
-    def adding_points(self):
+    def adding_points(self): #добавление очков
         self.hide = True
         self.collected = True
 

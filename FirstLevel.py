@@ -18,6 +18,7 @@ win_bool = False
 
 matrix = []
 
+life_group = pygame.sprite.Group()
 
 def faced(life):  # Отображает надпись и завершает программу
     global faced_bool
@@ -541,6 +542,8 @@ heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert(
 score = Score(screen)
 life = Life(725, 25, heart_image, screen, score)
 
+life_group.add(life)
+
 tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
 tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
 tumbleweed_back_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_back.png')).convert()
@@ -832,7 +835,8 @@ def first_level(running):
         # Рендеринг
         all_sprites.draw(screen)
         score.update()
-        life.update()
+        life_group.update()
+        life_group.draw(screen)
         # Вывод клетчатого поля
         if faced_bool:
             faced(life)
@@ -843,3 +847,4 @@ def first_level(running):
         number_frames += 1
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
+first_level(True)
