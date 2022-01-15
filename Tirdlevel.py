@@ -1,13 +1,16 @@
 import pygame
 import os
+from random import choice
 
 WIDTH = 750
 HEIGHT = 650
 FPS = 10
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
+boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
 
 matrix = [['' for _ in range(15)] for i in range(13)]
+BOILER = False
 
 
 def load_image(name, color_key=None):  # Функция для получения фотографий
@@ -236,6 +239,71 @@ class Hide_Flame(pygame.sprite.Sprite):
             self.image.set_colorkey('white')
 
 
+class Potion(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = potion_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+        self.hide = False
+        self.collected = False
+
+    def update(self):
+        if not self.hide:
+            if self.image == white_image:
+                self.image = potion_image
+                self.image.set_colorkey('white')
+
+            if pygame.sprite.collide_mask(self, player):
+                self.adding_points()
+                self.collected = True
+
+    def adding_points(self):  # добавление очков
+        self.hide = True
+        self.collected = True
+
+        self.image = white_image
+        self.image.set_colorkey('white')
+        # score.add_points(500)
+
+    def reloaded(self):
+        if not self.collected:
+            self.hide = False
+
+    def status_collected(self):
+        self.collected = False
+
+
+class Boiler(pygame.sprite.Sprite):
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, coord):
+        x, y = coord[0], coord[1]
+        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
+        self.image = boiler_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            self.bring_boiler()
+
+    def bring_boiler(self):
+        global BOILER
+        BOILER = True
+
+        self.rect.x = 575
+        self.rect.y = 0
+        # potion1.change_hide()
+        # potion2.change_hide()
+        # potion3.change_hide()
+
+    def reloaded(self):
+        global boiler_coord
+        self.__init__(choice(boiler_coord))
+
+
 pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption("Across The Road")
@@ -320,6 +388,14 @@ flame62 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 225, 325)
 
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()
 
+potion_image = pygame.image.load(os.path.join(data_folder, 'zelye.png')).convert()
+potion1 = Potion(25, 425)
+potion2 = Potion(725, 125)
+potion3 = Potion(425, 325)
+
+boiler_image = pygame.image.load(os.path.join(data_folder, 'boiler.png')).convert()
+boiler = Boiler(choice(boiler_coord))
+
 all_sprites.add(player)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
@@ -383,6 +459,10 @@ all_sprites.add(flame59)
 all_sprites.add(flame60)
 all_sprites.add(flame61)
 all_sprites.add(flame62)
+all_sprites.add(potion1)
+all_sprites.add(potion2)
+all_sprites.add(potion3)
+all_sprites.add(boiler)
 
 # Цикл игрыall_sprites.add(flame1)
 running = True
