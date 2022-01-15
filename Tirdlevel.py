@@ -40,12 +40,9 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_image
         self.image.set_colorkey('white')
-        self.image.set_colorkey('white')
 
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT - 25)
-        print(self.rect.y)
-        print(self.rect.x)
 
     def update(self):
         pass
@@ -57,7 +54,24 @@ class Player(pygame.sprite.Sprite):
             pass
         else:
             y = (self.rect.y - 50) // 50
-            if matrix[y][self.rect.x // 50] != 'Flame':
+            if matrix[y][self.rect.x // 50] == 'HideFlame':
+                flame48.show()
+                flame49.show()
+                flame50.show()
+                flame51.show()
+                flame52.show()
+                flame53.show()
+                flame54.show()
+                flame55.show()
+                flame56.show()
+                flame57.show()
+                flame58.show()
+                flame59.show()
+                flame60.show()
+                flame61.show()
+                flame62.show()
+                self.rect.y -= 50
+            elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y -= 50
 
     def go_down(self):
@@ -67,7 +81,24 @@ class Player(pygame.sprite.Sprite):
             pass
         else:
             y = (self.rect.y + 50) // 50
-            if matrix[y][self.rect.x // 50] != 'Flame':
+            if matrix[y][self.rect.x // 50] == 'HideFlame':
+                flame48.show()
+                flame49.show()
+                flame50.show()
+                flame51.show()
+                flame52.show()
+                flame53.show()
+                flame54.show()
+                flame55.show()
+                flame56.show()
+                flame57.show()
+                flame58.show()
+                flame59.show()
+                flame60.show()
+                flame61.show()
+                flame62.show()
+                self.rect.y += 50
+            elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y += 50
 
     def go_right(self):
@@ -76,10 +107,26 @@ class Player(pygame.sprite.Sprite):
         if self.rect.x == WIDTH - 50:
             if matrix[self.rect.y // 50][0] != 'Flame':
                 self.rect.x = 0
-
         else:
             x = (self.rect.x + 50) // 50
-            if matrix[self.rect.y // 50][x] != 'Flame':
+            if matrix[self.rect.y // 50][x] == 'HideFlame':
+                flame48.show()
+                flame49.show()
+                flame50.show()
+                flame51.show()
+                flame52.show()
+                flame53.show()
+                flame54.show()
+                flame55.show()
+                flame56.show()
+                flame57.show()
+                flame58.show()
+                flame59.show()
+                flame60.show()
+                flame61.show()
+                flame62.show()
+                self.rect.x += 50
+            elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x += 50
 
     def go_left(self):
@@ -87,10 +134,26 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.x == 0:
             self.rect.x = WIDTH - 50
-
         else:
             x = (self.rect.x - 50) // 50
-            if matrix[self.rect.y // 50][x] != 'Flame':
+            if matrix[self.rect.y // 50][x] == 'HideFlame':
+                flame48.show()
+                flame49.show()
+                flame50.show()
+                flame51.show()
+                flame52.show()
+                flame53.show()
+                flame54.show()
+                flame55.show()
+                flame56.show()
+                flame57.show()
+                flame58.show()
+                flame59.show()
+                flame60.show()
+                flame61.show()
+                flame62.show()
+                self.rect.x -= 50
+            elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x -= 50
 
 
@@ -124,7 +187,7 @@ class Flame(pygame.sprite.Sprite):
 class Hide_Flame(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y):
         super().__init__(all_sprites)
-        matrix[y // 50][x // 50] = 'Flame'
+        matrix[y // 50][x // 50] = 'HideFlame'
         self.frames = []
         self.cur_frame = 0
         self.cut_sheet(sheet, columns, rows)
@@ -147,6 +210,28 @@ class Hide_Flame(pygame.sprite.Sprite):
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('white')
+
+    def show(self):
+        if player.rect.center == self.rect.centerx - 50:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center == self.rect.centerx + 50:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center == self.rect.centery + 50:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center == self.rect.centery - 50:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        else:
+            self.hide = False
+            self.image = self.frames[self.cur_frame]
+            self.image.set_colorkey('white')
 
 
 pygame.init()
@@ -231,6 +316,8 @@ flame60 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 325, 375)
 flame61 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 275, 375)
 flame62 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 225, 325)
 
+white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()
+
 all_sprites.add(player)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
@@ -294,7 +381,6 @@ all_sprites.add(flame59)
 all_sprites.add(flame60)
 all_sprites.add(flame61)
 all_sprites.add(flame62)
-
 
 # Цикл игрыall_sprites.add(flame1)
 running = True
