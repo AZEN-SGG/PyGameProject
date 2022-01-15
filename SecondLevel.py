@@ -500,6 +500,8 @@ opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.p
 closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
 door = Door(375, 275)
 
+all_sprites.add(door)
+
 sea_star_image = pygame.image.load(os.path.join(data_folder, 'sea_star.png')).convert()
 sea_star1 = SeaStar(sea_star_coord[0], sea_star_coord[1])
 sea_star2 = SeaStar(625, 225)
@@ -657,7 +659,7 @@ all_sprites.add(coral50)
 all_sprites.add(coral51)
 all_sprites.add(coral52)
 
-all_sprites.add(door)
+
 # Цикл игры
 running = True
 
