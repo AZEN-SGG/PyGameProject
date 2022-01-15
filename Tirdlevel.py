@@ -55,21 +55,21 @@ class Player(pygame.sprite.Sprite):
         else:
             y = (self.rect.y - 50) // 50
             if matrix[y][self.rect.x // 50] == 'HideFlame':
-                flame48.show()
-                flame49.show()
-                flame50.show()
-                flame51.show()
-                flame52.show()
-                flame53.show()
-                flame54.show()
-                flame55.show()
-                flame56.show()
-                flame57.show()
-                flame58.show()
-                flame59.show()
-                flame60.show()
-                flame61.show()
-                flame62.show()
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
                 self.rect.y -= 50
             elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y -= 50
@@ -82,21 +82,21 @@ class Player(pygame.sprite.Sprite):
         else:
             y = (self.rect.y + 50) // 50
             if matrix[y][self.rect.x // 50] == 'HideFlame':
-                flame48.show()
-                flame49.show()
-                flame50.show()
-                flame51.show()
-                flame52.show()
-                flame53.show()
-                flame54.show()
-                flame55.show()
-                flame56.show()
-                flame57.show()
-                flame58.show()
-                flame59.show()
-                flame60.show()
-                flame61.show()
-                flame62.show()
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
                 self.rect.y += 50
             elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y += 50
@@ -110,21 +110,21 @@ class Player(pygame.sprite.Sprite):
         else:
             x = (self.rect.x + 50) // 50
             if matrix[self.rect.y // 50][x] == 'HideFlame':
-                flame48.show()
-                flame49.show()
-                flame50.show()
-                flame51.show()
-                flame52.show()
-                flame53.show()
-                flame54.show()
-                flame55.show()
-                flame56.show()
-                flame57.show()
-                flame58.show()
-                flame59.show()
-                flame60.show()
-                flame61.show()
-                flame62.show()
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
                 self.rect.x += 50
             elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x += 50
@@ -137,21 +137,21 @@ class Player(pygame.sprite.Sprite):
         else:
             x = (self.rect.x - 50) // 50
             if matrix[self.rect.y // 50][x] == 'HideFlame':
-                flame48.show()
-                flame49.show()
-                flame50.show()
-                flame51.show()
-                flame52.show()
-                flame53.show()
-                flame54.show()
-                flame55.show()
-                flame56.show()
-                flame57.show()
-                flame58.show()
-                flame59.show()
-                flame60.show()
-                flame61.show()
-                flame62.show()
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
                 self.rect.x -= 50
             elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x -= 50
@@ -210,21 +210,23 @@ class Hide_Flame(pygame.sprite.Sprite):
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('white')
-
-    def show(self):
-        if player.rect.center == self.rect.centerx - 50:
+        if player.rect.center[0] == self.rect.centerx - 50 and player.rect.center[1] == self.rect.centery:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-        elif player.rect.center == self.rect.centerx + 50:
+        elif player.rect.center[0] == self.rect.centerx + 50 and player.rect.center[1] == self.rect.centery:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-        elif player.rect.center == self.rect.centery + 50:
+        elif player.rect.center[1] == self.rect.centery + 50 and player.rect.center[0] == self.rect.centerx:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-        elif player.rect.center == self.rect.centery - 50:
+        elif player.rect.center[1] == self.rect.centery - 50 and player.rect.center[0] == self.rect.centerx:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center == self.rect.center:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
@@ -393,13 +395,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
+            if event.key == pygame.K_w or event.key == pygame.K_UP:
                 player.go_up()
-            elif event.key == pygame.K_s:
+
+            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 player.go_down()
-            elif event.key == pygame.K_d:
+
+            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 player.go_right()
-            elif event.key == pygame.K_a:
+
+            elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                 player.go_left()
     screen.fill((123, 34, 52))
     # Обновление
