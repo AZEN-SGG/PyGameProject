@@ -2,7 +2,7 @@ import pygame
 import random
 import os
 
-WIDTH = 750
+WIDTH = 650
 HEIGHT = 650
 FPS = 30  # Не трогать! На этом всё работает!
 
@@ -18,6 +18,7 @@ win_bool = False
 
 matrix = []
 
+life_group = pygame.sprite.Group()
 
 def faced(life):  # Отображает надпись и завершает программу
     global faced_bool
@@ -458,7 +459,7 @@ class Life(pygame.sprite.Sprite):
                 self.score.points = '0' * (6 - len_points) + self.score.points
 
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
-        text_x = 675
+        text_x = 575
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
@@ -485,7 +486,9 @@ player = Player()
 
 heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
 score = Score(screen)
-life = Life(725, 25, heart_image, screen, score)
+life = Life(625, 25, heart_image, screen, score)
+
+life_group.add(life)
 
 tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
 tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
@@ -717,63 +720,70 @@ add_sprite(fifth_thirteenth_thirny_bush)
 add_sprite(life)
 
 # Цикл игры
-running = True
-while running:
-    # Держим цикл на правильной скорости
-    clock.tick(FPS)
-    # Ввод процесса (события)
+running = False
 
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
 
-        if event.type == pygame.KEYDOWN:
-            if not faced_bool and not win_bool:
-                if event.key == pygame.K_w or event.key == pygame.K_UP:
-                    player.go_into_bush('Up')
+def first_level(running):
+    global faced_bool
+    global life
+    global win_bool
+    global number_frames
 
-                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                    player.go_into_bush('Down')
+    while running:
+        # Держим цикл на правильной скорости
+        clock.tick(FPS)
+        # Ввод процесса (события)
 
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    player.go_into_bush('Right')
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
 
-                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    player.go_into_bush('Left')
+            if event.type == pygame.KEYDOWN:
+                if not faced_bool and not win_bool:
+                    if event.key == pygame.K_w or event.key == pygame.K_UP:
+                        player.go_into_bush('Up')
 
-            else:
-                if event.key == pygame.K_SPACE:
-                    return_back()
-                    faced_bool = False
-                    win_bool = False
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        player.go_into_bush('Down')
+
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        player.go_into_bush('Right')
+
+                    elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        player.go_into_bush('Left')
 
                 else:
-                    if win_bool:
-                        win()
+                    if event.key == pygame.K_SPACE:
+                        return_back()
+                        faced_bool = False
+                        win_bool = False
 
                     else:
-                        faced(life)
+                        if win_bool:
+                            win()
 
-    # Обновление
-    screen.fill((222, 184, 135))
+                        else:
+                            faced(life)
 
-    if not faced_bool and not win_bool:
-        all_sprites.update()
+        # Обновление
+        screen.fill((222, 184, 135))
 
-    # Рендеринг
-    all_sprites.draw(screen)
-    score.update()
-    life.update()
-    # Вывод клетчатого поля
-    if faced_bool:
-        faced(life)
+        if not faced_bool and not win_bool:
+            all_sprites.update()
 
-    if win_bool:
-        win()
+        # Рендеринг
+        all_sprites.draw(screen)
+        score.update()
+        life_group.update()
+        life_group.draw(screen)
+        # Вывод клетчатого поля
+        if faced_bool:
+            faced(life)
 
-    number_frames += 1
-    # После отрисовки всего, переворачиваем экран
-    pygame.display.flip()
+        if win_bool:
+            win()
 
-pygame.quit()
+        number_frames += 1
+        # После отрисовки всего, переворачиваем экран
+        pygame.display.flip()
