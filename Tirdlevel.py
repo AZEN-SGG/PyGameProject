@@ -77,7 +77,7 @@ class Player(pygame.sprite.Sprite):
 
 class Flame(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__(all_sprites)
         matrix[y // 50][x // 50] = 'Flame'
         self.frames = []
         self.cur_frame = 0
@@ -95,6 +95,10 @@ class Flame(pygame.sprite.Sprite):
                 frame_location = (self.rect.w * i, self.rect.h * j)
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('white')
 
 
 pygame.init()
@@ -108,7 +112,6 @@ board = Board()
 player_image = pygame.image.load(os.path.join(data_folder, 'shlapa.png')).convert()
 player = Player()
 
-flame_image = pygame.image.load(os.path.join(data_folder, 'flame.png')).convert()
 flame1 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 75)
 
 all_sprites.add(player)
