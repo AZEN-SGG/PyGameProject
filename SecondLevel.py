@@ -1,96 +1,19 @@
 import pygame
 import os
-import sys
 from random import choice
 
 WIDTH = 750
 HEIGHT = 650
-FPS = 20
-
-# Создание групп спрайтов
-all_sprites = pygame.sprite.Group()
-key_group = pygame.sprite.Group()
-key_star_group = pygame.sprite.Group()
-life_group = pygame.sprite.Group()
+FPS = 10
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
-
-faced_bool = False
-win_bool = False
-stop_bool = False
-
-key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
-sea_star_coord = choice([[625, 625], [725, 625]])
-key_star_coord = [[675, 625], [675, 325], [225, 75], [475, 325]]
+boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
 
 matrix = [['' for _ in range(15)] for i in range(13)]
-KEY = False
-KEY_STAR = False
+BOILER = False
 
-
-def win():  # функция победы
-    global win_bool  # переменная отвечающая за работоспособность спрайтов
-    win_bool = True  # При win_bool равном правде все спрайты останавливаются
-
-    font = pygame.font.Font(None, 50)
-    text = font.render("Вы выиграли", True, 'white')
-    text_x = WIDTH // 2 - text.get_width() // 2
-    text_y = HEIGHT // 2 - text.get_height() // 2
-    text_w = text.get_width()
-    text_h = text.get_height()
-    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
-                                            text_w + 20, text_h + 20))
-    screen.blit(text, (text_x, text_y))
-
-
-def return_back():  # Возвращение спрайтов на исходные позиции
-    life.take_away_life()
-    shark1.reloaded()
-    shark2.reloaded()
-    shark3.reloaded()
-    shark4.reloaded()
-    shark5.reloaded()
-    shark6.reloaded()
-    shark7.reloaded()
-    shark8.reloaded()
-    shark9.reloaded()
-    shark10.reloaded()
-    player.reloaded()
-    key.reloaded()
-    key_star.reloaded()
-    if life.give_life() < 0:  # Обнуление очков при нехватке жизней
-        score.discharge()
-        life.alive()
-        star.status_collected()
-        star1.status_collected()
-        star2.status_collected()
-        sea_star1.status_collected()
-        sea_star2.status_collected()
-        sea_star3.status_collected()
-        sea_star4.status_collected()
-    star.reloaded()
-    star1.reloaded()
-    star2.reloaded()
-    sea_star1.reloaded()
-    sea_star2.reloaded()
-    sea_star3.reloaded()
-    sea_star4.reloaded()
-
-
-def faced():  # Игрок проиграл, отображение надписи
-    global faced_bool
-    faced_bool = True
-
-    font = pygame.font.Font(None, 50)
-    text = font.render("Игра окончена", True, 'white')
-    text_x = WIDTH // 2 - text.get_width() // 2
-    text_y = HEIGHT // 2 - text.get_height() // 2
-    text_w = text.get_width()
-    text_h = text.get_height()
-    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
-                                            text_w + 20, text_h + 20))
-    screen.blit(text, (text_x, text_y))
+stop_bool: bool = False
 
 
 def load_image(name, color_key=None):  # Функция для получения фотографий
@@ -110,273 +33,12 @@ def load_image(name, color_key=None):  # Функция для получени�
     return image
 
 
-class Shark(pygame.sprite.Sprite):  # Класс акулы
-    def __init__(self, sheet, columns, rows, x, y, SPEED, status, spi=[]):
-        super().__init__(all_sprites)
-        self.frames = []
-        self.cut_sheet(sheet, columns, rows)
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.image.set_colorkey('red')
-        self.rect = self.rect.move(x, y)
-        self.SPEED = SPEED
-        self.status = status
-        if spi == []:
-            self.spi = [sheet, columns, rows, x, y, SPEED, status]
-        else:
-            self.spi = spi
-
-    def cut_sheet(self, sheet, columns, rows):  # получение изображения
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                self.frames.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
-
-    def update(self):  # движение акул, изменение изображения
-        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
-        self.image = self.frames[self.cur_frame]
-        self.image.set_colorkey('red')
-        if self.status == 1:
-            self.rect.y += self.SPEED
-            if self.rect.y >= HEIGHT - 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
-        if self.status == 3:
-            self.rect.y -= self.SPEED
-            if self.rect.y <= 25:
-                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
-        if self.status == 2:
-            self.rect.x -= self.SPEED
-            if self.rect.x <= 0:
-                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1, self.spi)
-        if self.status == 4:
-            self.rect.x += self.SPEED
-            if self.rect.x >= WIDTH - 100:
-                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
-        if self.status == 5:
-            self.rect.y -= self.SPEED
-            if self.rect.y == 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 200, 150, 5, 6, self.spi)
-        if self.status == 6:
-            self.rect.x += self.SPEED
-            if self.rect.x == 450:
-                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 500, 150, 5, 7, self.spi)
-        if self.status == 7:
-            self.rect.y += self.SPEED
-            if self.rect.y == 350:
-                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 450, 400, 5, 8, self.spi)
-        if self.status == 8:
-            self.rect.x -= self.SPEED
-            if self.rect.x == 195:
-                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 200, 350, 5, 5, self.spi)
-        if pygame.sprite.collide_mask(self, player):
-            faced()
-
-    def reloaded(self):  # возвращение на исходную позицию
-        self.__init__(*self.spi)
-
-
-class SeaStar(pygame.sprite.Sprite):  # Класс морской звезды (очки)
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = sea_star_image
-        self.image.set_colorkey('green')
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-        self.hide = False
-        self.collected = False
-
-    def update(self):
-        if not self.hide:
-            if self.image == white_image:
-                self.image = sea_star_image
-                self.image.set_colorkey('green')
-
-            if pygame.sprite.collide_mask(self, player):
-                self.adding_points()
-                self.collected = True
-
-    def adding_points(self):  # добавление очков
-        self.hide = True
-        self.collected = True
-
-        self.image = white_image
-        self.image.set_colorkey('white')
-        score.add_points(500)
-
-    def reloaded(self):
-        if not self.collected:
-            self.hide = False
-
-    def status_collected(self):
-        self.collected = False
-
-
-class Star(pygame.sprite.Sprite):  # Класс звезды
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = white_image
-        self.image.set_colorkey('white')
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-        self.hide = True
-        self.collected = False
-
-    def update(self):
-        if not self.hide:
-            if self.image == white_image:
-                self.image = star_image
-                self.image.set_colorkey('green')
-
-            if pygame.sprite.collide_mask(self, player):
-                self.adding_points()
-
-    def adding_points(self):  # добавление очков
-        self.hide = True
-        self.collected = True
-
-        self.image = white_image
-        self.image.set_colorkey('white')
-        score.add_points(1000)
-
-    def change_hide(self):
-        if not self.collected:
-            self.hide = False
-            self.image = star_image
-            self.image.set_colorkey('green')
-
-    def reloaded(self):
-        self.hide = True
-        self.image = white_image
-        self.image.set_colorkey('white')
-
-    def status_collected(self):
-        self.collected = False
-
-
-class Score:  # Класс счёта
-    def __init__(self, screen, points: int = 0,
-                 color=(237, 28, 36)):  # При создании объекта класса надо задать счёт и цвет очков
-        self.points = str(points).rjust(6, '0')  # Создаю переменную очки в которую надо записывать счёт
-        self.screen = screen
-        self.color = color
-        self.font = pygame.font.Font(None, 45)
-        self.status = 1
-
-    def add_points(self, point):
-        self.points = str(int(self.points) + point).rjust(6, '0')
-
-    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
-        text = self.font.render(self.points, True, 'yellow')  # Рисую счёт - коричневый цвет
-        text_w = text.get_width()
-        text_h = text.get_height()
-        text_x = 15
-        text_y = 15
-        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
-                                         text_w + 10, text_h + 5), 1)
-        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
-                                         text_w + 10, text_h + 5))
-        screen.blit(text, (text_x, text_y))
-
-    def discharge(self):
-        self.points = '000000'
-
-
 class Board:
-    def render(self, screen, coor):
-        j, i = coor
-        j //= 50
-        i //= 50
-        for y in range(HEIGHT // 50):
-            for x in range(WIDTH // 50):
-                if not (abs(y - j) <= 1 and abs(x - i) <= 1):
-                    pygame.draw.rect(screen, 'black', (x * 50, y * 50, 50, 50))
-
-
-class Coral(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        matrix[y // 50][x // 50] = 'Coral'
-        self.image = coral_image
-        self.image.set_colorkey('green')
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-
-class Key(pygame.sprite.Sprite):
-    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
-    def __init__(self, coord):
-        x, y = coord[0], coord[1]
-        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
-        self.image = key_image
-        self.image.set_colorkey('white')
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if not KEY:
-            if pygame.sprite.collide_mask(self, player):
-                self.bring_key()
-
-    def bring_key(self):
-        global KEY
-        KEY = True
-        self.rect.x = 625
-        self.rect.y = 0
-
-    def reloaded(self):
-        global key_coord
-        self.__init__(choice(key_coord))
-
-
-class KeyStar(pygame.sprite.Sprite):
-    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
-    def __init__(self, coord):
-        x, y = coord[0], coord[1]
-        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
-        self.image = key_star_image
-        self.image.set_colorkey('green')
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if pygame.sprite.collide_mask(self, player):
-            self.bring_key()
-
-    def bring_key(self):
-        global KEY_STAR
-        KEY_STAR = True
-
-        self.rect.x = 575
-        self.rect.y = 0
-        star.change_hide()
-        star1.change_hide()
-        star2.change_hide()
-
-    def reloaded(self):
-        global key_star_coord
-        self.__init__(choice(key_star_coord))
-
-
-class Door(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = closing_door_image
-        self.image.set_colorkey('green')
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if KEY:
-            self.image = opening_door_image
-            self.image.set_colorkey('green')
-            if pygame.sprite.collide_mask(self, player):
-                win()
-        else:
-            self.image = closing_door_image
-            self.image.set_colorkey('green')
+    def render(self, screen):
+        for y in range(HEIGHT):
+            for x in range(WIDTH):
+                pygame.draw.rect(screen, 'white',
+                                 (x * 50, y * 50, 50, 50), 1)
 
 
 class Player(pygame.sprite.Sprite):
@@ -386,10 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
 
         self.rect = self.image.get_rect()
-        self.rect.center = WIDTH / 2, HEIGHT - 25
-
-    def get_rects(self):
-        return self.rect.y, self.rect.x
+        self.rect.center = (WIDTH / 2, HEIGHT - 25)
 
     def update(self):
         pass
@@ -401,7 +60,24 @@ class Player(pygame.sprite.Sprite):
             pass
         else:
             y = (self.rect.y - 50) // 50
-            if matrix[y][self.rect.x // 50] != 'Coral':
+            if matrix[y][self.rect.x // 50] == 'HideFlame':
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
+                self.rect.y -= 50
+            elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y -= 50
 
     def go_down(self):
@@ -411,19 +87,52 @@ class Player(pygame.sprite.Sprite):
             pass
         else:
             y = (self.rect.y + 50) // 50
-            if matrix[y][self.rect.x // 50] != 'Coral':
+            if matrix[y][self.rect.x // 50] == 'HideFlame':
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
+                self.rect.y += 50
+            elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y += 50
 
     def go_right(self):
         self.image = player_right_image
         self.image.set_colorkey('white')
         if self.rect.x == WIDTH - 50:
-            if matrix[self.rect.y // 50][0] != 'Coral':
+            if matrix[self.rect.y // 50][0] != 'Flame':
                 self.rect.x = 0
-
         else:
             x = (self.rect.x + 50) // 50
-            if matrix[self.rect.y // 50][x] != 'Coral':
+            if matrix[self.rect.y // 50][x] == 'HideFlame':
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
+                self.rect.x += 50
+            elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x += 50
 
     def go_left(self):
@@ -431,248 +140,340 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.x == 0:
             self.rect.x = WIDTH - 50
-
         else:
             x = (self.rect.x - 50) // 50
-            if matrix[self.rect.y // 50][x] != 'Coral':
+            if matrix[self.rect.y // 50][x] == 'HideFlame':
+                flame48.update()
+                flame49.update()
+                flame50.update()
+                flame51.update()
+                flame52.update()
+                flame53.update()
+                flame54.update()
+                flame55.update()
+                flame56.update()
+                flame57.update()
+                flame58.update()
+                flame59.update()
+                flame60.update()
+                flame61.update()
+                flame62.update()
+                self.rect.x -= 50
+            elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x -= 50
 
-    def reloaded(self):
-        self.image = player_image
+
+class Flame(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(all_sprites)
+        matrix[y // 50][x // 50] = 'Flame'
+        self.frames = []
+        self.cur_frame = 0
+        self.cut_sheet(sheet, columns, rows)
+        self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('white')
         self.rect = self.image.get_rect()
-        self.rect.center = WIDTH / 2, HEIGHT - 25
+        self.rect.center = x, y
+
+    def cut_sheet(self, sheet, columns, rows):  # получение изображения
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('white')
 
 
-class Life(pygame.sprite.Sprite):
-
-    def __init__(self, screen, color=(237, 28, 36)):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.COORDINATS = 675, 25
-        self.image = heart_image
-        self.image.set_colorkey("green")
+class Hide_Flame(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(all_sprites)
+        matrix[y // 50][x // 50] = 'HideFlame'
+        self.frames = []
+        self.cur_frame = 0
+        self.cut_sheet(sheet, columns, rows)
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('white')
         self.rect = self.image.get_rect()
-        self.rect.center = 725, 25
+        self.rect.center = x, y
+        self.hide = False
 
-        self.screen = screen
-        self.color = color
-        self.font = pygame.font.Font(None, 55)
+    def cut_sheet(self, sheet, columns, rows):  # получение изображения
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
 
-        self.life = '3'
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('white')
+        if player.rect.center[0] == self.rect.centerx - 50 and player.rect.center[1] == self.rect.centery:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center[0] == self.rect.centerx + 50 and player.rect.center[1] == self.rect.centery:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center[1] == self.rect.centery + 50 and player.rect.center[0] == self.rect.centerx:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center[1] == self.rect.centery - 50 and player.rect.center[0] == self.rect.centerx:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        elif player.rect.center == self.rect.center:
+            self.hide = True
+            self.image = white_image
+            self.image.set_colorkey('white')
+        else:
+            self.hide = False
+            self.image = self.frames[self.cur_frame]
+            self.image.set_colorkey('white')
 
-    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
-        text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
-        text_x = 675
-        text_y = 10
-        screen.blit(text, (text_x, text_y))
 
-    def take_away_life(self):
-        self.life = str(int(self.life) - 1)
+class Potion(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = potion_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+        self.hide = False
+        self.collected = False
 
-    def give_life(self):
-        return int(self.life)
+    def update(self):
+        if not self.hide:
+            if self.image == white_image:
+                self.image = potion_image
+                self.image.set_colorkey('white')
 
-    def alive(self):
-        self.life = '3'
+            if pygame.sprite.collide_mask(self, player):
+                self.adding_points()
+                self.collected = True
+
+    def adding_points(self):  # добавление очков
+        self.hide = True
+        self.collected = True
+
+        self.image = white_image
+        self.image.set_colorkey('white')
+        # score.add_points(500)
+
+    def reloaded(self):
+        if not self.collected:
+            self.hide = False
+
+    def status_collected(self):
+        self.collected = False
 
 
-# Создаем игру и окно
+class Boiler(pygame.sprite.Sprite):
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, coord):
+        x, y = coord[0], coord[1]
+        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
+        self.image = boiler_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            self.bring_boiler()
+
+    def bring_boiler(self):
+        global BOILER
+        BOILER = True
+
+        self.rect.x = 575
+        self.rect.y = 0
+        # potion1.change_hide()
+        # potion2.change_hide()
+        # potion3.change_hide()
+
+    def reloaded(self):
+        global boiler_coord
+        self.__init__(choice(boiler_coord))
+
+
 pygame.init()
 pygame.mixer.init()
-pygame.display.set_caption("Adventure experience")
-
+pygame.display.set_caption("Across The Road")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
 clock = pygame.time.Clock()
+all_sprites = pygame.sprite.Group()
+board = Board()
 
-score = Score(screen)
+player_image = pygame.image.load(os.path.join(data_folder, 'shlapa.png')).convert()
+player_down_image = pygame.image.load(os.path.join(data_folder, 'shlapa_down.png')).convert()
+player_right_image = pygame.image.load(os.path.join(data_folder, 'shlapa_right.png')).convert()
+player_left_image = pygame.image.load(os.path.join(data_folder, 'shlapa_left.png')).convert()
+player = Player()
+
+flame1 = Flame(load_image("data/" + "flame.png"), 4, 1, 25, 75)
+flame2 = Flame(load_image("data/" + "flame.png"), 4, 1, 175, 75)
+flame3 = Flame(load_image("data/" + "flame.png"), 4, 1, 225, 75)
+flame4 = Flame(load_image("data/" + "flame.png"), 4, 1, 275, 75)
+flame5 = Flame(load_image("data/" + "flame.png"), 4, 1, 325, 75)
+flame6 = Flame(load_image("data/" + "flame.png"), 4, 1, 425, 75)
+flame7 = Flame(load_image("data/" + "flame.png"), 4, 1, 475, 75)
+flame8 = Flame(load_image("data/" + "flame.png"), 4, 1, 525, 75)
+flame9 = Flame(load_image("data/" + "flame.png"), 4, 1, 575, 75)
+flame10 = Flame(load_image("data/" + "flame.png"), 4, 1, 725, 75)
+
+flame11 = Flame(load_image("data/" + "flame.png"), 4, 1, 125, 575)
+flame12 = Flame(load_image("data/" + "flame.png"), 4, 1, 175, 575)
+flame13 = Flame(load_image("data/" + "flame.png"), 4, 1, 225, 575)
+flame14 = Flame(load_image("data/" + "flame.png"), 4, 1, 275, 575)
+flame15 = Flame(load_image("data/" + "flame.png"), 4, 1, 325, 575)
+flame16 = Flame(load_image("data/" + "flame.png"), 4, 1, 375, 575)
+flame17 = Flame(load_image("data/" + "flame.png"), 4, 1, 425, 575)
+flame18 = Flame(load_image("data/" + "flame.png"), 4, 1, 475, 575)
+flame19 = Flame(load_image("data/" + "flame.png"), 4, 1, 525, 575)
+flame20 = Flame(load_image("data/" + "flame.png"), 4, 1, 575, 575)
+flame21 = Flame(load_image("data/" + "flame.png"), 4, 1, 625, 575)
+
+flame22 = Flame(load_image("data/" + "flame.png"), 4, 1, 25, 175)
+flame23 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 175)
+flame24 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 225)
+flame25 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 275)
+flame26 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 375)
+flame27 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 425)
+flame28 = Flame(load_image("data/" + "flame.png"), 4, 1, 75, 475)
+
+flame29 = Flame(load_image("data/" + "flame.png"), 4, 1, 25, 475)
+flame30 = Flame(load_image("data/" + "flame.png"), 4, 1, 725, 175)
+flame31 = Flame(load_image("data/" + "flame.png"), 4, 1, 675, 175)
+flame32 = Flame(load_image("data/" + "flame.png"), 4, 1, 675, 225)
+flame33 = Flame(load_image("data/" + "flame.png"), 4, 1, 675, 275)
+flame34 = Flame(load_image("data/" + "flame.png"), 4, 1, 675, 375)
+flame35 = Flame(load_image("data/" + "flame.png"), 4, 1, 675, 425)
+flame36 = Flame(load_image("data/" + "flame.png"), 4, 1, 675, 475)
+flame37 = Flame(load_image("data/" + "flame.png"), 4, 1, 725, 475)
+
+flame38 = Flame(load_image("data/" + "flame.png"), 4, 1, 225, 275)
+flame39 = Flame(load_image("data/" + "flame.png"), 4, 1, 275, 275)
+flame40 = Flame(load_image("data/" + "flame.png"), 4, 1, 325, 275)
+flame41 = Flame(load_image("data/" + "flame.png"), 4, 1, 375, 275)
+flame42 = Flame(load_image("data/" + "flame.png"), 4, 1, 525, 275)
+flame43 = Flame(load_image("data/" + "flame.png"), 4, 1, 525, 375)
+flame44 = Flame(load_image("data/" + "flame.png"), 4, 1, 475, 375)
+flame45 = Flame(load_image("data/" + "flame.png"), 4, 1, 425, 375)
+flame46 = Flame(load_image("data/" + "flame.png"), 4, 1, 375, 375)
+flame47 = Flame(load_image("data/" + "flame.png"), 4, 1, 225, 375)
+
+flame48 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 75, 75)
+flame49 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 125, 75)
+flame50 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 375, 75)
+flame51 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 625, 75)
+flame52 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 675, 75)
+flame53 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 175, 625)
+flame54 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 575, 625)
+flame55 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 75, 325)
+flame56 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 675, 325)
+flame57 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 425, 275)
+flame58 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 475, 275)
+flame59 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 525, 325)
+flame60 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 325, 375)
+flame61 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 275, 375)
+flame62 = Hide_Flame(load_image("data/" + "flame.png"), 4, 1, 225, 325)
 
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()
 
-board = Board()
+potion_image = pygame.image.load(os.path.join(data_folder, 'zelye.png')).convert()
+potion1 = Potion(25, 425)
+potion2 = Potion(725, 125)
+potion3 = Potion(425, 325)
 
-heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
-life = Life(screen, score)
-
-life_group.add(life)
-
-all_sprites.add(life)
-
-opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
-closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
-door = Door(375, 275)
-
-all_sprites.add(door)
-
-sea_star_image = pygame.image.load(os.path.join(data_folder, 'sea_star.png')).convert()
-sea_star1 = SeaStar(sea_star_coord[0], sea_star_coord[1])
-sea_star2 = SeaStar(625, 225)
-sea_star3 = SeaStar(75, 175)
-sea_star4 = SeaStar(175, 625)
-
-all_sprites.add(sea_star1)
-all_sprites.add(sea_star2)
-all_sprites.add(sea_star3)
-all_sprites.add(sea_star4)
-
-key_star_image = pygame.image.load(os.path.join(data_folder, 'key_star.png')).convert()
-key_star = KeyStar(choice(key_star_coord))
-
-all_sprites.add(key_star)
-key_star_group.add(key_star)
-
-star_image = pygame.image.load(os.path.join(data_folder, 'stars.png')).convert()
-star = Star(75, 425)
-star1 = Star(475, 525)
-star2 = Star(275, 275)
-
-all_sprites.add(star)
-all_sprites.add(star1)
-all_sprites.add(star2)
-
-key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
-key = Key(choice(key_coord))
-
-player_image = pygame.image.load(os.path.join(data_folder, 'aqualunger.png')).convert()
-player_left_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_left.png')).convert()
-player_right_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_right.png')).convert()
-player_down_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_down.png')).convert()
-player = Player()
+boiler_image = pygame.image.load(os.path.join(data_folder, 'boiler.png')).convert()
+boiler = Boiler(choice(boiler_coord))
 
 all_sprites.add(player)
-all_sprites.add(key)
-key_group.add(key)
+all_sprites.add(flame1)
+all_sprites.add(flame2)
+all_sprites.add(flame3)
+all_sprites.add(flame4)
+all_sprites.add(flame5)
+all_sprites.add(flame6)
+all_sprites.add(flame7)
+all_sprites.add(flame8)
+all_sprites.add(flame9)
+all_sprites.add(flame10)
+all_sprites.add(flame11)
+all_sprites.add(flame12)
+all_sprites.add(flame13)
+all_sprites.add(flame14)
+all_sprites.add(flame15)
+all_sprites.add(flame16)
+all_sprites.add(flame17)
+all_sprites.add(flame18)
+all_sprites.add(flame19)
+all_sprites.add(flame20)
+all_sprites.add(flame21)
+all_sprites.add(flame22)
+all_sprites.add(flame23)
+all_sprites.add(flame24)
+all_sprites.add(flame25)
+all_sprites.add(flame26)
+all_sprites.add(flame27)
+all_sprites.add(flame28)
+all_sprites.add(flame29)
+all_sprites.add(flame30)
+all_sprites.add(flame31)
+all_sprites.add(flame32)
+all_sprites.add(flame33)
+all_sprites.add(flame34)
+all_sprites.add(flame35)
+all_sprites.add(flame36)
+all_sprites.add(flame37)
+all_sprites.add(flame38)
+all_sprites.add(flame39)
+all_sprites.add(flame40)
+all_sprites.add(flame41)
+all_sprites.add(flame42)
+all_sprites.add(flame43)
+all_sprites.add(flame44)
+all_sprites.add(flame45)
+all_sprites.add(flame46)
+all_sprites.add(flame47)
+all_sprites.add(flame48)
+all_sprites.add(flame49)
+all_sprites.add(flame50)
+all_sprites.add(flame51)
+all_sprites.add(flame52)
+all_sprites.add(flame53)
+all_sprites.add(flame54)
+all_sprites.add(flame55)
+all_sprites.add(flame56)
+all_sprites.add(flame57)
+all_sprites.add(flame58)
+all_sprites.add(flame59)
+all_sprites.add(flame60)
+all_sprites.add(flame61)
+all_sprites.add(flame62)
+all_sprites.add(potion1)
+all_sprites.add(potion2)
+all_sprites.add(potion3)
+all_sprites.add(boiler)
 
-shark1 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 475, 7, 3, [])
-shark2 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 80, 7, 1, [])
-shark3 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 500, 7, 1, [])
-shark4 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 10, 7, 3, [])
-shark5 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 325, 0, 7, 2, [])
-shark6 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 300, HEIGHT - 100, 7, 4, [])
-shark7 = Shark(load_image("data/" + "shark_up.png"), 4, 1, 200, 250, 5, 5, [])
-shark8 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 500, 250, 5, 7, [])
-shark9 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 310, 400, 5, 8, [])
-shark10 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 320, 150, 5, 6, [])
-
-coral_image = pygame.image.load(os.path.join(data_folder, 'coral.png')).convert()
-coral1 = Coral(75, 75)
-coral2 = Coral(325, 75)
-coral3 = Coral(375, 75)
-coral4 = Coral(425, 75)
-coral5 = Coral(475, 75)
-coral6 = Coral(525, 75)
-coral7 = Coral(375, 125)
-coral8 = Coral(625, 125)
-coral9 = Coral(575, 275)
-coral10 = Coral(575, 325)
-coral11 = Coral(525, 475)
-coral12 = Coral(525, 525)
-coral13 = Coral(575, 525)
-coral14 = Coral(625, 525)
-coral15 = Coral(475, 625)
-coral16 = Coral(25, 625)
-coral17 = Coral(75, 625)
-coral18 = Coral(75, 525)
-coral19 = Coral(125, 425)
-coral20 = Coral(125, 375)
-coral21 = Coral(175, 425)
-coral22 = Coral(175, 525)
-coral23 = Coral(75, 225)
-coral24 = Coral(125, 225)
-coral25 = Coral(175, 225)
-coral26 = Coral(425, 275)
-coral27 = Coral(275, 375)
-coral28 = Coral(325, 625)
-coral29 = Coral(175, 475)
-coral30 = Coral(375, 475)
-coral31 = Coral(425, 375)
-coral32 = Coral(475, 375)
-coral33 = Coral(525, 625)
-coral34 = Coral(625, 425)
-coral35 = Coral(75, 275)
-coral36 = Coral(75, 125)
-coral37 = Coral(125, 75)
-coral38 = Coral(425, 125)
-coral39 = Coral(475, 275)
-coral40 = Coral(175, 75)
-coral41 = Coral(125, 275)
-coral42 = Coral(125, 625)
-coral43 = Coral(225, 475)
-coral44 = Coral(225, 525)
-coral45 = Coral(675, 525)
-coral46 = Coral(575, 625)
-coral47 = Coral(675, 425)
-coral48 = Coral(625, 325)
-coral49 = Coral(625, 175)
-coral50 = Coral(675, 175)
-coral51 = Coral(675, 225)
-coral52 = Coral(275, 225)
-
-all_sprites.add(coral1)
-all_sprites.add(coral2)
-all_sprites.add(coral3)
-all_sprites.add(coral4)
-all_sprites.add(coral5)
-all_sprites.add(coral6)
-all_sprites.add(coral7)
-all_sprites.add(coral8)
-all_sprites.add(coral9)
-all_sprites.add(coral10)
-all_sprites.add(coral11)
-all_sprites.add(coral12)
-all_sprites.add(coral13)
-all_sprites.add(coral14)
-all_sprites.add(coral15)
-all_sprites.add(coral16)
-all_sprites.add(coral17)
-all_sprites.add(coral18)
-all_sprites.add(coral19)
-all_sprites.add(coral20)
-all_sprites.add(coral21)
-all_sprites.add(coral22)
-all_sprites.add(coral23)
-all_sprites.add(coral24)
-all_sprites.add(coral25)
-all_sprites.add(coral26)
-all_sprites.add(coral27)
-all_sprites.add(coral28)
-all_sprites.add(coral29)
-all_sprites.add(coral30)
-all_sprites.add(coral31)
-all_sprites.add(coral32)
-all_sprites.add(coral33)
-all_sprites.add(coral34)
-all_sprites.add(coral35)
-all_sprites.add(coral36)
-all_sprites.add(coral37)
-all_sprites.add(coral38)
-all_sprites.add(coral39)
-all_sprites.add(coral40)
-all_sprites.add(coral41)
-all_sprites.add(coral42)
-all_sprites.add(coral43)
-all_sprites.add(coral44)
-all_sprites.add(coral45)
-all_sprites.add(coral46)
-all_sprites.add(coral47)
-all_sprites.add(coral48)
-all_sprites.add(coral49)
-all_sprites.add(coral50)
-all_sprites.add(coral51)
-all_sprites.add(coral52)
-
-# Цикл игры
+# Цикл игрыall_sprites.add(flame1)
 running = True
 
 
-def first_level(running: bool = True):
-    global KEY
-    global KEY_STAR
-
-    global faced_bool
-    global win_bool
+def second_level(running: bool = True):
     global stop_bool
+    global all_sprites
 
     while running:
         # Держим цикл на правильной скорости
@@ -684,7 +485,7 @@ def first_level(running: bool = True):
                 running = False
 
             if event.type == pygame.KEYDOWN:
-                if not faced_bool and not win_bool and not stop_bool:
+                if not stop_bool:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
                         player.go_up()
 
@@ -700,36 +501,19 @@ def first_level(running: bool = True):
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = True
 
-                elif win_bool:
-                    if event.key == pygame.K_SPACE:
-                        running = False
-                elif faced_bool:
-                    if event.key == pygame.K_SPACE:
-                        return_back()
-                        faced_bool = False
-                        win_bool = False
-                        KEY_STAR = False
-                        KEY = False
+                elif stop_bool:
+                    if event.key == pygame.K_ESCAPE:
+                        stop_bool = False
 
-                elif event.key == pygame.K_ESCAPE:
-                    stop_bool = False
+        screen.fill((123, 34, 52))
 
-        screen.fill((0, 0, 139))
-        # Обновление
-        if not faced_bool and not win_bool and not stop_bool:
+        if not stop_bool:
+            # Обновление
             all_sprites.update()
+
+        # Рендеринг
         all_sprites.draw(screen)
-        board.render(screen, player.get_rects())
-        score.update()
-        life_group.update()
-        life_group.draw(screen)
-        if KEY:
-            key_group.draw(screen)
-        if KEY_STAR:
-            key_star_group.draw(screen)
-        if faced_bool:
-            faced()
-        if win_bool:
-            win()
+        # Вывод клетчатого поля
+
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()

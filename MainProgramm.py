@@ -1,6 +1,6 @@
+import ThirdLevel
 import FirstLevel
 import SecondLevel
-import ThirdLevel
 
 import pygame
 import sys
@@ -73,8 +73,8 @@ clock = pygame.time.Clock()
 
 start_screen(intro_text)
 
-SecondLevel.first_level(True)
-ThirdLevel.second_level(True)
-FirstLevel.third_level(True)
+FirstLevel.first_level(True)
+SecondLevel.second_level(True)
+ThirdLevel.third_level(True)
 
 pygame.quit()

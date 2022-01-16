@@ -1,487 +1,512 @@
 import pygame
-import random
 import os
+import sys
+from random import choice
 
 WIDTH = 750
 HEIGHT = 650
-FPS = 30  # Не трогать! На этом всё работает!
+FPS = 20
 
-number_frames = 0
+# Создание групп спрайтов
+all_sprites = pygame.sprite.Group()
+key_group = pygame.sprite.Group()
+key_star_group = pygame.sprite.Group()
+life_group = pygame.sprite.Group()
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
-level: int = 2
+faced_bool = False
+win_bool = False
+stop_bool = False
+wait_bool = False
 
-faced_bool: bool = False
-win_bool: bool = False
-stop_bool: bool = False
+key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
+sea_star_coord = choice([[625, 625], [725, 625]])
+key_star_coord = [[675, 625], [675, 325], [225, 75], [475, 325]]
 
-matrix = []
-
-life_group = pygame.sprite.Group()
-
-
-# Функция проигрыши, запускается при проигрыше
-def faced(life):  # Отображает надпись и завершает программу
-    global faced_bool
-    faced_bool = True
-
-    if level == 1:
-        life.life = '3'
-        life.score.points = '000000'
-
-    else:
-        if life.life == '0':
-            font = pygame.font.Font(None, 50)
-            text = font.render("Игра окончена", True, (255, 0, 0))  # Нужно дописать про пробел
-            text_x = WIDTH // 2 - text.get_width() // 2
-            text_y = HEIGHT // 2 - text.get_height() // 2
-            text_w = text.get_width()
-            text_h = text.get_height()
-            screen.blit(text, (text_x, text_y))
-            pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
-                                                   text_w + 20, text_h + 20), 1)
-
-        else:
-            font = pygame.font.Font(None, 50)
-            text = font.render("Вы проиграли", True, (255, 0, 0))  # Нужно дописать про пробел
-            text_x = WIDTH // 2 - text.get_width() // 2
-            text_y = HEIGHT // 2 - text.get_height() // 2
-            text_w = text.get_width()
-            text_h = text.get_height()
-            screen.blit(text, (text_x, text_y))
-            pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
-                                                   text_w + 20, text_h + 20), 1)
+matrix = [['' for _ in range(15)] for i in range(13)]
+KEY = False
+KEY_STAR = False
 
 
-# Отображает сообщение о выигрыше
-def win():
+def win():  # функция победы
     global win_bool  # переменная отвечающая за работоспособность спрайтов
     win_bool = True  # При win_bool равном правде все спрайты останавливаются
 
     font = pygame.font.Font(None, 50)
-    text = font.render("Вы выиграли", True, (0, 255, 0))  # Нужно дописать про пробел
+    text = font.render("Вы выиграли", True, 'white')
     text_x = WIDTH // 2 - text.get_width() // 2
     text_y = HEIGHT // 2 - text.get_height() // 2
     text_w = text.get_width()
     text_h = text.get_height()
+    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
+                                            text_w + 20, text_h + 20))
     screen.blit(text, (text_x, text_y))
-    pygame.draw.rect(screen, (0, 255, 0), (text_x - 10, text_y - 10,
-                                           text_w + 20, text_h + 20), 1)
 
 
-def add_sprite(sprite):  # Добавление спрайтов
-    all_sprites.add(sprite)  # Обновление спрайтов
-    sprites.append(sprite)  # Добавляет в одну папку все спрайты
-    coordinats.append(sprite.COORDINATS)  # Координаты
-
-    type = sprite.type
-
-    if type != 'Bullet' and type != 'Tumbleweed' and type != 'Life':
-        x = sprite.COORDINATS[0] // 50
-        y = sprite.COORDINATS[1] // 50
-
-        matrix[y][x] = sprite.type
-
-
-def return_back():  # Победа или поражение -> возвращение назад
-    for sprite in range(len(sprites)):
-        sprites[sprite].rect.x = coordinats[sprite][0]
-        sprites[sprite].rect.y = coordinats[sprite][1]
-        sprites[sprite].status = 1
-
-        if sprites[sprite].type == 'Point':  # Мешочек с золотом
-            sprites[sprite].hide = False
-            score.points = '000000'
-
-        elif sprites[sprite].type == 'Key':
-            sprites[sprite].hide = False
-
-        elif sprites[sprite].type == 'Bullet':  # Пулька
-            sprites[sprite].delay = sprites[sprite].INITIAL_DELAY
-            sprites[sprite].image = white_image
-            sprites[sprite].image.set_colorkey('white')
-
-
-# При вызове функции можно задать количество очков которые прибавляются в счёту
-def get_point(this_point, add_points: int = 100):
-    this_point.hide = True
-    points = str(int(score.points) + add_points)
-
-    if len(points) < 6:
-        points = '0' * (6 - len(points)) + points
-
-    score.points = points
-    score.update()
+def return_back():  # Возвращение спрайтов на исходные позиции
+    life.take_away_life()
+    shark1.reloaded()
+    shark2.reloaded()
+    shark3.reloaded()
+    shark4.reloaded()
+    shark5.reloaded()
+    shark6.reloaded()
+    shark7.reloaded()
+    shark8.reloaded()
+    shark9.reloaded()
+    shark10.reloaded()
+    player.reloaded()
+    key.reloaded()
+    key_star.reloaded()
+    if life.give_life() < 0:  # Обнуление очков при нехватке жизней
+        score.discharge()
+        life.alive()
+        star.status_collected()
+        star1.status_collected()
+        star2.status_collected()
+        sea_star1.status_collected()
+        sea_star2.status_collected()
+        sea_star3.status_collected()
+        sea_star4.status_collected()
+    star.reloaded()
+    star1.reloaded()
+    star2.reloaded()
+    sea_star1.reloaded()
+    sea_star2.reloaded()
+    sea_star3.reloaded()
+    sea_star4.reloaded()
 
 
-def make_matrix():
-    for y in range(13):
-        matrix.append([])
-        for x in range(15):
-            matrix[y].append('')
+def faced():  # Игрок проиграл, отображение надписи
+    global faced_bool
+    faced_bool = True
+
+    font = pygame.font.Font(None, 50)
+    text = font.render("Игра окончена", True, 'white')
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
+                                            text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
+
+
+def load_image(name, color_key=None):  # Функция для получения фотографий
+    fullname = os.path.join(name)
+    try:
+        image = pygame.image.load(fullname).convert()
+    except pygame.error as message:
+        print('Cannot load image:', name)
+        raise SystemExit(message)
+
+    if color_key is not None:
+        if color_key == -1:
+            color_key = image.get_at((0, 0))
+        image.set_colorkey(color_key)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
+def save(save_slot: str = 1):
+    global life
+    global score
+
+    level = '1'
+    hearts = life.life
+    points = score.points
+
+    preservation_file = open('preservation.txt', 'r', encoding='utf8')
+    preservation: list = preservation_file.read().split('\n')
+    preservation[int(save_slot) - 1] = '.'.join([save_slot, level, hearts, points])
+
+    preservation_file = open('preservation.txt', 'w', encoding='utf8')
+    preservation_file.write('\n'.join(preservation))
+    preservation_file.close()
+
+
+class Shark(pygame.sprite.Sprite):  # Класс акулы
+    def __init__(self, sheet, columns, rows, x, y, SPEED, status, spi=[]):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('red')
+        self.rect = self.rect.move(x, y)
+        self.SPEED = SPEED
+        self.status = status
+        if spi == []:
+            self.spi = [sheet, columns, rows, x, y, SPEED, status]
+        else:
+            self.spi = spi
+
+    def cut_sheet(self, sheet, columns, rows):  # получение изображения
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):  # движение акул, изменение изображения
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('red')
+        if self.status == 1:
+            self.rect.y += self.SPEED
+            if self.rect.y >= HEIGHT - 150:
+                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
+        if self.status == 3:
+            self.rect.y -= self.SPEED
+            if self.rect.y <= 25:
+                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
+        if self.status == 2:
+            self.rect.x -= self.SPEED
+            if self.rect.x <= 0:
+                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1, self.spi)
+        if self.status == 4:
+            self.rect.x += self.SPEED
+            if self.rect.x >= WIDTH - 100:
+                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
+        if self.status == 5:
+            self.rect.y -= self.SPEED
+            if self.rect.y == 150:
+                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 200, 150, 5, 6, self.spi)
+        if self.status == 6:
+            self.rect.x += self.SPEED
+            if self.rect.x == 450:
+                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 500, 150, 5, 7, self.spi)
+        if self.status == 7:
+            self.rect.y += self.SPEED
+            if self.rect.y == 350:
+                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 450, 400, 5, 8, self.spi)
+        if self.status == 8:
+            self.rect.x -= self.SPEED
+            if self.rect.x == 195:
+                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 200, 350, 5, 5, self.spi)
+        if pygame.sprite.collide_mask(self, player):
+            faced()
+
+    def reloaded(self):  # возвращение на исходную позицию
+        self.__init__(*self.spi)
+
+
+class SeaStar(pygame.sprite.Sprite):  # Класс морской звезды (очки)
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = sea_star_image
+        self.image.set_colorkey('green')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+        self.hide = False
+        self.collected = False
+
+    def update(self):
+        if not self.hide:
+            if self.image == white_image:
+                self.image = sea_star_image
+                self.image.set_colorkey('green')
+
+            if pygame.sprite.collide_mask(self, player):
+                self.adding_points()
+                self.collected = True
+
+    def adding_points(self):  # добавление очков
+        self.hide = True
+        self.collected = True
+
+        self.image = white_image
+        self.image.set_colorkey('white')
+        score.add_points(1000)
+
+    def reloaded(self):
+        if not self.collected:
+            self.hide = False
+
+    def status_collected(self):
+        self.collected = False
+
+
+class Star(pygame.sprite.Sprite):  # Класс звезды
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = white_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+        self.hide = True
+        self.collected = False
+
+    def update(self):
+        if not self.hide:
+            if self.image == white_image:
+                self.image = star_image
+                self.image.set_colorkey('green')
+
+            if pygame.sprite.collide_mask(self, player):
+                self.adding_points()
+
+    def adding_points(self):  # добавление очков
+        self.hide = True
+        self.collected = True
+
+        self.image = white_image
+        self.image.set_colorkey('white')
+        score.add_points(3000)
+
+    def change_hide(self):
+        if not self.collected:
+            self.hide = False
+            self.image = star_image
+            self.image.set_colorkey('green')
+
+    def reloaded(self):
+        self.hide = True
+        self.image = white_image
+        self.image.set_colorkey('white')
+
+    def status_collected(self):
+        self.collected = False
+
+
+class Score:  # Класс счёта
+    def __init__(self, screen, points: int = 0,
+                 color=(237, 28, 36)):  # При создании объекта класса надо задать счёт и цвет очков
+        self.points = str(points).rjust(6, '0')  # Создаю переменную очки в которую надо записывать счёт
+        self.screen = screen
+        self.color = color
+        self.font = pygame.font.Font(None, 45)
+        self.status = 1
+
+    # Функция получает количество очков полученных при собирании звёздочки
+    # Если очков выходит больше тысячи прибавляет жизнь
+    def add_points(self, point):
+        global life
+
+        self.points = str(int(self.points) + point).rjust(6, '0')
+
+        if int(self.points) >= 1000:
+            number = int(self.points) // 1000
+
+            life.life = str(int(life.life) + number)
+            self.points = str(int(self.points) - number * 1000)
+            self.points = '0' * (6 - len(self.points)) + self.points
+
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
+        text = self.font.render(self.points, True, 'yellow')  # Рисую счёт - коричневый цвет
+        text_w = text.get_width()
+        text_h = text.get_height()
+        text_x = 15
+        text_y = 15
+        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
+                                         text_w + 10, text_h + 5), 1)
+        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
+                                         text_w + 10, text_h + 5))
+        screen.blit(text, (text_x, text_y))
+
+    def discharge(self):
+        self.points = '000000'
 
 
 class Board:
-    def render(self, screen):
-        for y in range(HEIGHT):
-            for x in range(WIDTH):
-                pygame.draw.rect(screen, 'white',
-                                 (x * 50, y * 50, 50, 50), 1)
+    def render(self, screen, coor):
+        j, i = coor
+        j //= 50
+        i //= 50
+        for y in range(HEIGHT // 50):
+            for x in range(WIDTH // 50):
+                if not (abs(y - j) <= 1 and abs(x - i) <= 1):
+                    pygame.draw.rect(screen, 'black', (x * 50, y * 50, 50, 50))
+
+
+class Coral(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        matrix[y // 50][x // 50] = 'Coral'
+        self.image = coral_image
+        self.image.set_colorkey('green')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+
+class Key(pygame.sprite.Sprite):
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, coord):
+        x, y = coord[0], coord[1]
+        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
+        self.image = key_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if not KEY:
+            if pygame.sprite.collide_mask(self, player):
+                self.bring_key()
+
+    def bring_key(self):
+        global KEY
+        KEY = True
+        self.rect.x = 625
+        self.rect.y = 0
+
+    def reloaded(self):
+        global key_coord
+        self.__init__(choice(key_coord))
+
+
+class KeyStar(pygame.sprite.Sprite):
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, coord):
+        x, y = coord[0], coord[1]
+        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
+        self.image = key_star_image
+        self.image.set_colorkey('green')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, player):
+            self.bring_key()
+
+    def bring_key(self):
+        global KEY_STAR
+        KEY_STAR = True
+
+        self.rect.x = 575
+        self.rect.y = 0
+        star.change_hide()
+        star1.change_hide()
+        star2.change_hide()
+
+    def reloaded(self):
+        global key_star_coord
+        self.__init__(choice(key_star_coord))
+
+
+class Door(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = closing_door_image
+        self.image.set_colorkey('green')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if KEY:
+            self.image = opening_door_image
+            self.image.set_colorkey('green')
+            if pygame.sprite.collide_mask(self, player):
+                win()
+        else:
+            self.image = closing_door_image
+            self.image.set_colorkey('green')
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.status = 1
         self.image = player_image
-        self.image.set_colorkey('green')
-        self.type = 'Player'
-
-        self.COORDINATS = (350, 600)
+        self.image.set_colorkey('white')
 
         self.rect = self.image.get_rect()
         self.rect.center = WIDTH / 2, HEIGHT - 25
 
+    def get_rects(self):
+        return self.rect.y, self.rect.x
+
     def update(self):
-        if self.status == 1:
-            self.image = player_image
-            self.image.set_colorkey('green')
+        pass
 
-    def go_into_bush(self, DIRECTION):
-        if DIRECTION == 'Right':
-            self.status = 3
-            self.image = player_right_image
-            self.image.set_colorkey('green')
-
-            if self.rect.x >= WIDTH - 50:
-                if matrix[self.rect.y // 50][0] != 'Hedge':
-                    self.rect.x = 0
-
-            else:
-                if matrix[self.rect.y // 50][self.rect.x // 50 + 1] != 'Hedge':
-                    self.rect.x += 50
-
-        elif DIRECTION == 'Left':
-            self.status = 4
-            self.image = player_left_image
-            self.image.set_colorkey('green')
-
-            if self.rect.x <= 0:
-                if matrix[self.rect.y // 50][14] != 'Hedge':
-                    self.rect.x = WIDTH - 50
-
-            else:
-                if matrix[self.rect.y // 50][self.rect.x // 50 - 1] != 'Hedge':
-                    self.rect.x -= 50
-
-        elif DIRECTION == 'Up':
-            self.status = 1
-            self.image = player_image
-            self.image.set_colorkey('green')
-
-            if self.rect.y == 0:
-                win()
-
-            else:
-                if matrix[self.rect.y // 50 - 1][self.rect.x // 50] != 'Hedge':
-                    self.rect.y -= 50
-
-        else:
-            self.status = 2
-            self.image = player_back_image
-            self.image.set_colorkey('green')
-
-            if self.rect.y != HEIGHT - 50:
-                if matrix[self.rect.y // 50 + 1][self.rect.x // 50] != 'Hedge':
-                    self.rect.y += 50
-
-
-class Enemy(pygame.sprite.Sprite):  # Основной класс для врагов
-    def __init__(self, x, y, DIRECTION='Right', SPEED=0):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.COORDINATS = (x - 25, y - 25)
-        self.DIRECTION = DIRECTION
-        self.status = 1
-        self.type = 'Enemy'  # Задаёт класс
-
-        if SPEED == 0:
-            self.SPEED = random.randint(5, 7)
-
-        else:
-            self.SPEED = SPEED
-
-
-class Robber(Enemy):
-    def __init__(self, x, y, DIRECTION='Right'):
-        Enemy.__init__(self, x, y, DIRECTION)
-
-        if self.DIRECTION == 'Right':
-            self.image = right_robber_image
-
-        else:
-            self.image = left_robber_image
-
+    def go_up(self):
+        self.image = player_image
         self.image.set_colorkey('white')
-        self.type = 'Robber'
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if pygame.sprite.collide_mask(self, player):
-            faced(life)
-
-
-class Bullet(Enemy):
-    # При инициализации пули надо ОБЯЗАТЕЛЬНО указать местоположение пули и где она будет появляться
-    # Также можно указать число кадров после которых пуля появиться
-    # Направление пули, а также скорость, направление НЕ РАБОТАЕТ!
-    def __init__(self, x, y, WHERE_BULLET, delay: int = 0, DIRECTION='Right', SPEED=0):
-        Enemy.__init__(self, x, y, DIRECTION, SPEED)
-        self.WHERE_BULLET = WHERE_BULLET
-        self.delay = delay
-        self.INITIAL_DELAY = delay
-
-        if self.delay == 0:
-            self.image = bullet_image
-            self.image.set_colorkey('white')
-
+        if self.rect.y == 0:
+            pass
         else:
-            self.image = white_image
-            self.image.set_colorkey('white')
+            y = (self.rect.y - 50) // 50
+            if matrix[y][self.rect.x // 50] != 'Coral':
+                self.rect.y -= 50
 
-        self.type = 'Bullet'
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if self.delay == 0:
-            if self.image == white_image:
-                self.image = bullet_image
-                self.image.set_colorkey('white')
-
-            if pygame.sprite.collide_mask(self, player):
-                faced(life)
-
-            elif self.DIRECTION == 'Right':
-                if self.rect.x >= WIDTH:
-                    self.rect.x = self.WHERE_BULLET[0]
-
-                else:
-                    self.rect.x += self.SPEED
-
-            elif self.DIRECTION == 'Left':
-                if self.rect.x <= 0:
-                    self.rect.x = self.WHERE_BULLET[0]
-
-                else:
-                    self.rect.x -= self.SPEED
-
-        else:
-            self.delay -= 1
-
-
-class Tumbleweed(Enemy):
-    def __init__(self, x, y, DIRECTION='Right', SPEED=0):
-        Enemy.__init__(self, x, y, DIRECTION, SPEED)
-        self.type = 'Tumbleweed'  # Задаёт класс
-
-        self.image = tumbleweed_image
+    def go_down(self):
+        self.image = player_down_image
         self.image.set_colorkey('white')
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if pygame.sprite.collide_mask(self, player):
-            faced(life)
-
-        elif self.rect.x > WIDTH:
-            self.rect.x = -50
-
+        if self.rect.y == HEIGHT - 50:
+            pass
         else:
-            self.rect.x += self.SPEED
+            y = (self.rect.y + 50) // 50
+            if matrix[y][self.rect.x // 50] != 'Coral':
+                self.rect.y += 50
 
-
-class Point(pygame.sprite.Sprite):  # Класс очков которые если взять то оно зачислется
-    # При создании объекта класса надо задать координаты, сколько даёт денег,
-    # Есть ли ключ (Если да, то указать ключ) и уровень
-    def __init__(self, x, y, money: int = 100, have_key=False, status: int = 1):
-        pygame.sprite.Sprite.__init__(self)
-        self.have_key = have_key
-        self.hide = False  # Переменная отвечает за показывание картинки
-        self.COORDINATS = (x - 25, y - 25)
-        self.type = 'Point'  # Задаёт класс
-        self.money: int = money
-        self.status = status
-
-        if self.have_key is not False:
-            self.image = white_image
-            self.image.set_colorkey('white')
-
-        else:
-            if status == 1:
-                self.image = point_image
-                self.image.set_colorkey('white')
-
-            else:
-                self.image = white_image
-                self.image.set_colorkey('white')
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if self.have_key is not False:
-            if self.have_key.hide:
-                self.reaction()
-
-            else:
-                self.image = white_image
-                self.image.set_colorkey('white')
-
-        else:
-            self.reaction()
-
-    def reaction(self):
-        if pygame.sprite.collide_mask(self, player):
-            get_point(self, self.money)
-
-        if self.hide:  # Если равен правде, то деньги не будут показываться
-            self.image = white_image
-            self.image.set_colorkey('white')
-
-        else:
-            self.image = point_image
-            self.image.set_colorkey('white')
-
-
-class Score:  # Класс счёта
-    def __init__(self, screen, points: str = '000000',
-                 color=(237, 28, 36)):  # При создании объекта класса надо задать счёт и цвет очков
-        self.points = points  # Создаю переменную очки в которую надо записывать счёт
-        self.screen = screen
-        self.color = color
-        self.font = pygame.font.Font(None, 45)
-        self.type = 'Score'  # Задаёт класс
-        self.status = 1
-
-    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
-        text = self.font.render(self.points, True, color)  # Рисую счёт - коричневый цвет
-        text_w = text.get_width()
-        text_h = text.get_height()
-        text_x = 15
-        text_y = 15
-        screen.blit(text, (text_x, text_y))
-        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
-                                         text_w + 10, text_h + 5), 1)
-
-
-class Key(pygame.sprite.Sprite):
-    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
-    def __init__(self, x, y, status: int = 1):
-        pygame.sprite.Sprite.__init__(self)
-        self.hide = False  # Переменная отвечает за показывание картинки
-        self.COORDINATS = (x - 25, y - 25)
-        self.type = 'Key'  # Задаёт класс
-        self.status = status
-
-        if status == 1:
-            self.image = key_image
-            self.image.set_colorkey('white')
-
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if not self.hide:
-            if self.image == white_image:
-                if self.status == 1:
-                    self.image = key_image
-                    self.image.set_colorkey('white')
-
-            if pygame.sprite.collide_mask(self, player):
-                self.bring_key()
-
-    def bring_key(self):
-        self.hide = True
-
-        self.image = white_image
+    def go_right(self):
+        self.image = player_right_image
         self.image.set_colorkey('white')
-
-
-class Hedge(pygame.sprite.Sprite):
-    # Класс переграда
-    # При создании объекта класса надо указать координаты и статус
-    # Статус - Картинка объекта
-    def __init__(self, x, y, status: int = 1):
-        pygame.sprite.Sprite.__init__(self)
-        self.status = status
-        self.COORDINATS = (x - 25, y - 25)
-        self.type = 'Hedge'  # Задаёт класс
-
-        if self.status == 1:
-            self.image = cactus_image
-            self.image.set_colorkey('white')
+        if self.rect.x == WIDTH - 50:
+            if matrix[self.rect.y // 50][0] != 'Coral':
+                self.rect.x = 0
 
         else:
-            self.image = thorny_bush_image
-            self.image.set_colorkey('white')
+            x = (self.rect.x + 50) // 50
+            if matrix[self.rect.y // 50][x] != 'Coral':
+                self.rect.x += 50
 
+    def go_left(self):
+        self.image = player_left_image
+        self.image.set_colorkey('white')
+        if self.rect.x == 0:
+            self.rect.x = WIDTH - 50
+
+        else:
+            x = (self.rect.x - 50) // 50
+            if matrix[self.rect.y // 50][x] != 'Coral':
+                self.rect.x -= 50
+
+    def reloaded(self):
+        self.image = player_image
+        self.image.set_colorkey('white')
         self.rect = self.image.get_rect()
-        self.rect.center = x, y
-
-    def update(self):
-        if pygame.sprite.collide_mask(self, player):
-            faced(life)
-
-    # Создаем игру и окно
+        self.rect.center = WIDTH / 2, HEIGHT - 25
 
 
-# Класс Жизнь выводит сердце на экран и количество жизней
 class Life(pygame.sprite.Sprite):
-    # При инициализации надо указать координаты сердца, изображение сердца
-    # Экран куда выводится текст и объект счёта, также можно указать цвет текста (красный по умолчанию)
-    def __init__(self, x, y, heart, screen, score, color=(237, 28, 36)):
+
+    def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
-        self.COORDINATS = x - 25, y - 25
-        self.image = heart
-
+        self.COORDINATS = 675, 25
+        self.image = heart_image
         self.image.set_colorkey("green")
         self.rect = self.image.get_rect()
-        self.rect.center = x, y
+        self.rect.center = 725, 25
 
-        self.status = 1
-        self.type = 'Life'
         self.screen = screen
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
         self.life = '3'
-        self.score = score
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
-        if int(self.score.points) >= 1000:
-            self.score.points = str(int(self.score.points) - 1000)
-            self.life = str(int(self.life) + 1)
-
-            len_points = len(self.score.points)
-            if len_points < 6:
-                self.score.points = '0' * (6 - len_points) + self.score.points
-
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
         text_x = 675
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
+    def take_away_life(self):
+        self.life = str(int(self.life) - 1)
 
-make_matrix()
+    def give_life(self):
+        return int(self.life)
 
+    def alive(self):
+        self.life = '3'
+
+
+# Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption("Adventure experience")
@@ -490,270 +515,198 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 clock = pygame.time.Clock()
 
-all_sprites = pygame.sprite.Group()
-sprites = []
-coordinats = []  # В этой переменной содержаться координаты всех персонажей
+score = Score(screen)
 
-player_image = pygame.image.load(os.path.join(data_folder, 'bigger_player.png')).convert()
-player_left_image = pygame.image.load(os.path.join(data_folder, 'bigger_left_player.png')).convert()
-player_right_image = pygame.image.load(os.path.join(data_folder, 'bigger_right_player.png')).convert()
-player_back_image = pygame.image.load(os.path.join(data_folder, 'bigger_back_player.png')).convert()
-player = Player()
+white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()
+
+board = Board()
 
 heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
-score = Score(screen)
-life = Life(725, 25, heart_image, screen, score)
+life = Life(screen, score)
 
 life_group.add(life)
 
-tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
-tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
-tumbleweed_back_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_back.png')).convert()
-tumbleweed_right_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_right.png')).convert()
+all_sprites.add(life)
 
-bullet_image = pygame.image.load(os.path.join(data_folder, 'bullet.png')).convert()
+opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
+closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
+door = Door(375, 275)
 
-right_robber_image = pygame.image.load(os.path.join(data_folder, 'right_robber.png')).convert()
-left_robber_image = pygame.image.load(os.path.join(data_folder, 'left_robber.png')).convert()
+all_sprites.add(door)
 
-cactus_image = pygame.image.load(os.path.join(data_folder, 'cactus.png')).convert()
-thorny_bush_image = pygame.image.load(os.path.join(data_folder, 'thorny_bush.png')).convert()
+sea_star_image = pygame.image.load(os.path.join(data_folder, 'sea_star.png')).convert()
+sea_star1 = SeaStar(sea_star_coord[0], sea_star_coord[1])
+sea_star2 = SeaStar(625, 225)
+sea_star3 = SeaStar(75, 175)
+sea_star4 = SeaStar(175, 625)
 
-# Создаю восемь объектов класса перекати поел которые средние
-first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
-first_second_tumbleweed = Tumbleweed(650, 375, 'Right', 6)
-first_third_tumbleweed = Tumbleweed(50, 375, 'Right', 6)
-first_fourth_tumbleweed = Tumbleweed(200, 375, 'Right', 6)
-first_fifth_tumbleweed = Tumbleweed(250, 375, 'Right', 6)
-first_sixth_tumbleweed = Tumbleweed(400, 375, 'Right', 6)
-first_seventh_tumbleweed = Tumbleweed(450, 375, 'Right', 6)
-first_eighth_tumbleweed = Tumbleweed(600, 375, 'Right', 6)
+all_sprites.add(sea_star1)
+all_sprites.add(sea_star2)
+all_sprites.add(sea_star3)
+all_sprites.add(sea_star4)
 
-# Создаю восемь объектов класса перекати поел которые самые верхние
-second_tumbleweed = Tumbleweed(100, 325, 'Right', 7)
-second_second_tumbleweed = Tumbleweed(750, 325, 'Right', 7)
-second_third_tumbleweed = Tumbleweed(150, 325, 'Right', 7)
-second_fourth_tumbleweed = Tumbleweed(300, 325, 'Right', 7)
-second_fifth_tumbleweed = Tumbleweed(350, 325, 'Right', 7)
-second_sixth_tumbleweed = Tumbleweed(500, 325, 'Right', 7)
-second_seventh_tumbleweed = Tumbleweed(550, 325, 'Right', 7)
-second_eighth_tumbleweed = Tumbleweed(700, 325, 'Right', 7)
+key_star_image = pygame.image.load(os.path.join(data_folder, 'key_star.png')).convert()
+key_star = KeyStar(choice(key_star_coord))
 
-# Создаю семь объектов класса перекати поел которые вторые нижние
-third_first_tumbleweed = Tumbleweed(50, 475, 'Right', 9)
-third_second_tumbleweed = Tumbleweed(100, 475, 'Right', 9)
-third_third_tumbleweed = Tumbleweed(300, 475, 'Right', 9)
-third_fourth_tumbleweed = Tumbleweed(350, 475, 'Right', 9)
-third_fifth_tumbleweed = Tumbleweed(400, 475, 'Right', 9)
-third_sixth_tumbleweed = Tumbleweed(600, 475, 'Right', 9)
-third_seventh_tumbleweed = Tumbleweed(650, 475, 'Right', 9)
+all_sprites.add(key_star)
+key_star_group.add(key_star)
 
-# Создаю четыре объекта класса перекати поел которые самые нижние
-fourth_first_tumbleweed = Tumbleweed(25, 525, 'Right', 10)
-fourth_second_tumbleweed = Tumbleweed(75, 525, 'Right', 10)
-fourth_third_tumbleweed = Tumbleweed(275, 525, 'Right', 10)
-fourth_fourth_tumbleweed = Tumbleweed(325, 525, 'Right', 10)
-fourth_fifth_tumbleweed = Tumbleweed(525, 525, 'Right', 10)
-fourth_sixth_tumbleweed = Tumbleweed(575, 525, 'Right', 10)
+star_image = pygame.image.load(os.path.join(data_folder, 'stars.png')).convert()
+star = Star(75, 425)
+star1 = Star(475, 525)
+star2 = Star(275, 275)
+
+all_sprites.add(star)
+all_sprites.add(star1)
+all_sprites.add(star2)
 
 key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
-key = Key(475, 25)
+key = Key(choice(key_coord))
 
-point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
-white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
-point = Point(75, 625, 1000)
-high_point = Point(675, 175, 4000, key)
+player_image = pygame.image.load(os.path.join(data_folder, 'aqualunger.png')).convert()
+player_left_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_left.png')).convert()
+player_right_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_right.png')).convert()
+player_down_image = pygame.image.load(os.path.join(data_folder, 'aqualunger_down.png')).convert()
+player = Player()
 
-# Создаю пули
-first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 9)
-first_second_bullet = Bullet(50, 125, (50, 125), 36, 'Right', 9)
+all_sprites.add(player)
+all_sprites.add(key)
+key_group.add(key)
 
-second_first_bullet = Bullet(50, 175, (50, 175), 18, 'Right', 9)
-second_second_bullet = Bullet(50, 175, (50, 175), 54, 'Right', 9)
+shark1 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 475, 7, 3, [])
+shark2 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 80, 7, 1, [])
+shark3 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 500, 7, 1, [])
+shark4 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 10, 7, 3, [])
+shark5 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 325, 0, 7, 2, [])
+shark6 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 300, HEIGHT - 100, 7, 4, [])
+shark7 = Shark(load_image("data/" + "shark_up.png"), 4, 1, 200, 250, 5, 5, [])
+shark8 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 500, 250, 5, 7, [])
+shark9 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 310, 400, 5, 8, [])
+shark10 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 320, 150, 5, 6, [])
 
-third_first_bullet = Bullet(50, 75, (50, 75), 58, 'Right', 9)
-third_second_bullet = Bullet(50, 75, (50, 75), 94, 'Right', 9)
+coral_image = pygame.image.load(os.path.join(data_folder, 'coral.png')).convert()
+coral1 = Coral(75, 75)
+coral2 = Coral(325, 75)
+coral3 = Coral(375, 75)
+coral4 = Coral(425, 75)
+coral5 = Coral(475, 75)
+coral6 = Coral(525, 75)
+coral7 = Coral(375, 125)
+coral8 = Coral(625, 125)
+coral9 = Coral(575, 275)
+coral10 = Coral(575, 325)
+coral11 = Coral(525, 475)
+coral12 = Coral(525, 525)
+coral13 = Coral(575, 525)
+coral14 = Coral(625, 525)
+coral15 = Coral(475, 625)
+coral16 = Coral(25, 625)
+coral17 = Coral(75, 625)
+coral18 = Coral(75, 525)
+coral19 = Coral(125, 425)
+coral20 = Coral(125, 375)
+coral21 = Coral(175, 425)
+coral22 = Coral(175, 525)
+coral23 = Coral(75, 225)
+coral24 = Coral(125, 225)
+coral25 = Coral(175, 225)
+coral26 = Coral(425, 275)
+coral27 = Coral(275, 375)
+coral28 = Coral(325, 625)
+coral29 = Coral(175, 475)
+coral30 = Coral(375, 475)
+coral31 = Coral(425, 375)
+coral32 = Coral(475, 375)
+coral33 = Coral(525, 625)
+coral34 = Coral(625, 425)
+coral35 = Coral(75, 275)
+coral36 = Coral(75, 125)
+coral37 = Coral(125, 75)
+coral38 = Coral(425, 125)
+coral39 = Coral(475, 275)
+coral40 = Coral(175, 75)
+coral41 = Coral(125, 275)
+coral42 = Coral(125, 625)
+coral43 = Coral(225, 475)
+coral44 = Coral(225, 525)
+coral45 = Coral(675, 525)
+coral46 = Coral(575, 625)
+coral47 = Coral(675, 425)
+coral48 = Coral(625, 325)
+coral49 = Coral(625, 175)
+coral50 = Coral(675, 175)
+coral51 = Coral(675, 225)
+coral52 = Coral(275, 225)
 
-first_robber = Robber(25, 125, 'Right')
-second_robber = Robber(25, 175, 'Right')
-third_robber = Robber(25, 75, 'Right')
-
-second_cactus = Hedge(25, 575, 1)
-third_cactus = Hedge(25, 625, 1)
-fourth_cactus = Hedge(75, 575, 1)
-eighth_cactus = Hedge(175, 575, 1)
-ninth_cactus = Hedge(175, 625, 1)
-eleventh_cactus = Hedge(225, 575, 1)
-twelvth_cactus = Hedge(225, 625, 1)
-
-first_first_thirny_bush = Hedge(25, 25, 2)
-first_second_thirny_bush = Hedge(225, 75, 2)
-first_third_thirny_bush = Hedge(325, 25, 2)
-first_fourth_thirny_bush = Hedge(525, 25, 2)
-first_fifth_thirny_bush = Hedge(575, 25, 2)
-first_sixth_thirny_bush = Hedge(625, 25, 2)
-first_seventh_thirny_bush = Hedge(675, 25, 2)
-first_eight_thirny_bush = Hedge(725, 25, 2)
-
-second_first_thirny_bush = Hedge(75, 75, 2)
-second_second_thirny_bush = Hedge(125, 75, 2)
-second_third_thirny_bush = Hedge(425, 75, 2)
-second_fourth_thirny_bush = Hedge(475, 75, 2)
-second_fifth_thirny_bush = Hedge(525, 75, 2)
-second_sixth_thirny_bush = Hedge(725, 75, 2)
-
-third_first_thirny_bush = Hedge(75, 125, 2)
-third_second_thirny_bush = Hedge(225, 25, 2)
-third_third_thirny_bush = Hedge(225, 125, 2)
-third_fourth_thirny_bush = Hedge(275, 125, 2)
-third_fifth_thirny_bush = Hedge(325, 125, 2)
-third_sixth_thirny_bush = Hedge(525, 125, 2)
-third_seventh_thirny_bush = Hedge(625, 125, 2)
-third_eight_thirny_bush = Hedge(725, 125, 2)
-
-fourth_first_thirny_bush = Hedge(175, 175, 2)
-fourth_third_thirny_bush = Hedge(625, 175, 2)
-fourth_fourth_thirny_bush = Hedge(725, 175, 2)
-
-fifth_first_thirny_bush = Hedge(25, 225, 2)
-fifth_second_thirny_bush = Hedge(125, 225, 2)
-fifth_third_thirny_bush = Hedge(175, 225, 2)
-fifth_fourth_thirny_bush = Hedge(275, 225, 2)
-fifth_fifth_thirny_bush = Hedge(325, 225, 2)
-fifth_sixth_thirny_bush = Hedge(375, 225, 2)
-fifth_seventh_thirny_bush = Hedge(425, 225, 2)
-fifth_eighth_thirny_bush = Hedge(475, 225, 2)
-fifth_ninth_thirny_bush = Hedge(525, 225, 2)
-fifth_tenth_thirny_bush = Hedge(575, 225, 2)
-fifth_eleventh_thirny_bush = Hedge(625, 225, 2)
-fifth_twelvth_thirny_bush = Hedge(675, 225, 2)
-fifth_thirteenth_thirny_bush = Hedge(725, 225, 2)
-
-# Добавляю все спрайты
-
-add_sprite(player)
-add_sprite(first_tumbleweed)
-add_sprite(first_second_tumbleweed)
-add_sprite(first_third_tumbleweed)
-add_sprite(first_fourth_tumbleweed)
-add_sprite(first_fifth_tumbleweed)
-add_sprite(first_sixth_tumbleweed)
-add_sprite(first_seventh_tumbleweed)
-add_sprite(first_eighth_tumbleweed)
-
-add_sprite(second_tumbleweed)
-add_sprite(second_second_tumbleweed)
-add_sprite(second_third_tumbleweed)
-add_sprite(second_fourth_tumbleweed)
-add_sprite(second_fifth_tumbleweed)
-add_sprite(second_sixth_tumbleweed)
-add_sprite(second_seventh_tumbleweed)
-add_sprite(second_eighth_tumbleweed)
-
-add_sprite(third_first_tumbleweed)
-add_sprite(third_second_tumbleweed)
-add_sprite(third_third_tumbleweed)
-add_sprite(third_fourth_tumbleweed)
-add_sprite(third_fifth_tumbleweed)
-add_sprite(third_sixth_tumbleweed)
-add_sprite(third_seventh_tumbleweed)
-
-add_sprite(fourth_first_tumbleweed)
-add_sprite(fourth_second_tumbleweed)
-add_sprite(fourth_third_tumbleweed)
-add_sprite(fourth_fourth_tumbleweed)
-add_sprite(fourth_fifth_tumbleweed)
-add_sprite(fourth_sixth_tumbleweed)
-
-add_sprite(key)
-add_sprite(point)
-add_sprite(high_point)
-
-add_sprite(first_first_bullet)
-add_sprite(first_second_bullet)
-
-add_sprite(second_first_bullet)
-add_sprite(second_second_bullet)
-
-add_sprite(third_first_bullet)
-add_sprite(third_second_bullet)
-
-add_sprite(first_robber)
-add_sprite(second_robber)
-add_sprite(third_robber)
-
-add_sprite(second_cactus)
-add_sprite(third_cactus)
-add_sprite(fourth_cactus)
-add_sprite(eighth_cactus)
-add_sprite(ninth_cactus)
-add_sprite(eleventh_cactus)
-add_sprite(twelvth_cactus)
-
-add_sprite(first_first_thirny_bush)
-add_sprite(first_second_thirny_bush)
-add_sprite(first_third_thirny_bush)
-add_sprite(first_fourth_thirny_bush)
-add_sprite(first_fifth_thirny_bush)
-add_sprite(first_sixth_thirny_bush)
-add_sprite(first_seventh_thirny_bush)
-add_sprite(first_eight_thirny_bush)
-
-add_sprite(second_first_thirny_bush)
-add_sprite(second_second_thirny_bush)
-add_sprite(second_third_thirny_bush)
-add_sprite(second_fourth_thirny_bush)
-add_sprite(second_fifth_thirny_bush)
-add_sprite(second_sixth_thirny_bush)
-
-add_sprite(third_first_thirny_bush)
-add_sprite(third_second_thirny_bush)
-add_sprite(third_third_thirny_bush)
-add_sprite(third_fourth_thirny_bush)
-add_sprite(third_fifth_thirny_bush)
-add_sprite(third_sixth_thirny_bush)
-add_sprite(third_seventh_thirny_bush)
-add_sprite(third_eight_thirny_bush)
-
-add_sprite(fourth_first_thirny_bush)
-add_sprite(fourth_third_thirny_bush)
-add_sprite(fourth_fourth_thirny_bush)
-
-add_sprite(fifth_first_thirny_bush)
-add_sprite(fifth_second_thirny_bush)
-add_sprite(fifth_third_thirny_bush)
-add_sprite(fifth_fourth_thirny_bush)
-add_sprite(fifth_fifth_thirny_bush)
-add_sprite(fifth_sixth_thirny_bush)
-add_sprite(fifth_seventh_thirny_bush)
-add_sprite(fifth_eighth_thirny_bush)
-add_sprite(fifth_ninth_thirny_bush)
-add_sprite(fifth_tenth_thirny_bush)
-add_sprite(fifth_eleventh_thirny_bush)
-add_sprite(fifth_twelvth_thirny_bush)
-add_sprite(fifth_thirteenth_thirny_bush)
-
-add_sprite(life)
+all_sprites.add(coral1)
+all_sprites.add(coral2)
+all_sprites.add(coral3)
+all_sprites.add(coral4)
+all_sprites.add(coral5)
+all_sprites.add(coral6)
+all_sprites.add(coral7)
+all_sprites.add(coral8)
+all_sprites.add(coral9)
+all_sprites.add(coral10)
+all_sprites.add(coral11)
+all_sprites.add(coral12)
+all_sprites.add(coral13)
+all_sprites.add(coral14)
+all_sprites.add(coral15)
+all_sprites.add(coral16)
+all_sprites.add(coral17)
+all_sprites.add(coral18)
+all_sprites.add(coral19)
+all_sprites.add(coral20)
+all_sprites.add(coral21)
+all_sprites.add(coral22)
+all_sprites.add(coral23)
+all_sprites.add(coral24)
+all_sprites.add(coral25)
+all_sprites.add(coral26)
+all_sprites.add(coral27)
+all_sprites.add(coral28)
+all_sprites.add(coral29)
+all_sprites.add(coral30)
+all_sprites.add(coral31)
+all_sprites.add(coral32)
+all_sprites.add(coral33)
+all_sprites.add(coral34)
+all_sprites.add(coral35)
+all_sprites.add(coral36)
+all_sprites.add(coral37)
+all_sprites.add(coral38)
+all_sprites.add(coral39)
+all_sprites.add(coral40)
+all_sprites.add(coral41)
+all_sprites.add(coral42)
+all_sprites.add(coral43)
+all_sprites.add(coral44)
+all_sprites.add(coral45)
+all_sprites.add(coral46)
+all_sprites.add(coral47)
+all_sprites.add(coral48)
+all_sprites.add(coral49)
+all_sprites.add(coral50)
+all_sprites.add(coral51)
+all_sprites.add(coral52)
 
 # Цикл игры
-running = False
+running = True
 
 
-def third_level(running: bool = True):
+def first_level(running: bool = True):
+    global KEY
+    global KEY_STAR
+
     global faced_bool
     global win_bool
     global stop_bool
-
-    global life
-    global number_frames
-
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     while running:
         # Держим цикл на правильной скорости
         clock.tick(FPS)
         # Ввод процесса (события)
-
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
@@ -762,62 +715,116 @@ def third_level(running: bool = True):
             if event.type == pygame.KEYDOWN:
                 if not faced_bool and not win_bool and not stop_bool:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
-                        player.go_into_bush('Up')
+                        player.go_up()
 
                     elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                        player.go_into_bush('Down')
+                        player.go_down()
 
                     elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                        player.go_into_bush('Right')
+                        player.go_right()
 
                     elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                        player.go_into_bush('Left')
+                        player.go_left()
 
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = True
 
-                else:
+                    elif event.key == pygame.K_e:
+                        stop_bool = True
+                        wait_bool = True
+
+                elif win_bool:
                     if event.key == pygame.K_SPACE:
-                        if win_bool:
-                            running = False
+                        running = False
 
-                        if faced_bool:
-                            if life.life == '0':
-                                running = False
+                elif faced_bool:
+                    if event.key == pygame.K_SPACE:
+                        return_back()
+                        faced_bool = False
+                        win_bool = False
+                        KEY_STAR = False
+                        KEY = False
 
-                            else:
-                                life.life = str(int(life.life) - 1)
-                                return_back()
-                                faced_bool = False
+                elif stop_bool:
+                    if wait_bool:
+                        if event.key == pygame.K_1:
+                            save('1')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_2:
+                            save('2')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_3:
+                            save('3')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_4:
+                            save('4')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_5:
+                            save('5')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_6:
+                            save('6')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_7:
+                            save('7')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_8:
+                            save('8')
+
+                            stop_bool = False
+                            wait_bool = False
+
+                        elif event.key == pygame.K_9:
+                            save('9')
+
+                            stop_bool = False
+                            wait_bool = False
 
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = False
 
-            else:
-                if win_bool:
-                    win()
-
-                elif faced_bool:
-                    faced(life)
-
+        screen.fill((0, 0, 139))
         # Обновление
-        screen.fill((222, 184, 135))
-
         if not faced_bool and not win_bool and not stop_bool:
             all_sprites.update()
 
-        # Рендеринг
         all_sprites.draw(screen)
+        board.render(screen, player.get_rects())
         score.update()
         life_group.update()
         life_group.draw(screen)
-        # Вывод клетчатого поля
+
+        if KEY:
+            key_group.draw(screen)
+
+        if KEY_STAR:
+            key_star_group.draw(screen)
+
         if faced_bool:
-            faced(life)
+            faced()
 
         if win_bool:
             win()
-
-        number_frames += 1
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
