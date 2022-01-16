@@ -73,8 +73,27 @@ clock = pygame.time.Clock()
 
 start_screen(intro_text)
 
-FirstLevel.first_level(True)
-SecondLevel.second_level(True)
-ThirdLevel.third_level(True)
+something = FirstLevel.first_level(True)
+
+if something is not None:
+    level = int(something[1])
+    hearts = something[2]
+    points = something[3]
+
+    if level == 1:
+        something = FirstLevel.first_level(True, hearts, points)
+
+    elif level == 2:
+        something = SecondLevel.second_level(True, hearts, points)
+
+    else:
+        something = ThirdLevel.third_level(True, hearts, points)
+
+else:
+    something = SecondLevel.second_level(True)
+
+something = ThirdLevel.third_level(True)
+
+
 
 pygame.quit()

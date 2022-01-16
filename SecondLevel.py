@@ -471,7 +471,7 @@ all_sprites.add(boiler)
 running = True
 
 
-def second_level(running: bool = True):
+def second_level(running: bool = True, hearts: str = '3', points: str = '000000'):
     global stop_bool
     global all_sprites
 

@@ -16,6 +16,7 @@ level: int = 2
 faced_bool: bool = False
 win_bool: bool = False
 stop_bool: bool = False
+wait_bool: bool = False
 
 matrix = []
 
@@ -123,12 +124,21 @@ def make_matrix():
             matrix[y].append('')
 
 
-class Board:
-    def render(self, screen):
-        for y in range(HEIGHT):
-            for x in range(WIDTH):
-                pygame.draw.rect(screen, 'white',
-                                 (x * 50, y * 50, 50, 50), 1)
+def save(save_slot: str = 1):
+    global life
+    global score
+
+    level = '3'
+    hearts = life.life
+    points = score.points
+
+    preservation_file = open('preservation.txt', 'r', encoding='utf8')
+    preservation: list = preservation_file.read().split('\n')
+    preservation[int(save_slot) - 1] = '.'.join([save_slot, level, hearts, points])
+
+    preservation_file = open('preservation.txt', 'w', encoding='utf8')
+    preservation_file.write('\n'.join(preservation))
+    preservation_file.close()
 
 
 class Player(pygame.sprite.Sprite):
@@ -739,10 +749,11 @@ add_sprite(life)
 running = False
 
 
-def third_level(running: bool = True):
+def third_level(running: bool = True, hearts: str = '3', points: str = '000000'):
     global faced_bool
     global win_bool
     global stop_bool
+    global wait_bool
 
     global life
     global number_frames
@@ -776,6 +787,10 @@ def third_level(running: bool = True):
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = True
 
+                    elif event.key == pygame.K_e:
+                        stop_bool = True
+                        wait_bool = True
+
                 else:
                     if event.key == pygame.K_SPACE:
                         if win_bool:
@@ -790,8 +805,65 @@ def third_level(running: bool = True):
                                 return_back()
                                 faced_bool = False
 
-                    elif event.key == pygame.K_ESCAPE:
-                        stop_bool = False
+
+                    elif stop_bool:
+                        if wait_bool:
+                            if event.key == pygame.K_1:
+                                save('1')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_2:
+                                save('2')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_3:
+                                save('3')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_4:
+                                save('4')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_5:
+                                save('5')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_6:
+                                save('6')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_7:
+                                save('7')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_8:
+                                save('8')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                            elif event.key == pygame.K_9:
+                                save('9')
+
+                                stop_bool = False
+                                wait_bool = False
+
+                        elif event.key == pygame.K_ESCAPE:
+                            stop_bool = False
 
             else:
                 if win_bool:

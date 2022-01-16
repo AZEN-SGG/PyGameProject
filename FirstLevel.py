@@ -1,6 +1,5 @@
 import pygame
 import os
-import sys
 from random import choice
 
 WIDTH = 750
@@ -19,7 +18,8 @@ data_folder = os.path.join(game_folder, 'data')
 faced_bool = False
 win_bool = False
 stop_bool = False
-wait_bool = False
+save_bool = False
+load_bool = False
 
 key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
 sea_star_coord = choice([[625, 625], [725, 625]])
@@ -126,6 +126,13 @@ def save(save_slot: str = 1):
     preservation_file = open('preservation.txt', 'w', encoding='utf8')
     preservation_file.write('\n'.join(preservation))
     preservation_file.close()
+
+
+def load(load_slot: str = 1):
+    preservation_file = open('preservation.txt', 'r', encoding='utf8')
+    preservation: list = preservation_file.read().split('\n')
+
+    return preservation[int(load_slot) - 1].split()
 
 
 class Shark(pygame.sprite.Sprite):  # Класс акулы
@@ -695,13 +702,14 @@ all_sprites.add(coral52)
 running = True
 
 
-def first_level(running: bool = True):
+def first_level(running: bool = True, hearts: str = '3', points: str = '000000'):
     global KEY
     global KEY_STAR
 
     global faced_bool
     global win_bool
     global stop_bool
+    global save_bool
 
     while running:
         # Держим цикл на правильной скорости
@@ -731,7 +739,7 @@ def first_level(running: bool = True):
 
                     elif event.key == pygame.K_e:
                         stop_bool = True
-                        wait_bool = True
+                        save_bool = True
 
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
@@ -746,60 +754,60 @@ def first_level(running: bool = True):
                         KEY = False
 
                 elif stop_bool:
-                    if wait_bool:
+                    if save_bool:
                         if event.key == pygame.K_1:
                             save('1')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_2:
                             save('2')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_3:
                             save('3')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_4:
                             save('4')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_5:
                             save('5')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_6:
                             save('6')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_7:
                             save('7')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_8:
                             save('8')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                         elif event.key == pygame.K_9:
                             save('9')
 
                             stop_bool = False
-                            wait_bool = False
+                            save_bool = False
 
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = False
