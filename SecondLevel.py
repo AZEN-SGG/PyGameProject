@@ -3,11 +3,11 @@ import os
 import sys
 from random import choice
 
-WIDTH = 650
+WIDTH = 750
 HEIGHT = 650
 FPS = 20
 
-#Создание групп спрайтов
+# Создание групп спрайтов
 all_sprites = pygame.sprite.Group()
 key_group = pygame.sprite.Group()
 key_star_group = pygame.sprite.Group()
@@ -17,16 +17,16 @@ game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 faced_bool = False
 win_bool = False
-key_coord = [[575, 75], [125, 125], [75, 525], [525, 475]]
-sea_star_coord = choice([[625, 625], [525, 625]])
-key_star_coord = [[575, 625], [575, 325], [225, 75], [375, 325]]
+key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
+sea_star_coord = choice([[625, 625], [725, 625]])
+key_star_coord = [[675, 625], [675, 325], [225, 75], [475, 325]]
 
-matrix = [['' for _ in range(13)] for i in range(13)]
+matrix = [['' for _ in range(15)] for i in range(13)]
 KEY = False
 KEY_STAR = False
 
 
-def win(): #функция победы
+def win():  # функция победы
     global win_bool  # переменная отвечающая за работоспособность спрайтов
     win_bool = True  # При win_bool равном правде все спрайты останавливаются
 
@@ -41,7 +41,7 @@ def win(): #функция победы
     screen.blit(text, (text_x, text_y))
 
 
-def return_back(): #Возвращение спрайтов на исходные позиции
+def return_back():  # Возвращение спрайтов на исходные позиции
     life.take_away_life()
     shark1.reloaded()
     shark2.reloaded()
@@ -56,7 +56,7 @@ def return_back(): #Возвращение спрайтов на исходны�
     player.reloaded()
     key.reloaded()
     key_star.reloaded()
-    if life.give_life() < 0: # Обнуление очков при нехватке жизней
+    if life.give_life() < 0:  # Обнуление очков при нехватке жизней
         score.discharge()
         life.alive()
         star.status_collected()
@@ -90,7 +90,7 @@ def faced():  # Игрок проиграл, отображение надпис
     screen.blit(text, (text_x, text_y))
 
 
-def load_image(name, color_key=None): # Функция для получения фотографий
+def load_image(name, color_key=None):  # Функция для получения фотографий
     fullname = os.path.join(name)
     try:
         image = pygame.image.load(fullname).convert()
@@ -107,8 +107,8 @@ def load_image(name, color_key=None): # Функция для получения
     return image
 
 
-class Shark(pygame.sprite.Sprite): #Класс акулы
-    def __init__(self, sheet, columns, rows, x, y, SPEED, status):
+class Shark(pygame.sprite.Sprite):  # Класс акулы
+    def __init__(self, sheet, columns, rows, x, y, SPEED, status, spi=[]):
         super().__init__(all_sprites)
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
@@ -118,9 +118,12 @@ class Shark(pygame.sprite.Sprite): #Класс акулы
         self.rect = self.rect.move(x, y)
         self.SPEED = SPEED
         self.status = status
-        self.spi = [sheet, columns, rows, x, y, SPEED, status]
+        if spi == []:
+            self.spi = [sheet, columns, rows, x, y, SPEED, status]
+        else:
+            self.spi = spi
 
-    def cut_sheet(self, sheet, columns, rows): #получение изображения
+    def cut_sheet(self, sheet, columns, rows):  # получение изображения
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         for j in range(rows):
@@ -129,50 +132,50 @@ class Shark(pygame.sprite.Sprite): #Класс акулы
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
 
-    def update(self): #движение акул, изменение изображения
+    def update(self):  # движение акул, изменение изображения
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('red')
         if self.status == 1:
             self.rect.y += self.SPEED
             if self.rect.y >= HEIGHT - 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4)
+                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
         if self.status == 3:
             self.rect.y -= self.SPEED
             if self.rect.y <= 25:
-                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2)
+                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
         if self.status == 2:
             self.rect.x -= self.SPEED
             if self.rect.x <= 0:
-                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1)
+                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1, self.spi)
         if self.status == 4:
             self.rect.x += self.SPEED
             if self.rect.x >= WIDTH - 100:
-                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3)
+                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
         if self.status == 5:
             self.rect.y -= self.SPEED
             if self.rect.y == 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 150, 150, 5, 6)
+                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 200, 150, 5, 6, self.spi)
         if self.status == 6:
             self.rect.x += self.SPEED
-            if self.rect.x == 400:
-                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 450, 150, 5, 7)
+            if self.rect.x == 450:
+                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 500, 150, 5, 7, self.spi)
         if self.status == 7:
             self.rect.y += self.SPEED
             if self.rect.y == 350:
-                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 400, 400, 5, 8)
+                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 450, 400, 5, 8, self.spi)
         if self.status == 8:
             self.rect.x -= self.SPEED
-            if self.rect.x == 145:
-                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 150, 350, 5, 5)
+            if self.rect.x == 195:
+                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 200, 350, 5, 5, self.spi)
         if pygame.sprite.collide_mask(self, player):
             faced()
 
-    def reloaded(self): #возвращение на исходную позицию
+    def reloaded(self):  # возвращение на исходную позицию
         self.__init__(*self.spi)
 
 
-class SeaStar(pygame.sprite.Sprite): #Класс морской звезды (очки)
+class SeaStar(pygame.sprite.Sprite):  # Класс морской звезды (очки)
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = sea_star_image
@@ -192,7 +195,7 @@ class SeaStar(pygame.sprite.Sprite): #Класс морской звезды (о
                 self.adding_points()
                 self.collected = True
 
-    def adding_points(self): #добавление очков
+    def adding_points(self):  # добавление очков
         self.hide = True
         self.collected = True
 
@@ -208,7 +211,7 @@ class SeaStar(pygame.sprite.Sprite): #Класс морской звезды (о
         self.collected = False
 
 
-class Star(pygame.sprite.Sprite): #Класс звезды
+class Star(pygame.sprite.Sprite):  # Класс звезды
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = white_image
@@ -227,7 +230,7 @@ class Star(pygame.sprite.Sprite): #Класс звезды
             if pygame.sprite.collide_mask(self, player):
                 self.adding_points()
 
-    def adding_points(self): #добавление очков
+    def adding_points(self):  # добавление очков
         self.hide = True
         self.collected = True
 
@@ -257,7 +260,6 @@ class Score:  # Класс счёта
         self.screen = screen
         self.color = color
         self.font = pygame.font.Font(None, 45)
-        self.type = 'Score'  # Задаёт класс
         self.status = 1
 
     def add_points(self, point):
@@ -288,8 +290,6 @@ class Board:
             for x in range(WIDTH // 50):
                 if not (abs(y - j) <= 1 and abs(x - i) <= 1):
                     pygame.draw.rect(screen, 'black', (x * 50, y * 50, 50, 50))
-                # pygame.draw.rect(screen, 'white',
-                #                (x * 50, y * 50, 50, 50), 1)
 
 
 class Coral(pygame.sprite.Sprite):
@@ -320,7 +320,7 @@ class Key(pygame.sprite.Sprite):
     def bring_key(self):
         global KEY
         KEY = True
-        self.rect.x = 525
+        self.rect.x = 625
         self.rect.y = 0
 
     def reloaded(self):
@@ -346,7 +346,7 @@ class KeyStar(pygame.sprite.Sprite):
         global KEY_STAR
         KEY_STAR = True
 
-        self.rect.x = 475
+        self.rect.x = 575
         self.rect.y = 0
         star.change_hide()
         star1.change_hide()
@@ -415,7 +415,8 @@ class Player(pygame.sprite.Sprite):
         self.image = player_right_image
         self.image.set_colorkey('white')
         if self.rect.x == WIDTH - 50:
-            self.rect.x = 0
+            if matrix[self.rect.y // 50][0] != 'Coral':
+                self.rect.x = 0
 
         else:
             x = (self.rect.x + 50) // 50
@@ -445,11 +446,11 @@ class Life(pygame.sprite.Sprite):
     def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
-        self.COORDINATS = 575, 25
+        self.COORDINATS = 675, 25
         self.image = heart_image
         self.image.set_colorkey("green")
         self.rect = self.image.get_rect()
-        self.rect.center = 625, 25
+        self.rect.center = 725, 25
 
         self.screen = screen
         self.color = color
@@ -459,7 +460,7 @@ class Life(pygame.sprite.Sprite):
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
-        text_x = 575
+        text_x = 675
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
@@ -484,8 +485,6 @@ clock = pygame.time.Clock()
 
 score = Score(screen)
 
-all_sprites = pygame.sprite.Group()
-
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()
 
 board = Board()
@@ -499,13 +498,15 @@ all_sprites.add(life)
 
 opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
 closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
-door = Door(325, 275)
+door = Door(375, 275)
+
+all_sprites.add(door)
 
 sea_star_image = pygame.image.load(os.path.join(data_folder, 'sea_star.png')).convert()
 sea_star1 = SeaStar(sea_star_coord[0], sea_star_coord[1])
-sea_star2 = SeaStar(575, 225)
+sea_star2 = SeaStar(625, 225)
 sea_star3 = SeaStar(75, 175)
-sea_star4 = SeaStar(125, 625)
+sea_star4 = SeaStar(175, 625)
 
 all_sprites.add(sea_star1)
 all_sprites.add(sea_star2)
@@ -520,8 +521,8 @@ key_star_group.add(key_star)
 
 star_image = pygame.image.load(os.path.join(data_folder, 'stars.png')).convert()
 star = Star(75, 425)
-star1 = Star(425, 525)
-star2 = Star(225, 275)
+star1 = Star(475, 525)
+star2 = Star(275, 275)
 
 all_sprites.add(star)
 all_sprites.add(star1)
@@ -540,57 +541,70 @@ all_sprites.add(player)
 all_sprites.add(key)
 key_group.add(key)
 
-shark1 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 475, 7, 3)
-shark2 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 80, 7, 1)
-shark3 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 500, 7, 1)
-shark4 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 50, 7, 3)
-shark5 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 275, 0, 7, 2)
-shark6 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 300, HEIGHT - 100, 7, 4)
-shark7 = Shark(load_image("data/" + "shark_up.png"), 4, 1, 150, 250, 5, 5)
-shark8 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 450, 250, 5, 7)
-shark9 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 260, 400, 5, 8)
-shark10 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 270, 150, 5, 6)
+shark1 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 475, 7, 3, [])
+shark2 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 80, 7, 1, [])
+shark3 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 0, 500, 7, 1, [])
+shark4 = Shark(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, 10, 7, 3, [])
+shark5 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 325, 0, 7, 2, [])
+shark6 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 300, HEIGHT - 100, 7, 4, [])
+shark7 = Shark(load_image("data/" + "shark_up.png"), 4, 1, 200, 250, 5, 5, [])
+shark8 = Shark(load_image("data/" + "shark_down.png"), 4, 1, 500, 250, 5, 7, [])
+shark9 = Shark(load_image("data/" + "shark_left.png"), 2, 1, 310, 400, 5, 8, [])
+shark10 = Shark(load_image("data/" + "shark_right.png"), 2, 1, 320, 150, 5, 6, [])
 
 coral_image = pygame.image.load(os.path.join(data_folder, 'coral.png')).convert()
 coral1 = Coral(75, 75)
-coral2 = Coral(275, 75)
-coral3 = Coral(325, 75)
-coral4 = Coral(375, 75)
-coral5 = Coral(425, 75)
-coral6 = Coral(475, 75)
+coral2 = Coral(325, 75)
+coral3 = Coral(375, 75)
+coral4 = Coral(425, 75)
+coral5 = Coral(475, 75)
+coral6 = Coral(525, 75)
 coral7 = Coral(375, 125)
-coral8 = Coral(575, 175)
-coral9 = Coral(525, 275)
-coral10 = Coral(525, 325)
-coral11 = Coral(475, 475)
-coral12 = Coral(475, 525)
-coral13 = Coral(525, 525)
-coral14 = Coral(575, 525)
-coral15 = Coral(425, 625)
+coral8 = Coral(625, 125)
+coral9 = Coral(575, 275)
+coral10 = Coral(575, 325)
+coral11 = Coral(525, 475)
+coral12 = Coral(525, 525)
+coral13 = Coral(575, 525)
+coral14 = Coral(625, 525)
+coral15 = Coral(475, 625)
 coral16 = Coral(25, 625)
 coral17 = Coral(75, 625)
-coral18 = Coral(125, 525)
-coral19 = Coral(125, 475)
-coral20 = Coral(125, 425)
-coral21 = Coral(125, 375)
+coral18 = Coral(75, 525)
+coral19 = Coral(125, 425)
+coral20 = Coral(125, 375)
+coral21 = Coral(175, 425)
 coral22 = Coral(175, 525)
 coral23 = Coral(75, 225)
 coral24 = Coral(125, 225)
-coral25 = Coral(225, 225)
+coral25 = Coral(175, 225)
 coral26 = Coral(425, 275)
-coral27 = Coral(225, 375)
-coral28 = Coral(275, 625)
+coral27 = Coral(275, 375)
+coral28 = Coral(325, 625)
 coral29 = Coral(175, 475)
-coral30 = Coral(325, 475)
-coral31 = Coral(375, 375)
-coral32 = Coral(425, 375)
-coral33 = Coral(475, 625)
-coral34 = Coral(575, 425)
+coral30 = Coral(375, 475)
+coral31 = Coral(425, 375)
+coral32 = Coral(475, 375)
+coral33 = Coral(525, 625)
+coral34 = Coral(625, 425)
 coral35 = Coral(75, 275)
 coral36 = Coral(75, 125)
 coral37 = Coral(125, 75)
-coral38 = Coral(325, 125)
-coral39 = Coral(375, 275)
+coral38 = Coral(425, 125)
+coral39 = Coral(475, 275)
+coral40 = Coral(175, 75)
+coral41 = Coral(125, 275)
+coral42 = Coral(125, 625)
+coral43 = Coral(225, 475)
+coral44 = Coral(225, 525)
+coral45 = Coral(675, 525)
+coral46 = Coral(575, 625)
+coral47 = Coral(675, 425)
+coral48 = Coral(625, 325)
+coral49 = Coral(625, 175)
+coral50 = Coral(675, 175)
+coral51 = Coral(675, 225)
+coral52 = Coral(275, 225)
 
 all_sprites.add(coral1)
 all_sprites.add(coral2)
@@ -631,8 +645,21 @@ all_sprites.add(coral36)
 all_sprites.add(coral37)
 all_sprites.add(coral38)
 all_sprites.add(coral39)
+all_sprites.add(coral40)
+all_sprites.add(coral41)
+all_sprites.add(coral42)
+all_sprites.add(coral43)
+all_sprites.add(coral44)
+all_sprites.add(coral45)
+all_sprites.add(coral46)
+all_sprites.add(coral47)
+all_sprites.add(coral48)
+all_sprites.add(coral49)
+all_sprites.add(coral50)
+all_sprites.add(coral51)
+all_sprites.add(coral52)
 
-all_sprites.add(door)
+
 # Цикл игры
 running = True
 
@@ -666,7 +693,7 @@ def second_level(running):
                         player.go_left()
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
-                        running=False
+                        running = False
                 else:
                     if event.key == pygame.K_SPACE:
                         return_back()
