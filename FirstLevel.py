@@ -2,7 +2,7 @@ import pygame
 import random
 import os
 
-WIDTH = 650
+WIDTH = 750
 HEIGHT = 650
 FPS = 30  # Не трогать! На этом всё работает!
 
@@ -11,15 +11,18 @@ number_frames = 0
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
-level = 1
+level: int = 2
 
-faced_bool = False
-win_bool = False
+faced_bool: bool = False
+win_bool: bool = False
+stop_bool: bool = False
 
 matrix = []
 
 life_group = pygame.sprite.Group()
 
+
+# Функция проигрыши, запускается при проигрыше
 def faced(life):  # Отображает надпись и завершает программу
     global faced_bool
     faced_bool = True
@@ -28,15 +31,28 @@ def faced(life):  # Отображает надпись и завершает п
         life.life = '3'
         life.score.points = '000000'
 
-    font = pygame.font.Font(None, 50)
-    text = font.render("Игра окончена", True, (255, 0, 0))  # Нужно дописать про пробел
-    text_x = WIDTH // 2 - text.get_width() // 2
-    text_y = HEIGHT // 2 - text.get_height() // 2
-    text_w = text.get_width()
-    text_h = text.get_height()
-    screen.blit(text, (text_x, text_y))
-    pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
-                                           text_w + 20, text_h + 20), 1)
+    else:
+        if life.life == '0':
+            font = pygame.font.Font(None, 50)
+            text = font.render("Игра окончена", True, (255, 0, 0))  # Нужно дописать про пробел
+            text_x = WIDTH // 2 - text.get_width() // 2
+            text_y = HEIGHT // 2 - text.get_height() // 2
+            text_w = text.get_width()
+            text_h = text.get_height()
+            screen.blit(text, (text_x, text_y))
+            pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
+                                                   text_w + 20, text_h + 20), 1)
+
+        else:
+            font = pygame.font.Font(None, 50)
+            text = font.render("Вы проиграли", True, (255, 0, 0))  # Нужно дописать про пробел
+            text_x = WIDTH // 2 - text.get_width() // 2
+            text_y = HEIGHT // 2 - text.get_height() // 2
+            text_w = text.get_width()
+            text_h = text.get_height()
+            screen.blit(text, (text_x, text_y))
+            pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
+                                                   text_w + 20, text_h + 20), 1)
 
 
 # Отображает сообщение о выигрыше
@@ -459,7 +475,7 @@ class Life(pygame.sprite.Sprite):
                 self.score.points = '0' * (6 - len_points) + self.score.points
 
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
-        text_x = 575
+        text_x = 675
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
@@ -486,7 +502,7 @@ player = Player()
 
 heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
 score = Score(screen)
-life = Life(625, 25, heart_image, screen, score)
+life = Life(725, 25, heart_image, screen, score)
 
 life_group.add(life)
 
@@ -545,8 +561,8 @@ key = Key(475, 25)
 
 point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
 white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
-point = Point(75, 625, 500)
-high_point = Point(675, 175, 4500, key)
+point = Point(75, 625, 1000)
+high_point = Point(675, 175, 4000, key)
 
 # Создаю пули
 first_first_bullet = Bullet(50, 125, (50, 125), 0, 'Right', 9)
@@ -723,11 +739,15 @@ add_sprite(life)
 running = False
 
 
-def first_level(running):
+def third_level(running: bool = True):
     global faced_bool
-    global life
     global win_bool
+    global stop_bool
+
+    global life
     global number_frames
+
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     while running:
         # Держим цикл на правильной скорости
@@ -740,7 +760,7 @@ def first_level(running):
                 running = False
 
             if event.type == pygame.KEYDOWN:
-                if not faced_bool and not win_bool:
+                if not faced_bool and not win_bool and not stop_bool:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
                         player.go_into_bush('Up')
 
@@ -753,23 +773,37 @@ def first_level(running):
                     elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                         player.go_into_bush('Left')
 
+                    elif event.key == pygame.K_ESCAPE:
+                        stop_bool = True
+
                 else:
                     if event.key == pygame.K_SPACE:
-                        return_back()
-                        faced_bool = False
-                        win_bool = False
-
-                    else:
                         if win_bool:
-                            win()
+                            running = False
 
-                        else:
-                            faced(life)
+                        if faced_bool:
+                            if life.life == '0':
+                                running = False
+
+                            else:
+                                life.life = str(int(life.life) - 1)
+                                return_back()
+                                faced_bool = False
+
+                    elif event.key == pygame.K_ESCAPE:
+                        stop_bool = False
+
+            else:
+                if win_bool:
+                    win()
+
+                elif faced_bool:
+                    faced(life)
 
         # Обновление
         screen.fill((222, 184, 135))
 
-        if not faced_bool and not win_bool:
+        if not faced_bool and not win_bool and not stop_bool:
             all_sprites.update()
 
         # Рендеринг

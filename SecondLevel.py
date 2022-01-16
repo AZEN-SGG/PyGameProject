@@ -15,8 +15,11 @@ life_group = pygame.sprite.Group()
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
+
 faced_bool = False
 win_bool = False
+stop_bool = False
+
 key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
 sea_star_coord = choice([[625, 625], [725, 625]])
 key_star_coord = [[675, 625], [675, 325], [225, 75], [475, 325]]
@@ -659,16 +662,17 @@ all_sprites.add(coral50)
 all_sprites.add(coral51)
 all_sprites.add(coral52)
 
-
 # Цикл игры
 running = True
 
 
-def second_level(running):
+def first_level(running: bool = True):
     global KEY
     global KEY_STAR
+
     global faced_bool
     global win_bool
+    global stop_bool
 
     while running:
         # Держим цикл на правильной скорости
@@ -678,8 +682,9 @@ def second_level(running):
             # check for closing window
             if event.type == pygame.QUIT:
                 running = False
+
             if event.type == pygame.KEYDOWN:
-                if not faced_bool and not win_bool:
+                if not faced_bool and not win_bool and not stop_bool:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
                         player.go_up()
 
@@ -691,10 +696,14 @@ def second_level(running):
 
                     elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                         player.go_left()
+
+                    elif event.key == pygame.K_ESCAPE:
+                        stop_bool = True
+
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
                         running = False
-                else:
+                elif faced_bool:
                     if event.key == pygame.K_SPACE:
                         return_back()
                         faced_bool = False
@@ -702,9 +711,12 @@ def second_level(running):
                         KEY_STAR = False
                         KEY = False
 
+                elif event.key == pygame.K_ESCAPE:
+                    stop_bool = False
+
         screen.fill((0, 0, 139))
         # Обновление
-        if not faced_bool and not win_bool:
+        if not faced_bool and not win_bool and not stop_bool:
             all_sprites.update()
         all_sprites.draw(screen)
         board.render(screen, player.get_rects())

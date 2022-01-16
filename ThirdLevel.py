@@ -5,12 +5,15 @@ from random import choice
 WIDTH = 750
 HEIGHT = 650
 FPS = 10
+
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
 
 matrix = [['' for _ in range(15)] for i in range(13)]
 BOILER = False
+
+stop_bool: bool = False
 
 
 def load_image(name, color_key=None):  # Функция для получения фотографий
@@ -466,34 +469,51 @@ all_sprites.add(boiler)
 
 # Цикл игрыall_sprites.add(flame1)
 running = True
-while running:
-    # Держим цикл на правильной скорости
-    clock.tick(FPS)
-    # Ввод процесса (события)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w or event.key == pygame.K_UP:
-                player.go_up()
 
-            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                player.go_down()
 
-            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                player.go_right()
+def second_level(running: bool = True):
+    global stop_bool
+    global all_sprites
 
-            elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                player.go_left()
-    screen.fill((123, 34, 52))
-    # Обновление
-    all_sprites.update()
+    while running:
+        # Держим цикл на правильной скорости
+        clock.tick(FPS)
+        # Ввод процесса (события)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
 
-    # Рендеринг
-    all_sprites.draw(screen)
-    # Вывод клетчатого поля
+            if event.type == pygame.KEYDOWN:
+                if not stop_bool:
+                    if event.key == pygame.K_w or event.key == pygame.K_UP:
+                        player.go_up()
 
-    # После отрисовки всего, переворачиваем экран
-    pygame.display.flip()
-pygame.quit()
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        player.go_down()
+
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        player.go_right()
+
+                    elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        player.go_left()
+
+                    elif event.key == pygame.K_ESCAPE:
+                        stop_bool = True
+
+                elif stop_bool:
+                    if event.key == pygame.K_ESCAPE:
+                        stop_bool = False
+
+        screen.fill((123, 34, 52))
+
+        if not stop_bool:
+            # Обновление
+            all_sprites.update()
+
+        # Рендеринг
+        all_sprites.draw(screen)
+        # Вывод клетчатого поля
+
+        # После отрисовки всего, переворачиваем экран
+        pygame.display.flip()
