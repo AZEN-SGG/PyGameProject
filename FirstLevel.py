@@ -493,7 +493,7 @@ class Life(pygame.sprite.Sprite):
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
-        self.life = '3'
+        self.life = '5'
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
@@ -508,7 +508,7 @@ class Life(pygame.sprite.Sprite):
         return int(self.life)
 
     def alive(self):
-        self.life = '3'
+        self.life = '5'
 
 
 # Создаем игру и окно
