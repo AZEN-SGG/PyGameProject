@@ -223,7 +223,7 @@ class SeaStar(pygame.sprite.Sprite):  # Класс морской звезды (
         self.collected = False
 
     def update(self):
-        if not self.hide:
+        if not self.hide:  # Исчезновение звезды
             if self.image == white_image:
                 self.image = sea_star_image
                 self.image.set_colorkey('green')
@@ -259,7 +259,7 @@ class Star(pygame.sprite.Sprite):  # Класс звезды
         self.collected = False
 
     def update(self):
-        if not self.hide:
+        if not self.hide:  # Исчезновение звезды
             if self.image == white_image:
                 self.image = star_image
                 self.image.set_colorkey('green')
@@ -316,11 +316,11 @@ class Score:  # Класс счёта
                                          text_w + 10, text_h + 5))
         screen.blit(text, (text_x, text_y))
 
-    def discharge(self):
+    def discharge(self):  # обнуление счета
         self.points = '000000'
 
 
-class Board:
+class Board:  # Класс доски, для создания тумана
     def render(self, screen, coor):
         j, i = coor
         j //= 50
@@ -331,7 +331,7 @@ class Board:
                     pygame.draw.rect(screen, 'black', (x * 50, y * 50, 50, 50))
 
 
-class Coral(pygame.sprite.Sprite):
+class Coral(pygame.sprite.Sprite):  # Класс коралла (преграда)
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         matrix[y // 50][x // 50] = 'Coral'
@@ -341,8 +341,7 @@ class Coral(pygame.sprite.Sprite):
         self.rect.center = x, y
 
 
-class Key(pygame.sprite.Sprite):
-    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+class Key(pygame.sprite.Sprite):  # Класс Ключа для открывания двери
     def __init__(self, coord):
         x, y = coord[0], coord[1]
         pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
@@ -356,7 +355,7 @@ class Key(pygame.sprite.Sprite):
             if pygame.sprite.collide_mask(self, player):
                 self.bring_key()
 
-    def bring_key(self):
+    def bring_key(self):  # функция для собирания ключа
         global KEY
         KEY = True
         self.rect.x = 625
@@ -367,8 +366,7 @@ class Key(pygame.sprite.Sprite):
         self.__init__(choice(key_coord))
 
 
-class KeyStar(pygame.sprite.Sprite):
-    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+class KeyStar(pygame.sprite.Sprite):  # Класс ключа для открытия звезд
     def __init__(self, coord):
         x, y = coord[0], coord[1]
         pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
@@ -381,7 +379,7 @@ class KeyStar(pygame.sprite.Sprite):
         if pygame.sprite.collide_mask(self, player):
             self.bring_key()
 
-    def bring_key(self):
+    def bring_key(self):  # Функция
         global KEY_STAR
         KEY_STAR = True
 

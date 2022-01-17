@@ -57,15 +57,16 @@ def faced(life):  # Отображает надпись и завершает п
 
 def record():
     global score
-    with open('record', 'r', encoding='utf8') as f:
+    with open('record.txt', 'r', encoding='utf8') as f:
         text = f.readlines()
     text = [int(x) for x in text]
+    print(text)
     text.append(int(score.points))
-    text.sort()
+    text.sort(reverse=True)
     text = text[:3]
-    m = open("record", 'w')
+    m = open("record.txt", 'w')
     for elem in text:
-        m.write(str(elem))
+        m.write(str(elem) + '\n')
     m.close()
     f.close()
 
