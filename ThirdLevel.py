@@ -2,11 +2,11 @@ import pygame
 import random
 import os
 
-WIDTH = 750
-HEIGHT = 650
-FPS = 30  # Не трогать! На этом всё работает!
+WIDTH: int = 750
+HEIGHT: int = 650
+FPS: int = 30  # Не трогать! На этом всё работает!
 
-number_frames = 0
+number_frames: int = 0
 
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
@@ -16,9 +16,8 @@ level: int = 2
 faced_bool: bool = False
 win_bool: bool = False
 stop_bool: bool = False
-wait_bool: bool = False
 
-matrix = []
+matrix: list = []
 
 life_group = pygame.sprite.Group()
 
@@ -29,7 +28,7 @@ def faced(life):  # Отображает надпись и завершает п
     faced_bool = True
 
     if level == 1:
-        life.life = '3'
+        life.life = '5'
         life.score.points = '000000'
 
     else:
@@ -106,7 +105,7 @@ def return_back():  # Победа или поражение -> возвраще
 
 
 # При вызове функции можно задать количество очков которые прибавляются в счёту
-def get_point(this_point, add_points: int = 100):
+def get_point(this_point, add_points: int = 500):
     this_point.hide = True
     points = str(int(score.points) + add_points)
 
@@ -749,11 +748,10 @@ add_sprite(life)
 running = False
 
 
-def third_level(running: bool = True, hearts: str = '3', points: str = '000000'):
+def third_level(running: bool = True, points: str = '000000'):
     global faced_bool
     global win_bool
     global stop_bool
-    global wait_bool
 
     global life
     global number_frames
@@ -787,10 +785,6 @@ def third_level(running: bool = True, hearts: str = '3', points: str = '000000')
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = True
 
-                    elif event.key == pygame.K_e:
-                        stop_bool = True
-                        wait_bool = True
-
                 else:
                     if event.key == pygame.K_SPACE:
                         if win_bool:
@@ -807,62 +801,7 @@ def third_level(running: bool = True, hearts: str = '3', points: str = '000000')
 
 
                     elif stop_bool:
-                        if wait_bool:
-                            if event.key == pygame.K_1:
-                                save('1')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_2:
-                                save('2')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_3:
-                                save('3')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_4:
-                                save('4')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_5:
-                                save('5')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_6:
-                                save('6')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_7:
-                                save('7')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_8:
-                                save('8')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                            elif event.key == pygame.K_9:
-                                save('9')
-
-                                stop_bool = False
-                                wait_bool = False
-
-                        elif event.key == pygame.K_ESCAPE:
+                        if event.key == pygame.K_ESCAPE:
                             stop_bool = False
 
             else:

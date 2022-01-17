@@ -723,7 +723,7 @@ all_sprites.add(key)
 running = True
 
 
-def second_level(running: bool = True, hearts: str = '3', points: str = '000000'):
+def second_level(running: bool = True, points: str = '000000'):
     global stop_bool
     global all_sprites
 
