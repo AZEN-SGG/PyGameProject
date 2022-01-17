@@ -9,6 +9,10 @@ FPS = 10
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
+poison_coord1 = [[25, 125], [175, 225], [725, 625]]
+poison_coord2 = [[325, 25], [425, 175], [275, 625]]
+poison_coord3 = [[725, 525], [375, 325], [625, 475]]
+poison_coord4 = [[175, 525], [25, 325], [75, 525]]
 
 matrix = [['' for _ in range(15)] for i in range(13)]
 BOILER = False
@@ -298,13 +302,57 @@ class Boiler(pygame.sprite.Sprite):
 
         self.rect.x = 575
         self.rect.y = 0
-        # potion1.change_hide()
-        # potion2.change_hide()
-        # potion3.change_hide()
+        poison1.change_hide()
+        poison2.change_hide()
+        poison3.change_hide()
+        poison4.change_hide()
 
     def reloaded(self):
         global boiler_coord
         self.__init__(choice(boiler_coord))
+
+
+class Poison(pygame.sprite.Sprite):
+    def __init__(self, coord):
+        x, y = coord[0], coord[1]
+        pygame.sprite.Sprite.__init__(self)
+        self.image = white_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+        self.hide = True
+        self.collected = False
+
+    def update(self):
+        if not self.hide:
+            if self.image == white_image:
+                self.image = poison_image
+                self.image.set_colorkey('white')
+
+            if pygame.sprite.collide_mask(self, player):
+                self.adding_points()
+
+    def adding_points(self):  # добавление очков
+        self.hide = True
+        self.collected = True
+
+        self.image = white_image
+        self.image.set_colorkey('white')
+        # score.add_points(3000)
+
+    def change_hide(self):
+        if not self.collected:
+            self.hide = False
+            self.image = poison_image
+            self.image.set_colorkey('white')
+
+    def reloaded(self):
+        self.hide = True
+        self.image = white_image
+        self.image.set_colorkey('white')
+
+    def status_collected(self):
+        self.collected = False
 
 
 pygame.init()
@@ -399,6 +447,12 @@ potion3 = Potion(425, 325)
 boiler_image = pygame.image.load(os.path.join(data_folder, 'boiler.png')).convert()
 boiler = Boiler(choice(boiler_coord))
 
+poison_image = pygame.image.load(os.path.join(data_folder, 'dopzelye.png')).convert()
+poison1 = Poison(choice(poison_coord1))
+poison2 = Poison(choice(poison_coord2))
+poison3 = Poison(choice(poison_coord3))
+poison4 = Poison(choice(poison_coord4))
+
 all_sprites.add(player)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
@@ -466,6 +520,10 @@ all_sprites.add(potion1)
 all_sprites.add(potion2)
 all_sprites.add(potion3)
 all_sprites.add(boiler)
+all_sprites.add(poison1)
+all_sprites.add(poison2)
+all_sprites.add(poison3)
+all_sprites.add(poison4)
 
 # Цикл игрыall_sprites.add(flame1)
 running = True
@@ -517,3 +575,6 @@ def second_level(running: bool = True, hearts: str = '3', points: str = '000000'
 
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
+
+
+
