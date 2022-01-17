@@ -34,14 +34,16 @@ def terminate():
     sys.exit()
 
 
-def start_screen(text):
-    fon = pygame.transform.scale(load_image('fon.png'), (WIDTH, HEIGHT))
+# Функция выводит правила игры
+# Нужно задать имя файла изображения, а также можно указать цвет текста
+def start_screen(text, fon_name: str, color: str = 'yellow'):
+    fon = pygame.transform.scale(load_image(fon_name), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 50
 
     for line in text:
-        string_rendered = font.render(line, True, pygame.Color('white'))
+        string_rendered = font.render(line, True, pygame.Color(color))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -81,7 +83,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 # Отображаю правила первого уровня
-start_screen(intro_text)
+start_screen(intro_text, 'FirstLevelFon.png')
 something = FirstLevel.first_level(True)
 
 intro_text = ['                             Второй Уровень - Путешествие в Ад', '', '', '',
@@ -97,7 +99,7 @@ intro_text = ['                             Второй Уровень - Пут
               '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
 # Отображаю правила второго уровня
-start_screen(intro_text)
+start_screen(intro_text, 'SecondLevelFon.png')
 something = SecondLevel.second_level(True, something)
 
 intro_text = ['                             Третий Уровень - Дикий Запад', '', '', '',
@@ -114,7 +116,7 @@ intro_text = ['                             Третий Уровень - Дик
               '     4 - Пули, идут чередой с небольшой скоростью, но могут убить', '',
               '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
-start_screen(intro_text)
+start_screen(intro_text, 'ThirdLevelFon.png', 'brown')
 ThirdLevel.third_level(True, something)
 
 pygame.quit()
