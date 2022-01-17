@@ -27,6 +27,7 @@ def load_image(name, color_key=None):  # Функция для получени�
     fullname = os.path.join(name)
     try:
         image = pygame.image.load(fullname).convert()
+
     except pygame.error as message:
         print('Cannot load image:', name)
         raise SystemExit(message)
@@ -35,8 +36,10 @@ def load_image(name, color_key=None):  # Функция для получени�
         if color_key == -1:
             color_key = image.get_at((0, 0))
         image.set_colorkey(color_key)
+
     else:
         image = image.convert_alpha()
+
     return image
 
 
@@ -80,6 +83,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.y == 0:
             pass
+
         else:
             y = (self.rect.y - 50) // 50
             if matrix[y][self.rect.x // 50] == 'HideFlame':
@@ -99,6 +103,7 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.y -= 50
+
             elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y -= 50
 
@@ -107,6 +112,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.y == HEIGHT - 50:
             pass
+
         else:
             y = (self.rect.y + 50) // 50
             if matrix[y][self.rect.x // 50] == 'HideFlame':
@@ -126,6 +132,7 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.y += 50
+
             elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y += 50
 
@@ -135,6 +142,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.x == WIDTH - 50:
             if matrix[self.rect.y // 50][0] != 'Flame':
                 self.rect.x = 0
+
         else:
             x = (self.rect.x + 50) // 50
             if matrix[self.rect.y // 50][x] == 'HideFlame':
@@ -154,6 +162,7 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.x += 50
+
             elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x += 50
 
@@ -162,6 +171,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.x == 0:
             self.rect.x = WIDTH - 50
+
         else:
             x = (self.rect.x - 50) // 50
             if matrix[self.rect.y // 50][x] == 'HideFlame':
@@ -181,6 +191,7 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.x -= 50
+
             elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x -= 50
 
@@ -242,22 +253,27 @@ class Hide_Flame(pygame.sprite.Sprite):
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
+
         elif player.rect.center[0] == self.rect.centerx + 50 and player.rect.center[1] == self.rect.centery:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
+
         elif player.rect.center[1] == self.rect.centery + 50 and player.rect.center[0] == self.rect.centerx:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
+
         elif player.rect.center[1] == self.rect.centery - 50 and player.rect.center[0] == self.rect.centerx:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
+
         elif player.rect.center == self.rect.center:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
+
         else:
             self.hide = False
             self.image = self.frames[self.cur_frame]
@@ -503,6 +519,7 @@ class Bat(pygame.sprite.Sprite):
         self.status = status
         if spi == []:
             self.spi = [sheet, columns, rows, x, y, SPEED, status]
+
         else:
             self.spi = spi
 
@@ -516,25 +533,30 @@ class Bat(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self):
+        global bat_image
+
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('white')
         if self.status == 1:
             self.rect.x -= self.SPEED
             if self.rect.x <= -20:
-                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 0, 510, 20, 2, self.spi)
-        if self.status == 2:
+                self.__init__(bat_image, 3, 1, 0, 510, 20, 2, self.spi)
+
+        elif self.status == 2:
             self.rect.x += self.SPEED
             if self.rect.x >= 710:
-                self.__init__(load_image("data/" + "bat.png"), 3, 1, 710, 510, 20, 1, self.spi)
-        if self.status == 3:
+                self.__init__(bat_image, 3, 1, 710, 510, 20, 1, self.spi)
+
+        elif self.status == 3:
             self.rect.x -= self.SPEED
             if self.rect.x <= -20:
-                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 0, 105, 20, 4, self.spi)
-        if self.status == 4:
+                self.__init__(bat_image, 3, 1, 0, 105, 20, 4, self.spi)
+
+        elif self.status == 4:
             self.rect.x += self.SPEED
             if self.rect.x >= 710:
-                self.__init__(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 20, 3, self.spi)
+                self.__init__(bat_image, 3, 1, WIDTH - 50, 105, 20, 3, self.spi)
 
     def reloaded(self):  # возвращение на исходную позицию
         self.__init__(*self.spi)
@@ -662,8 +684,8 @@ bat3 = Bat(bat_image, 3, 1, 350, 105, 15, 3, [])
 bat4 = Bat(bat_image, 3, 1, 350, 105, 15, 4, [])
 
 all_sprites.add(door)
-all_sprites.add(bat1)
 all_sprites.add(player)
+all_sprites.add(bat1)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
 all_sprites.add(flame3)
