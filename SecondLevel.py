@@ -649,15 +649,17 @@ opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.p
 closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
 door = Door(375, 325)
 
-bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 510, 20, 1, [])
-bat2 = Bat(load_image("data/" + "bat.png"), 3, 1, 0, 510, 20, 2, [])
-bat3 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 1, [])
-bat4 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 2, [])
+bat_image = load_image("data/" + "bat.png")
 
-bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 20, 3, [])
-bat2 = Bat(load_image("data/" + "bat.png"), 3, 1, 0, 105, 20, 4, [])
-bat3 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 3, [])
-bat4 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 4, [])
+bat1 = Bat(bat_image, 3, 1, WIDTH - 50, 510, 20, 1, [])
+bat2 = Bat(bat_image, 3, 1, 0, 510, 20, 2, [])
+bat3 = Bat(bat_image, 3, 1, 350, 510, 15, 1, [])
+bat4 = Bat(bat_image, 3, 1, 350, 510, 15, 2, [])
+
+bat1 = Bat(bat_image, 3, 1, WIDTH - 50, 105, 20, 3, [])
+bat2 = Bat(bat_image, 3, 1, 0, 105, 20, 4, [])
+bat3 = Bat(bat_image, 3, 1, 350, 105, 15, 3, [])
+bat4 = Bat(bat_image, 3, 1, 350, 105, 15, 4, [])
 
 all_sprites.add(door)
 all_sprites.add(bat1)

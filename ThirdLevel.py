@@ -123,20 +123,16 @@ def make_matrix():
             matrix[y].append('')
 
 
-def save(save_slot: str = 1):
-    global life
+def save():
     global score
 
     level = '3'
-    hearts = life.life
     points = score.points
 
-    preservation_file = open('preservation.txt', 'r', encoding='utf8')
-    preservation: list = preservation_file.read().split('\n')
-    preservation[int(save_slot) - 1] = '.'.join([save_slot, level, hearts, points])
+    preservation = '.'.join(['autosave', level, points])
 
     preservation_file = open('preservation.txt', 'w', encoding='utf8')
-    preservation_file.write('\n'.join(preservation))
+    preservation_file.write(preservation)
     preservation_file.close()
 
 
