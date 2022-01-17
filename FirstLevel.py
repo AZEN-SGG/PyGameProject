@@ -379,7 +379,7 @@ class KeyStar(pygame.sprite.Sprite):  # Класс ключа для откры�
         if pygame.sprite.collide_mask(self, player):
             self.bring_key()
 
-    def bring_key(self):  # Функция
+    def bring_key(self):  # Функция при собирании ключа, показывает потайные звезды
         global KEY_STAR
         KEY_STAR = True
 
@@ -394,7 +394,7 @@ class KeyStar(pygame.sprite.Sprite):  # Класс ключа для откры�
         self.__init__(choice(key_star_coord))
 
 
-class Door(pygame.sprite.Sprite):
+class Door(pygame.sprite.Sprite): #Класс двери
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = closing_door_image
@@ -413,7 +413,7 @@ class Door(pygame.sprite.Sprite):
             self.image.set_colorkey('green')
 
 
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):#Класс игрока
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_image
@@ -422,13 +422,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = WIDTH / 2, HEIGHT - 25
 
-    def get_rects(self):
+    def get_rects(self): # функция для получения координат
         return self.rect.y, self.rect.x
 
     def update(self):
         pass
 
-    def go_up(self):
+    def go_up(self): #шаг вверх
         self.image = player_image
         self.image.set_colorkey('white')
         if self.rect.y == 0:
@@ -438,7 +438,7 @@ class Player(pygame.sprite.Sprite):
             if matrix[y][self.rect.x // 50] != 'Coral':
                 self.rect.y -= 50
 
-    def go_down(self):
+    def go_down(self): #шаг вниз
         self.image = player_down_image
         self.image.set_colorkey('white')
         if self.rect.y == HEIGHT - 50:
@@ -448,7 +448,7 @@ class Player(pygame.sprite.Sprite):
             if matrix[y][self.rect.x // 50] != 'Coral':
                 self.rect.y += 50
 
-    def go_right(self):
+    def go_right(self): #шаг вправо
         self.image = player_right_image
         self.image.set_colorkey('white')
         if self.rect.x == WIDTH - 50:
@@ -460,7 +460,7 @@ class Player(pygame.sprite.Sprite):
             if matrix[self.rect.y // 50][x] != 'Coral':
                 self.rect.x += 50
 
-    def go_left(self):
+    def go_left(self): #шаг влево
         self.image = player_left_image
         self.image.set_colorkey('white')
         if self.rect.x == 0:
@@ -478,7 +478,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = WIDTH / 2, HEIGHT - 25
 
 
-class Life(pygame.sprite.Sprite):
+class Life(pygame.sprite.Sprite): #Класс жизни
     def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -494,19 +494,19 @@ class Life(pygame.sprite.Sprite):
 
         self.life = '5'
 
-    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
-        text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять жизни
+        text = self.font.render(self.life, True, color)  # Отображение количества жизней
         text_x = 675
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
-    def take_away_life(self):
+    def take_away_life(self): #При смерти игрока жизнь отнимается
         self.life = str(int(self.life) - 1)
 
-    def give_life(self):
+    def give_life(self): # Получение количества жизни
         return int(self.life)
 
-    def alive(self):
+    def alive(self): #Для перезапуска уровня
         self.life = '5'
 
 
