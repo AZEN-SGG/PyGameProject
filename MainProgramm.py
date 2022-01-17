@@ -86,13 +86,13 @@ if something is not None:
     points = something[3]
 
     if level == 1:
-        something = FirstLevel.first_level(True, hearts, points)
+        something = FirstLevel.first_level(True, points)
 
     elif level == 2:
-        something = SecondLevel.second_level(True, hearts, points)
+        something = SecondLevel.second_level(True, points)
 
     else:
-        something = ThirdLevel.third_level(True, hearts, points)
+        something = ThirdLevel.third_level(True, points)
 
 else:
     something = SecondLevel.second_level(True)

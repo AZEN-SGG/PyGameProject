@@ -111,20 +111,16 @@ def load_image(name, color_key=None):  # Функция для получени�
     return image
 
 
-def save(save_slot: str = 1):
-    global life
+def save():
     global score
 
-    level = '1'
-    hearts = life.life
+    level = '2'
     points = score.points
 
-    preservation_file = open('preservation.txt', 'r', encoding='utf8')
-    preservation: list = preservation_file.read().split('\n')
-    preservation[int(save_slot) - 1] = '.'.join([save_slot, level, hearts, points])
+    preservation = '.'.join(['autosave', level, points])
 
     preservation_file = open('preservation.txt', 'w', encoding='utf8')
-    preservation_file.write('\n'.join(preservation))
+    preservation_file.write(preservation)
     preservation_file.close()
 
 
@@ -165,45 +161,47 @@ class Shark(pygame.sprite.Sprite):  # Класс акулы
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('red')
+        shark = "data/shark_"
+
         if self.status == 1:
             self.rect.y += self.SPEED
             if self.rect.y >= HEIGHT - 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
+                self.__init__(load_image(shark + "right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
 
         elif self.status == 3:
             self.rect.y -= self.SPEED
             if self.rect.y <= 25:
-                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
+                self.__init__(load_image(shark + "left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
 
         elif self.status == 2:
             self.rect.x -= self.SPEED
             if self.rect.x <= 0:
-                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1, self.spi)
+                self.__init__(load_image(shark + "down.png"), 4, 1, 0, 0, 5, 1, self.spi)
 
         elif self.status == 4:
             self.rect.x += self.SPEED
             if self.rect.x >= WIDTH - 100:
-                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
+                self.__init__(load_image(shark + "up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
 
         elif self.status == 5:
             self.rect.y -= self.SPEED
             if self.rect.y == 150:
-                self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 200, 150, 5, 6, self.spi)
+                self.__init__(load_image(shark + "right.png"), 2, 1, 200, 150, 5, 6, self.spi)
 
         elif self.status == 6:
             self.rect.x += self.SPEED
             if self.rect.x == 450:
-                self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 500, 150, 5, 7, self.spi)
+                self.__init__(load_image(shark + "down.png"), 4, 1, 500, 150, 5, 7, self.spi)
 
         elif self.status == 7:
             self.rect.y += self.SPEED
             if self.rect.y == 350:
-                self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 450, 400, 5, 8, self.spi)
+                self.__init__(load_image(shark + "left.png"), 2, 1, 450, 400, 5, 8, self.spi)
 
         elif self.status == 8:
             self.rect.x -= self.SPEED
             if self.rect.x == 195:
-                self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 200, 350, 5, 5, self.spi)
+                self.__init__(load_image(shark + "up.png"), 4, 1, 200, 350, 5, 5, self.spi)
 
         if pygame.sprite.collide_mask(self, player):
             faced()
