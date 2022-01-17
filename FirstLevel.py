@@ -293,16 +293,7 @@ class Score:  # Класс счёта
     # Функция получает количество очков полученных при собирании звёздочки
     # Если очков выходит больше тысячи прибавляет жизнь
     def add_points(self, point):
-        global life
-
         self.points = str(int(self.points) + point).rjust(6, '0')
-
-        if int(self.points) >= 1000:
-            number = int(self.points) // 1000
-
-            life.life = str(int(life.life) + number)
-            self.points = str(int(self.points) - number * 1000)
-            self.points = '0' * (6 - len(self.points)) + self.points
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.points, True, 'yellow')  # Рисую счёт - коричневый цвет
