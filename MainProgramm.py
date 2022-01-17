@@ -34,14 +34,14 @@ def terminate():
     sys.exit()
 
 
-def start_screen(intro_text):
+def start_screen(text):
     fon = pygame.transform.scale(load_image('fon.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 50
 
-    for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
+    for line in text:
+        string_rendered = font.render(line, True, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -61,13 +61,17 @@ def start_screen(intro_text):
         clock.tick(FPS)
 
 
-intro_text = ["Правила игры",
-              "Управление игроком происходит благодаря",
-              "кнопкам WASD или стрелочками",
-              'Чтобы пройти кровень необходимо найти ключ и открыть им дверь',
-              'Так же на уровнях присутствуют препятствия',
-              "Одни будут просто мешать проходу, другие отнимать жизни",
-              'Цель игры собрать наибольшего количества очков']
+intro_text = ['                             Первый Уровень - Подводный Мир', '', '', '',
+              "                                          ПРАВИЛА УРОВНЯ",
+              "             Управление игроком -> кнопки WASD или стрелочки",
+              '   Чтобы пройти уровень необходимо найти ключ и открыть им дверь', '',
+              '                                       Два типа вознаграждения:',
+              '                 1 - Обычные морские звёзды, 500 очков',
+              '                 2 - Дорогие морские звёзды, нужен ключ, 1000 очков', '',
+              '                                             Два типа врагов:',
+              "     1 - Акулы, на них лучше не попадаться иначе умрёшь",
+              '     2 - Коралы, обычные препятствия, которые мешают пройти', '',
+              '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
 pygame.init()
 pygame.mixer.init()
@@ -76,27 +80,41 @@ pygame.display.set_caption("Adventure experience")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
+# Отображаю правила первого уровня
 start_screen(intro_text)
-
 something = FirstLevel.first_level(True)
 
-if something is not None:
-    level = int(something[1])
-    hearts = something[2]
-    points = something[3]
+intro_text = ['                             Второй Уровень - Путешествие в Ад', '', '', '',
+              "                                          ПРАВИЛА УРОВНЯ",
+              "             Управление игроком -> кнопки WASD или стрелочки",
+              '   Чтобы пройти уровень необходимо найти ключ и открыть им дверь', '',
+              '                                       Два типа вознаграждения:',
+              '                 1 - Зелёные зелья, нужен котел, 500 очков',
+              '                 2 - Красные зелья, 1000 очков', '',
+              '                                             Два типа врагов:',
+              "     1 - Летучие Мыши, на них лучше не попадаться иначе умрёшь",
+              '     2 - Пламя, обычное препятствие, которое мешает пройти', '',
+              '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
-    if level == 1:
-        something = FirstLevel.first_level(True, points)
+# Отображаю правила второго уровня
+start_screen(intro_text)
+something = SecondLevel.second_level(True, something)
 
-    elif level == 2:
-        something = SecondLevel.second_level(True, points)
+intro_text = ['                             Третий Уровень - Дикий Запад', '', '', '',
+              "                                          ПРАВИЛА УРОВНЯ",
+              "             Управление игроком -> кнопки WASD или стрелочки",
+              '   Чтобы пройти уровень необходимо дойти до верхнего конца', '',
+              '                                       Два типа вознаграждения:',
+              '                 1 - Мешок с деньгами, 1000 очков',
+              '                 2 - Большой мешок с деньгами, нужен ключ, 4000 очков', '',
+              '                                             Четыре типа врагов:',
+              "     1 - Перекати поле, движутся на вас с огромной скоростью, убьют",
+              '     2 - Кактус и Колючий куст, препятствие, которое не даёт пройти',
+              '     3 - Ковбой, если наткнуться на него, то умрёшь, стреляет пулями',
+              '     4 - Пули, идут чередой с небольшой скоростью, но могут убить', '',
+              '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
-    else:
-        something = ThirdLevel.third_level(True, points)
-
-else:
-    something = SecondLevel.second_level(True)
-
-something = ThirdLevel.third_level(True)
+start_screen(intro_text)
+ThirdLevel.third_level(True, something)
 
 pygame.quit()

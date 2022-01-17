@@ -20,7 +20,9 @@ BOILER = False
 KEY = False
 
 stop_bool: bool = False
-win_bool = False
+win_bool: bool = False
+
+state_points: str = '000000'
 
 
 def load_image(name, color_key=None):  # Функция для получения фотографий
@@ -418,7 +420,7 @@ class Score:  # Класс счёта
         screen.blit(text, (text_x, text_y))
 
     def discharge(self):
-        self.points = '000000'
+        self.points = state_points
 
 
 class Life(pygame.sprite.Sprite):
@@ -754,15 +756,20 @@ all_sprites.add(poison4)
 all_sprites.add(life)
 all_sprites.add(key)
 
+
 # Цикл игры all_sprites.add(flame1)
-running = True
-
-
 def second_level(running: bool = True, points: str = '000000'):
     global stop_bool
     global win_bool
 
     global all_sprites
+    global score
+    global state_points
+
+    # Если предыдущий уровень вернул в игру очки, то они добавляются сюда
+    if points is not None:
+        state_points = points
+        score.points = points
 
     while running:
         # Держим цикл на правильной скорости
@@ -796,7 +803,7 @@ def second_level(running: bool = True, points: str = '000000'):
 
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
-                        running = False
+                        return score.points
 
         screen.fill((123, 34, 52))
 

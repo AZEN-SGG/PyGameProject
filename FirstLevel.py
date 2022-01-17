@@ -44,6 +44,11 @@ def win():  # функция победы
     screen.blit(text, (text_x, text_y))
 
 
+# Функция отвечает за передачу данных об заработанных очках
+def return_function():
+    points = score.points
+
+
 def return_back():  # Возвращение спрайтов на исходные позиции
     life.take_away_life()
     shark1.reloaded()
@@ -392,7 +397,7 @@ class KeyStar(pygame.sprite.Sprite):  # Класс ключа для откры�
         self.__init__(choice(key_star_coord))
 
 
-class Door(pygame.sprite.Sprite): #Класс двери
+class Door(pygame.sprite.Sprite):  # Класс двери
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = closing_door_image
@@ -411,7 +416,7 @@ class Door(pygame.sprite.Sprite): #Класс двери
             self.image.set_colorkey('green')
 
 
-class Player(pygame.sprite.Sprite):#Класс игрока
+class Player(pygame.sprite.Sprite):  # Класс игрока
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_image
@@ -420,13 +425,13 @@ class Player(pygame.sprite.Sprite):#Класс игрока
         self.rect = self.image.get_rect()
         self.rect.center = WIDTH / 2, HEIGHT - 25
 
-    def get_rects(self): # функция для получения координат
+    def get_rects(self):  # функция для получения координат
         return self.rect.y, self.rect.x
 
     def update(self):
         pass
 
-    def go_up(self): #шаг вверх
+    def go_up(self):  # шаг вверх
         self.image = player_image
         self.image.set_colorkey('white')
         if self.rect.y == 0:
@@ -436,7 +441,7 @@ class Player(pygame.sprite.Sprite):#Класс игрока
             if matrix[y][self.rect.x // 50] != 'Coral':
                 self.rect.y -= 50
 
-    def go_down(self): #шаг вниз
+    def go_down(self):  # шаг вниз
         self.image = player_down_image
         self.image.set_colorkey('white')
         if self.rect.y == HEIGHT - 50:
@@ -446,7 +451,7 @@ class Player(pygame.sprite.Sprite):#Класс игрока
             if matrix[y][self.rect.x // 50] != 'Coral':
                 self.rect.y += 50
 
-    def go_right(self): #шаг вправо
+    def go_right(self):  # шаг вправо
         self.image = player_right_image
         self.image.set_colorkey('white')
         if self.rect.x == WIDTH - 50:
@@ -458,7 +463,7 @@ class Player(pygame.sprite.Sprite):#Класс игрока
             if matrix[self.rect.y // 50][x] != 'Coral':
                 self.rect.x += 50
 
-    def go_left(self): #шаг влево
+    def go_left(self):  # шаг влево
         self.image = player_left_image
         self.image.set_colorkey('white')
         if self.rect.x == 0:
@@ -476,7 +481,7 @@ class Player(pygame.sprite.Sprite):#Класс игрока
         self.rect.center = WIDTH / 2, HEIGHT - 25
 
 
-class Life(pygame.sprite.Sprite): #Класс жизни
+class Life(pygame.sprite.Sprite):  # Класс жизни
     def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -498,13 +503,13 @@ class Life(pygame.sprite.Sprite): #Класс жизни
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
-    def take_away_life(self): #При смерти игрока жизнь отнимается
+    def take_away_life(self):  # При смерти игрока жизнь отнимается
         self.life = str(int(self.life) - 1)
 
-    def give_life(self): # Получение количества жизни
+    def give_life(self):  # Получение количества жизни
         return int(self.life)
 
-    def alive(self): #Для перезапуска уровня
+    def alive(self):  # Для перезапуска уровня
         self.life = '5'
 
 
@@ -693,13 +698,13 @@ all_sprites.add(coral50)
 all_sprites.add(coral51)
 all_sprites.add(coral52)
 
+
 # Цикл игры
-running = True
-
-
-def first_level(running: bool = True, points: str = '000000'):
+def first_level(running: bool = True):
     global KEY
     global KEY_STAR
+
+    global score
 
     global faced_bool
     global win_bool
@@ -733,7 +738,7 @@ def first_level(running: bool = True, points: str = '000000'):
 
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
-                        running = False
+                        return score.points
 
                 elif faced_bool:
                     if event.key == pygame.K_SPACE:
@@ -769,5 +774,6 @@ def first_level(running: bool = True, points: str = '000000'):
 
         if win_bool:
             win()
+
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()

@@ -11,7 +11,8 @@ number_frames: int = 0
 game_folder = os.path.dirname(__file__)
 data_folder = os.path.join(game_folder, 'data')
 
-level: int = 2
+level: int = 3
+state_points: str = '000000'
 
 faced_bool: bool = False
 win_bool: bool = False
@@ -27,32 +28,27 @@ def faced(heart):  # Отображает надпись и завершает �
     global faced_bool
     faced_bool = True
 
-    if level == 1:
-        heart.life = '5'
-        heart.score.points = '000000'
+    if heart.life == '0':
+        font = pygame.font.Font(None, 50)
+        text = font.render("Игра окончена", True, (255, 0, 0))  # Нужно дописать про пробел
+        text_x = WIDTH // 2 - text.get_width() // 2
+        text_y = HEIGHT // 2 - text.get_height() // 2
+        text_w = text.get_width()
+        text_h = text.get_height()
+        screen.blit(text, (text_x, text_y))
+        pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
+                                               text_w + 20, text_h + 20), 1)
 
     else:
-        if heart.life == '0':
-            font = pygame.font.Font(None, 50)
-            text = font.render("Игра окончена", True, (255, 0, 0))  # Нужно дописать про пробел
-            text_x = WIDTH // 2 - text.get_width() // 2
-            text_y = HEIGHT // 2 - text.get_height() // 2
-            text_w = text.get_width()
-            text_h = text.get_height()
-            screen.blit(text, (text_x, text_y))
-            pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
-                                                   text_w + 20, text_h + 20), 1)
-
-        else:
-            font = pygame.font.Font(None, 50)
-            text = font.render("Вы проиграли", True, (255, 0, 0))  # Нужно дописать про пробел
-            text_x = WIDTH // 2 - text.get_width() // 2
-            text_y = HEIGHT // 2 - text.get_height() // 2
-            text_w = text.get_width()
-            text_h = text.get_height()
-            screen.blit(text, (text_x, text_y))
-            pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
-                                                   text_w + 20, text_h + 20), 1)
+        font = pygame.font.Font(None, 50)
+        text = font.render("Вы проиграли", True, (255, 0, 0))  # Нужно дописать про пробел
+        text_x = WIDTH // 2 - text.get_width() // 2
+        text_y = HEIGHT // 2 - text.get_height() // 2
+        text_w = text.get_width()
+        text_h = text.get_height()
+        screen.blit(text, (text_x, text_y))
+        pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
+                                               text_w + 20, text_h + 20), 1)
 
 
 # Функция отвечает за запись рекордов, которые происходят при выигрыше последнего третьего уровня
@@ -125,7 +121,7 @@ def return_back():  # Поражение -> возвращение назад
 
         if sprites[sprite].type == 'Point':  # Мешочек с золотом
             sprites[sprite].hide = False
-            score.points = '000000'
+            score.points = state_points
 
         elif sprites[sprite].type == 'Key':
             sprites[sprite].hide = False
@@ -763,6 +759,12 @@ def third_level(running: bool = True, points: str = '000000'):
     global life
     global number_frames
     global screen
+    global score
+    global state_points
+
+    if points is not None:
+        state_points = points
+        score.points = points
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
