@@ -527,6 +527,14 @@ class Bat(pygame.sprite.Sprite):
             self.rect.x += self.SPEED
             if self.rect.x >= 710:
                 self.__init__(load_image("data/" + "bat.png"), 3, 1, 710, 510, 20, 1, self.spi)
+        if self.status == 3:
+            self.rect.x -= self.SPEED
+            if self.rect.x <= -20:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 0, 105, 20, 4, self.spi)
+        if self.status == 4:
+            self.rect.x += self.SPEED
+            if self.rect.x >= 710:
+                self.__init__(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 20, 3, self.spi)
 
     def reloaded(self):  # возвращение на исходную позицию
         self.__init__(*self.spi)
@@ -642,6 +650,14 @@ closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.p
 door = Door(375, 325)
 
 bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 510, 20, 1, [])
+bat2 = Bat(load_image("data/" + "bat.png"), 3, 1, 0, 510, 20, 2, [])
+bat3 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 1, [])
+bat4 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 2, [])
+
+bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 20, 3, [])
+bat2 = Bat(load_image("data/" + "bat.png"), 3, 1, 0, 105, 20, 4, [])
+bat3 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 3, [])
+bat4 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 4, [])
 
 all_sprites.add(door)
 all_sprites.add(bat1)
