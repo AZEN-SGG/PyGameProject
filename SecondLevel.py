@@ -11,13 +11,16 @@ data_folder = os.path.join(game_folder, 'data')
 boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
 poison_coord1 = [[25, 125], [175, 225], [725, 625]]
 poison_coord2 = [[325, 25], [425, 175], [275, 625]]
-poison_coord3 = [[725, 525], [375, 325], [625, 475]]
+poison_coord3 = [[725, 525], [325, 325], [625, 475]]
 poison_coord4 = [[175, 525], [25, 325], [75, 525]]
+key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
 
 matrix = [['' for _ in range(15)] for i in range(13)]
 BOILER = False
+KEY = False
 
 stop_bool: bool = False
+win_bool = False
 
 
 def load_image(name, color_key=None):  # Функция для получения фотографий
@@ -35,6 +38,21 @@ def load_image(name, color_key=None):  # Функция для получени�
     else:
         image = image.convert_alpha()
     return image
+
+
+def win():  # функция победы
+    global win_bool  # переменная отвечающая за работоспособность спрайтов
+    win_bool = True  # При win_bool равном правде все спрайты останавливаются
+
+    font = pygame.font.Font(None, 50)
+    text = font.render("Вы выиграли", True, 'white')
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
+                                            text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
 
 
 class Board:
@@ -272,7 +290,7 @@ class Potion(pygame.sprite.Sprite):
 
         self.image = white_image
         self.image.set_colorkey('white')
-        # score.add_points(500)
+        score.add_points(500)
 
     def reloaded(self):
         if not self.collected:
@@ -338,7 +356,7 @@ class Poison(pygame.sprite.Sprite):
 
         self.image = white_image
         self.image.set_colorkey('white')
-        # score.add_points(3000)
+        score.add_points(3000)
 
     def change_hide(self):
         if not self.collected:
@@ -355,6 +373,159 @@ class Poison(pygame.sprite.Sprite):
         self.collected = False
 
 
+class Score:  # Класс счёта
+    def __init__(self, screen, points: int = 0,
+                 color=(237, 28, 36)):  # При создании объекта класса надо задать счёт и цвет очков
+        self.points = str(points).rjust(6, '0')  # Создаю переменную очки в которую надо записывать счёт
+        self.screen = screen
+        self.color = color
+        self.font = pygame.font.Font(None, 45)
+        self.status = 1
+
+    # Функция получает количество очков полученных при собирании звёздочки
+    # Если очков выходит больше тысячи прибавляет жизнь
+    def add_points(self, point):
+        global life
+
+        self.points = str(int(self.points) + point).rjust(6, '0')
+
+        if int(self.points) >= 1000:
+            number = int(self.points) // 1000
+
+            life.life = str(int(life.life) + number)
+            self.points = str(int(self.points) - number * 1000)
+            self.points = '0' * (6 - len(self.points)) + self.points
+
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
+        text = self.font.render(self.points, True, 'yellow')  # Рисую счёт - коричневый цвет
+        text_w = text.get_width()
+        text_h = text.get_height()
+        text_x = 15
+        text_y = 15
+        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
+                                         text_w + 10, text_h + 5), 1)
+        pygame.draw.rect(screen, color, (text_x - 5, text_y - 5,
+                                         text_w + 10, text_h + 5))
+        screen.blit(text, (text_x, text_y))
+
+    def discharge(self):
+        self.points = '000000'
+
+
+class Life(pygame.sprite.Sprite):
+
+    def __init__(self, screen, color=(237, 28, 36)):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.COORDINATS = 675, 25
+        self.image = heart_image
+        self.image.set_colorkey("green")
+        self.rect = self.image.get_rect()
+        self.rect.center = 725, 25
+
+        self.screen = screen
+        self.color = color
+        self.font = pygame.font.Font(None, 55)
+
+        self.life = '3'
+
+    def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
+        text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
+        text_x = 675
+        text_y = 10
+        screen.blit(text, (text_x, text_y))
+
+    def take_away_life(self):
+        self.life = str(int(self.life) - 1)
+
+    def give_life(self):
+        return int(self.life)
+
+    def alive(self):
+        self.life = '3'
+
+
+class Door(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = closing_door_image
+        self.image.set_colorkey('green')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if KEY:
+            self.image = opening_door_image
+            self.image.set_colorkey('green')
+            if pygame.sprite.collide_mask(self, player):
+                win()
+        else:
+            self.image = closing_door_image
+            self.image.set_colorkey('green')
+
+
+class Key(pygame.sprite.Sprite):
+    # При создании объекта класса надо задать координаты, а также есть возможность выбрать уровень
+    def __init__(self, coord):
+        x, y = coord[0], coord[1]
+        pygame.sprite.Sprite.__init__(self)  # Переменная отвечает за показывание картинки
+        self.image = key_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def update(self):
+        if not KEY:
+            if pygame.sprite.collide_mask(self, player):
+                self.bring_key()
+
+    def bring_key(self):
+        global KEY
+        KEY = True
+        self.rect.x = 625
+        self.rect.y = 0
+
+    def reloaded(self):
+        global key_coord
+        self.__init__(choice(key_coord))
+
+
+class Bat(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y, SPEED, status, spi=[]):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('white')
+        self.rect = self.rect.move(x, y)
+        self.SPEED = SPEED
+        self.status = status
+        if spi == []:
+            self.spi = [sheet, columns, rows, x, y, SPEED, status]
+        else:
+            self.spi = spi
+
+    def cut_sheet(self, sheet, columns, rows):  # получение изображения
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+        self.image.set_colorkey('white')
+
+
+
+    def reloaded(self):  # возвращение на исходную позицию
+        self.__init__(*self.spi)
+
+
 pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption("Across The Road")
@@ -362,6 +533,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 board = Board()
+score = Score(screen)
 
 player_image = pygame.image.load(os.path.join(data_folder, 'shlapa.png')).convert()
 player_down_image = pygame.image.load(os.path.join(data_folder, 'shlapa_down.png')).convert()
@@ -444,6 +616,12 @@ potion1 = Potion(25, 425)
 potion2 = Potion(725, 125)
 potion3 = Potion(425, 325)
 
+heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
+life = Life(screen, score)
+
+key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
+key = Key(choice(key_coord))
+
 boiler_image = pygame.image.load(os.path.join(data_folder, 'boiler.png')).convert()
 boiler = Boiler(choice(boiler_coord))
 
@@ -453,6 +631,14 @@ poison2 = Poison(choice(poison_coord2))
 poison3 = Poison(choice(poison_coord3))
 poison4 = Poison(choice(poison_coord4))
 
+opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
+closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
+door = Door(375, 325)
+
+bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 525, 7, 3, [])
+
+all_sprites.add(door)
+all_sprites.add(bat1)
 all_sprites.add(player)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
@@ -524,6 +710,8 @@ all_sprites.add(poison1)
 all_sprites.add(poison2)
 all_sprites.add(poison3)
 all_sprites.add(poison4)
+all_sprites.add(life)
+all_sprites.add(key)
 
 # Цикл игрыall_sprites.add(flame1)
 running = True
@@ -571,6 +759,7 @@ def second_level(running: bool = True, hearts: str = '3', points: str = '000000'
 
         # Рендеринг
         all_sprites.draw(screen)
+        score.update()
         # Вывод клетчатого поля
 
         # После отрисовки всего, переворачиваем экран
