@@ -471,7 +471,7 @@ class Life(pygame.sprite.Sprite):
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
-        self.life = '3'
+        self.life = '5'
         self.score = score
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
