@@ -470,11 +470,14 @@ class Door(pygame.sprite.Sprite):
         self.rect.center = x, y
 
     def update(self):
+        global win_bool
+
         if KEY:
             self.image = opening_door_image
             self.image.set_colorkey('green')
             if pygame.sprite.collide_mask(self, player):
-                win()
+                win_bool = True
+
         else:
             self.image = closing_door_image
             self.image.set_colorkey('green')
@@ -765,6 +768,8 @@ running = True
 
 def second_level(running: bool = True, points: str = '000000'):
     global stop_bool
+    global win_bool
+
     global all_sprites
 
     while running:
@@ -777,7 +782,7 @@ def second_level(running: bool = True, points: str = '000000'):
                 running = False
 
             if event.type == pygame.KEYDOWN:
-                if not stop_bool:
+                if not stop_bool and not win_bool:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
                         player.go_up()
 
@@ -797,6 +802,10 @@ def second_level(running: bool = True, points: str = '000000'):
                     if event.key == pygame.K_ESCAPE:
                         stop_bool = False
 
+                elif win_bool:
+                    if event.key == pygame.K_SPACE:
+                        running = False
+
         screen.fill((123, 34, 52))
 
         if not stop_bool:
@@ -807,6 +816,9 @@ def second_level(running: bool = True, points: str = '000000'):
         all_sprites.draw(screen)
         score.update()
         # Вывод клетчатого поля
+
+        if win_bool:
+            win()
 
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
