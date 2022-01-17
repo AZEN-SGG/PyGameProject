@@ -44,43 +44,6 @@ def win():  # функция победы
     screen.blit(text, (text_x, text_y))
 
 
-def terminate():
-    pygame.quit()
-    sys.exit()
-
-
-def start_screen():
-    intro_text = ["Правила игры",
-                  "Управление игроком происходит благодаря",
-                  "кнопкам WASD или стрелочками",
-                  'Чтобы пройти кровень необходимо найти ключ и открыть им дверь',
-                  'Так же на уровнях присутствуют препятствия',
-                  "Одни будут просто мешать проходу, другие отнимать жизни",
-                  'Цель игры собрать наибольшего количества очков']
-
-    fon = pygame.transform.scale(load_image('data/fon.png'), (WIDTH, HEIGHT))
-    screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
-    for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                return
-        pygame.display.flip()
-        clock.tick(FPS)
-
-
 def return_back():  # Возвращение спрайтов на исходные позиции
     life.take_away_life()
     shark1.reloaded()
@@ -739,7 +702,6 @@ running = True
 
 
 def first_level(running: bool = True, points: str = '000000'):
-    start_screen()
     global KEY
     global KEY_STAR
 
