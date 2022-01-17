@@ -475,14 +475,6 @@ class Life(pygame.sprite.Sprite):
         self.score = score
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
-        if int(self.score.points) >= 1000:
-            self.score.points = str(int(self.score.points) - 1000)
-            self.life = str(int(self.life) + 1)
-
-            len_points = len(self.score.points)
-            if len_points < 6:
-                self.score.points = '0' * (6 - len_points) + self.score.points
-
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
         text_x = 675
         text_y = 10
