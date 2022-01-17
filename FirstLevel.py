@@ -1,6 +1,7 @@
 import pygame
 import os
 from random import choice
+import sys
 
 WIDTH = 750
 HEIGHT = 650
@@ -41,6 +42,43 @@ def win():  # функция победы
     pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
                                             text_w + 20, text_h + 20))
     screen.blit(text, (text_x, text_y))
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen():
+    intro_text = ["Правила игры",
+                  "Управление игроком происходит благодаря",
+                  "кнопкам WASD или стрелочками",
+                  'Чтобы пройти кровень необходимо найти ключ и открыть им дверь',
+                  'Так же на уровнях присутствуют препятствия',
+                  "Одни будут просто мешать проходу, другие отнимать жизни",
+                  'Цель игры собрать наибольшего количества очков']
+
+    fon = pygame.transform.scale(load_image('data/fon.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                return
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def return_back():  # Возвращение спрайтов на исходные позиции
@@ -169,37 +207,37 @@ class Shark(pygame.sprite.Sprite):  # Класс акулы
             if self.rect.y >= HEIGHT - 150:
                 self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
 
-        if self.status == 3:
+        elif self.status == 3:
             self.rect.y -= self.SPEED
             if self.rect.y <= 25:
                 self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
 
-        if self.status == 2:
+        elif self.status == 2:
             self.rect.x -= self.SPEED
             if self.rect.x <= 0:
                 self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1, self.spi)
 
-        if self.status == 4:
+        elif self.status == 4:
             self.rect.x += self.SPEED
             if self.rect.x >= WIDTH - 100:
                 self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
 
-        if self.status == 5:
+        elif self.status == 5:
             self.rect.y -= self.SPEED
             if self.rect.y == 150:
                 self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 200, 150, 5, 6, self.spi)
 
-        if self.status == 6:
+        elif self.status == 6:
             self.rect.x += self.SPEED
             if self.rect.x == 450:
                 self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 500, 150, 5, 7, self.spi)
 
-        if self.status == 7:
+        elif self.status == 7:
             self.rect.y += self.SPEED
             if self.rect.y == 350:
                 self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 450, 400, 5, 8, self.spi)
 
-        if self.status == 8:
+        elif self.status == 8:
             self.rect.x -= self.SPEED
             if self.rect.x == 195:
                 self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 200, 350, 5, 5, self.spi)
@@ -701,6 +739,7 @@ running = True
 
 
 def first_level(running: bool = True, points: str = '000000'):
+    start_screen()
     global KEY
     global KEY_STAR
 
