@@ -70,6 +70,7 @@ def return_back():  # Возвращение спрайтов на исходн�
         sea_star2.status_collected()
         sea_star3.status_collected()
         sea_star4.status_collected()
+
     star.reloaded()
     star1.reloaded()
     star2.reloaded()
@@ -148,6 +149,7 @@ class Shark(pygame.sprite.Sprite):  # Класс акулы
         self.status = status
         if spi == []:
             self.spi = [sheet, columns, rows, x, y, SPEED, status]
+
         else:
             self.spi = spi
 
@@ -168,34 +170,42 @@ class Shark(pygame.sprite.Sprite):  # Класс акулы
             self.rect.y += self.SPEED
             if self.rect.y >= HEIGHT - 150:
                 self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 0, HEIGHT - 100, 5, 4, self.spi)
+
         if self.status == 3:
             self.rect.y -= self.SPEED
             if self.rect.y <= 25:
                 self.__init__(load_image("data/" + "shark_left.png"), 2, 1, WIDTH - 75, 0, 5, 2, self.spi)
+
         if self.status == 2:
             self.rect.x -= self.SPEED
             if self.rect.x <= 0:
                 self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 0, 0, 5, 1, self.spi)
+
         if self.status == 4:
             self.rect.x += self.SPEED
             if self.rect.x >= WIDTH - 100:
                 self.__init__(load_image("data/" + "shark_up.png"), 4, 1, WIDTH - 50, HEIGHT - 150, 5, 3, self.spi)
+
         if self.status == 5:
             self.rect.y -= self.SPEED
             if self.rect.y == 150:
                 self.__init__(load_image("data/" + "shark_right.png"), 2, 1, 200, 150, 5, 6, self.spi)
+
         if self.status == 6:
             self.rect.x += self.SPEED
             if self.rect.x == 450:
                 self.__init__(load_image("data/" + "shark_down.png"), 4, 1, 500, 150, 5, 7, self.spi)
+
         if self.status == 7:
             self.rect.y += self.SPEED
             if self.rect.y == 350:
                 self.__init__(load_image("data/" + "shark_left.png"), 2, 1, 450, 400, 5, 8, self.spi)
+
         if self.status == 8:
             self.rect.x -= self.SPEED
             if self.rect.x == 195:
                 self.__init__(load_image("data/" + "shark_up.png"), 4, 1, 200, 350, 5, 5, self.spi)
+
         if pygame.sprite.collide_mask(self, player):
             faced()
 
@@ -229,7 +239,7 @@ class SeaStar(pygame.sprite.Sprite):  # Класс морской звезды (
 
         self.image = white_image
         self.image.set_colorkey('white')
-        score.add_points(1000)
+        score.add_points(500)
 
     def reloaded(self):
         if not self.collected:
@@ -264,7 +274,7 @@ class Star(pygame.sprite.Sprite):  # Класс звезды
 
         self.image = white_image
         self.image.set_colorkey('white')
-        score.add_points(3000)
+        score.add_points(1000)
 
     def change_hide(self):
         if not self.collected:
@@ -481,7 +491,6 @@ class Player(pygame.sprite.Sprite):
 
 
 class Life(pygame.sprite.Sprite):
-
     def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 

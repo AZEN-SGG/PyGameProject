@@ -528,7 +528,6 @@ class Bat(pygame.sprite.Sprite):
             if self.rect.x >= 710:
                 self.__init__(load_image("data/" + "bat.png"), 3, 1, 710, 510, 20, 1, self.spi)
 
-
     def reloaded(self):  # возвращение на исходную позицию
         self.__init__(*self.spi)
 
@@ -771,6 +770,3 @@ def second_level(running: bool = True, hearts: str = '3', points: str = '000000'
 
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
-
-
-
