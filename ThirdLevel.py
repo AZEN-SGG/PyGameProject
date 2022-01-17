@@ -766,6 +766,7 @@ def third_level(running: bool = True, points: str = '000000'):
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
+    # Цикл игры
     while running:
         # Держим цикл на правильной скорости
         clock.tick(FPS)

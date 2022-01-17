@@ -306,7 +306,7 @@ class Potion(pygame.sprite.Sprite):
 
         self.image = white_image
         self.image.set_colorkey('white')
-        score.add_points(500)
+        score.add_points(1000)
 
     def reloaded(self):
         if not self.collected:
@@ -372,7 +372,7 @@ class Poison(pygame.sprite.Sprite):
 
         self.image = white_image
         self.image.set_colorkey('white')
-        score.add_points(3000)
+        score.add_points(500)
 
     def change_hide(self):
         if not self.collected:
@@ -405,13 +405,6 @@ class Score:  # Класс счёта
 
         self.points = str(int(self.points) + point).rjust(6, '0')
 
-        if int(self.points) >= 1000:
-            number = int(self.points) // 1000
-
-            life.life = str(int(life.life) + number)
-            self.points = str(int(self.points) - number * 1000)
-            self.points = '0' * (6 - len(self.points)) + self.points
-
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.points, True, 'yellow')  # Рисую счёт - коричневый цвет
         text_w = text.get_width()
@@ -429,7 +422,6 @@ class Score:  # Класс счёта
 
 
 class Life(pygame.sprite.Sprite):
-
     def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -443,7 +435,7 @@ class Life(pygame.sprite.Sprite):
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
-        self.life = '3'
+        self.life = '5'
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
@@ -458,7 +450,7 @@ class Life(pygame.sprite.Sprite):
         return int(self.life)
 
     def alive(self):
-        self.life = '3'
+        self.life = '5'
 
 
 class Door(pygame.sprite.Sprite):
@@ -762,7 +754,7 @@ all_sprites.add(poison4)
 all_sprites.add(life)
 all_sprites.add(key)
 
-# Цикл игрыall_sprites.add(flame1)
+# Цикл игры all_sprites.add(flame1)
 running = True
 
 
