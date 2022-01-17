@@ -55,6 +55,21 @@ def faced(life):  # Отображает надпись и завершает п
                                                    text_w + 20, text_h + 20), 1)
 
 
+def record():
+    global score
+    with open('record', 'r', encoding='utf8') as f:
+        text = f.readlines()
+    text = [int(x) for x in text]
+    text.append(int(score.points))
+    text.sort()
+    text = text[:3]
+    m = open("record", 'w')
+    for elem in text:
+        m.write(str(elem))
+    m.close()
+    f.close()
+
+
 # Отображает сообщение о выигрыше
 def win():
     global win_bool  # переменная отвечающая за работоспособность спрайтов
@@ -816,6 +831,7 @@ def third_level(running: bool = True, points: str = '000000'):
 
         if win_bool:
             win()
+            record()
 
         number_frames += 1
         # После отрисовки всего, переворачиваем экран
