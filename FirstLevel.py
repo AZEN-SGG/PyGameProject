@@ -29,6 +29,14 @@ KEY = False
 KEY_STAR = False
 
 
+# Функция выключает программу
+def terminate():
+    # Выключает pygame
+    pygame.quit()
+    # Выключает всю программу
+    exit()
+
+
 def win():  # функция победы
     global win_bool  # переменная отвечающая за работоспособность спрайтов
     win_bool = True  # При win_bool равном правде все спрайты останавливаются

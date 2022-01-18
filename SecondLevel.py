@@ -27,6 +27,14 @@ save_bool = False
 load_bool = False
 
 
+# Функция выключает программу
+def terminate():
+    # Выключает pygame
+    pygame.quit()
+    # Выключает всю программу
+    exit()
+
+
 def load_image(name, color_key=None):  # Функция для получения фотографий
     fullname = os.path.join(name)
     try:
@@ -487,7 +495,7 @@ class Life(pygame.sprite.Sprite):
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
-        self.life = '3'
+        self.life = '5'
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
@@ -502,7 +510,7 @@ class Life(pygame.sprite.Sprite):
         return int(self.life)
 
     def alive(self):
-        self.life = '3'
+        self.life = '5'
 
 
 class Door(pygame.sprite.Sprite):
@@ -906,10 +914,6 @@ def second_level(running: bool = True, points: str = '000000'):
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = True
 
-                    elif event.key == pygame.K_e:
-                        stop_bool = True
-                        save_bool = True
-
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
                         running = False
@@ -921,6 +925,10 @@ def second_level(running: bool = True, points: str = '000000'):
                         win_bool = False
                         BOILER = False
                         KEY = False
+
+                elif stop_bool:
+                    if event.key == pygame.K_ESCAPE:
+                        stop_bool = False
 
         screen.fill((123, 34, 52))
 
@@ -938,6 +946,3 @@ def second_level(running: bool = True, points: str = '000000'):
             win()
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
-
-
-

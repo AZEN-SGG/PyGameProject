@@ -7,12 +7,9 @@ WIDTH: int = 750
 HEIGHT: int = 650
 FPS: int = 30  # Не трогать! На этом всё работает!
 
-number_frames: int = 0
-
 game_folder = path.dirname(__file__)
 data_folder = path.join(game_folder, 'data')
 
-level: int = 3
 state_points: str = '000000'
 
 faced_bool: bool = False
@@ -85,13 +82,21 @@ def record():
     for element in text:
         records += str(element).rjust(6, '0') + '\n'
 
-    # records = records.rstrip('\n')
+    records = records.rstrip('\n')
     file.write(records)
 
     # Закрываем файл
     file.close()
 
     return records
+
+
+# Функция выключает программу
+def terminate():
+    # Выключает pygame
+    pygame.quit()
+    # Выключает всю программу
+    exit()
 
 
 # Отображает сообщение о выигрыше
@@ -769,7 +774,6 @@ def third_level(running: bool = True, points: str = '000000'):
     global stop_bool
 
     global life
-    global number_frames
     global screen
     global score
     global state_points
@@ -789,7 +793,7 @@ def third_level(running: bool = True, points: str = '000000'):
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
-                exit()
+                terminate()
 
             if event.type == pygame.KEYDOWN:
                 if not faced_bool and not win_bool and not stop_bool:
@@ -815,7 +819,9 @@ def third_level(running: bool = True, points: str = '000000'):
 
                         if faced_bool:
                             if life.life == '0':
-                                running = False
+                                life.life = '5'
+                                return_back()
+                                faced_bool = False
 
                             else:
                                 life.life = str(int(life.life) - 1)
@@ -851,6 +857,5 @@ def third_level(running: bool = True, points: str = '000000'):
         if win_bool:
             win()
 
-        number_frames += 1
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
