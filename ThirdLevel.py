@@ -1,6 +1,7 @@
 import pygame
-import random
-import os
+from sys import exit
+from random import randint
+from os import path
 
 WIDTH: int = 750
 HEIGHT: int = 650
@@ -8,8 +9,8 @@ FPS: int = 30  # Не трогать! На этом всё работает!
 
 number_frames: int = 0
 
-game_folder = os.path.dirname(__file__)
-data_folder = os.path.join(game_folder, 'data')
+game_folder = path.dirname(__file__)
+data_folder = path.join(game_folder, 'data')
 
 level: int = 3
 state_points: str = '000000'
@@ -51,6 +52,10 @@ def faced(heart):  # Отображает надпись и завершает �
                                                text_w + 20, text_h + 20), 1)
 
 
+def load_image(image: str):
+    return pygame.image.load(path.join(data_folder, image)).convert()
+
+
 # Функция отвечает за запись рекордов, которые происходят при выигрыше последнего третьего уровня
 def record():
     global score
@@ -72,14 +77,21 @@ def record():
     # Удаляем все элементы до оставшихся трёх самых больших рекордов
     text = text[:3]
 
+    records: str = ''
+
     # Открываем файл для записи
     file = open("record.txt", 'w')
     # Записываем поэлементно
     for element in text:
-        file.write(str(element).rjust(6, '0') + '\n')
+        records += str(element).rjust(6, '0') + '\n'
+
+    # records = records.rstrip('\n')
+    file.write(records)
 
     # Закрываем файл
     file.close()
+
+    return records
 
 
 # Отображает сообщение о выигрыше
@@ -228,7 +240,7 @@ class Enemy(pygame.sprite.Sprite):  # Основной класс для вра�
         self.type = 'Enemy'  # Задаёт класс
 
         if speed == 0:
-            self.SPEED = random.randint(5, 7)
+            self.SPEED = randint(5, 7)
 
         else:
             self.SPEED = speed
@@ -508,30 +520,30 @@ all_sprites = pygame.sprite.Group()
 sprites = []
 coordinates = []  # В этой переменной содержаться координаты всех персонажей
 
-player_image = pygame.image.load(os.path.join(data_folder, 'bigger_player.png')).convert()
-player_left_image = pygame.image.load(os.path.join(data_folder, 'bigger_left_player.png')).convert()
-player_right_image = pygame.image.load(os.path.join(data_folder, 'bigger_right_player.png')).convert()
-player_back_image = pygame.image.load(os.path.join(data_folder, 'bigger_back_player.png')).convert()
+player_image = load_image('bigger_player.png')
+player_left_image = load_image('bigger_left_player.png')
+player_right_image = load_image('bigger_right_player.png')
+player_back_image = load_image('bigger_back_player.png')
 player = Player()
 
-heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
+heart_image = load_image('heart.png')
 score = Score(screen)
 life = Life(725, 25, heart_image, screen, score)
 
 life_group.add(life)
 
-tumbleweed_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed.png')).convert()
-tumbleweed_left_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_left.png')).convert()
-tumbleweed_back_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_back.png')).convert()
-tumbleweed_right_image = pygame.image.load(os.path.join(data_folder, 'tumbleweed_right.png')).convert()
+tumbleweed_image = load_image('tumbleweed.png')
+tumbleweed_left_image = load_image('tumbleweed_left.png')
+tumbleweed_back_image = load_image('tumbleweed_back.png')
+tumbleweed_right_image = load_image('tumbleweed_right.png')
 
-bullet_image = pygame.image.load(os.path.join(data_folder, 'bullet.png')).convert()
+bullet_image = load_image('bullet.png')
 
-right_robber_image = pygame.image.load(os.path.join(data_folder, 'right_robber.png')).convert()
-left_robber_image = pygame.image.load(os.path.join(data_folder, 'left_robber.png')).convert()
+right_robber_image = load_image('right_robber.png')
+left_robber_image = load_image('left_robber.png')
 
-cactus_image = pygame.image.load(os.path.join(data_folder, 'cactus.png')).convert()
-thorny_bush_image = pygame.image.load(os.path.join(data_folder, 'thorny_bush.png')).convert()
+cactus_image = load_image('cactus.png')
+thorny_bush_image = load_image('thorny_bush.png')
 
 # Создаю восемь объектов класса перекати поел которые средние
 first_tumbleweed = Tumbleweed(0, 375, 'Right', 6)
@@ -570,11 +582,11 @@ fourth_fourth_tumbleweed = Tumbleweed(325, 525, 'Right', 10)
 fourth_fifth_tumbleweed = Tumbleweed(525, 525, 'Right', 10)
 fourth_sixth_tumbleweed = Tumbleweed(575, 525, 'Right', 10)
 
-key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
+key_image = load_image('key.png')
 key = Key(475, 25)
 
-point_image = pygame.image.load(os.path.join(data_folder, 'point.png')).convert()
-white_image = pygame.image.load(os.path.join(data_folder, 'white.png')).convert()  # Белое изображение нужно для очков
+point_image = load_image('point.png')
+white_image = load_image('white.png')  # Белое изображение нужно для очков
 point = Point(75, 625, 1000)
 high_point = Point(675, 175, 4000, key)
 
@@ -777,7 +789,7 @@ def third_level(running: bool = True, points: str = '000000'):
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
-                running = False
+                exit()
 
             if event.type == pygame.KEYDOWN:
                 if not faced_bool and not win_bool and not stop_bool:
@@ -799,7 +811,7 @@ def third_level(running: bool = True, points: str = '000000'):
                 else:
                     if event.key == pygame.K_SPACE:
                         if win_bool:
-                            running = False
+                            return record()
 
                         if faced_bool:
                             if life.life == '0':
@@ -838,7 +850,6 @@ def third_level(running: bool = True, points: str = '000000'):
 
         if win_bool:
             win()
-            record()
 
         number_frames += 1
         # После отрисовки всего, переворачиваем экран

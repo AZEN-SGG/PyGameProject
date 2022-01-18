@@ -3,8 +3,8 @@ import FirstLevel
 import SecondLevel
 
 import pygame
-import sys
-import os
+from sys import exit
+from os import path
 
 WIDTH = 750
 HEIGHT = 650
@@ -13,7 +13,7 @@ FPS = 20
 
 def load_image(name, color_key=None):
     name = "data/" + name
-    fullname = os.path.join(name)
+    fullname = path.join(name)
     try:
         image = pygame.image.load(fullname).convert()
     except pygame.error as message:
@@ -29,14 +29,18 @@ def load_image(name, color_key=None):
     return image
 
 
+# Функция выключает программу
 def terminate():
+    # Выключает pygame
     pygame.quit()
-    sys.exit()
+    # Выключает всю программу
+    exit()
 
 
 # Функция выводит правила игры
 # Нужно задать имя файла изображения, а также можно указать цвет текста
 def start_screen(text, fon_name: str, color: str = 'yellow'):
+    # Создаём фон
     fon = pygame.transform.scale(load_image(fon_name), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -72,7 +76,7 @@ intro_text = ['                             Первый Уровень - Под
               '                 2 - Дорогие морские звёзды, нужен ключ, 1000 очков', '',
               '                                             Два типа врагов:',
               "     1 - Акулы, на них лучше не попадаться иначе умрёшь",
-              '     2 - Коралы, обычные препятствия, которые мешают пройти', '',
+              '     2 - Кораллы, обычные препятствия, которые мешают пройти', '',
               '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
 pygame.init()
@@ -117,6 +121,8 @@ intro_text = ['                             Третий Уровень - Дик
               '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
 start_screen(intro_text, 'ThirdLevelFon.png', 'brown')
-ThirdLevel.third_level(True, something)
+record: str = ThirdLevel.third_level(True, something)
+
+start_screen(record, 'RecordsFon.png')
 
 pygame.quit()

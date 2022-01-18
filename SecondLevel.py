@@ -1,5 +1,6 @@
 import pygame
 import os
+from sys import exit
 from random import choice
 
 WIDTH = 750
@@ -778,7 +779,7 @@ def second_level(running: bool = True, points: str = '000000'):
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
-                running = False
+                exit()
 
             if event.type == pygame.KEYDOWN:
                 if not stop_bool and not win_bool:

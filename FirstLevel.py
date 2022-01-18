@@ -1,7 +1,7 @@
 import pygame
 import os
 from random import choice
-import sys
+from sys import exit
 
 WIDTH = 750
 HEIGHT = 650
@@ -717,7 +717,7 @@ def first_level(running: bool = True):
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
-                running = False
+                exit()
 
             if event.type == pygame.KEYDOWN:
                 if not faced_bool and not win_bool and not stop_bool:
