@@ -21,16 +21,16 @@ BOILER = False
 KEY = False
 
 stop_bool: bool = False
-win_bool: bool = False
-
-state_points: str = '000000'
+win_bool = False
+faced_bool = False
+save_bool = False
+load_bool = False
 
 
 def load_image(name, color_key=None):  # Функция для получения фотографий
     fullname = os.path.join(name)
     try:
         image = pygame.image.load(fullname).convert()
-
     except pygame.error as message:
         print('Cannot load image:', name)
         raise SystemExit(message)
@@ -39,10 +39,8 @@ def load_image(name, color_key=None):  # Функция для получени�
         if color_key == -1:
             color_key = image.get_at((0, 0))
         image.set_colorkey(color_key)
-
     else:
         image = image.convert_alpha()
-
     return image
 
 
@@ -59,6 +57,53 @@ def win():  # функция победы
     pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
                                             text_w + 20, text_h + 20))
     screen.blit(text, (text_x, text_y))
+
+
+def faced():  # Игрок проиграл, отображение надписи
+    global faced_bool
+    faced_bool = True
+
+    font = pygame.font.Font(None, 50)
+    text = font.render("Игра окончена", True, 'white')
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
+                                            text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
+
+
+def return_back():  # Возвращение спрайтов на исходные позиции
+    life.take_away_life()
+    bat1.reloaded()
+    bat2.reloaded()
+    bat3.reloaded()
+    bat4.reloaded()
+    bat5.reloaded()
+    bat6.reloaded()
+    bat7.reloaded()
+    bat8.reloaded()
+    player.reloaded()
+    key.reloaded()
+    boiler.reloaded()
+    if life.give_life() < 0:  # Обнуление очков при нехватке жизней
+        score.discharge()
+        life.alive()
+        potion1.status_collected()
+        potion2.status_collected()
+        potion3.status_collected()
+        poison1.status_collected()
+        poison2.status_collected()
+        poison3.status_collected()
+        poison4.status_collected()
+    potion1.reloaded()
+    potion2.reloaded()
+    potion3.reloaded()
+    poison1.reloaded()
+    poison2.reloaded()
+    poison3.reloaded()
+    poison4.reloaded()
 
 
 class Board:
@@ -81,12 +126,14 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         pass
 
+    def get_rects(self):
+        return self.rect.y, self.rect.x
+
     def go_up(self):
         self.image = player_image
         self.image.set_colorkey('white')
         if self.rect.y == 0:
             pass
-
         else:
             y = (self.rect.y - 50) // 50
             if matrix[y][self.rect.x // 50] == 'HideFlame':
@@ -106,7 +153,6 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.y -= 50
-
             elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y -= 50
 
@@ -115,7 +161,6 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.y == HEIGHT - 50:
             pass
-
         else:
             y = (self.rect.y + 50) // 50
             if matrix[y][self.rect.x // 50] == 'HideFlame':
@@ -135,7 +180,6 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.y += 50
-
             elif matrix[y][self.rect.x // 50] != 'Flame':
                 self.rect.y += 50
 
@@ -145,7 +189,6 @@ class Player(pygame.sprite.Sprite):
         if self.rect.x == WIDTH - 50:
             if matrix[self.rect.y // 50][0] != 'Flame':
                 self.rect.x = 0
-
         else:
             x = (self.rect.x + 50) // 50
             if matrix[self.rect.y // 50][x] == 'HideFlame':
@@ -165,7 +208,6 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.x += 50
-
             elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x += 50
 
@@ -174,7 +216,6 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
         if self.rect.x == 0:
             self.rect.x = WIDTH - 50
-
         else:
             x = (self.rect.x - 50) // 50
             if matrix[self.rect.y // 50][x] == 'HideFlame':
@@ -194,9 +235,14 @@ class Player(pygame.sprite.Sprite):
                 flame61.update()
                 flame62.update()
                 self.rect.x -= 50
-
             elif matrix[self.rect.y // 50][x] != 'Flame':
                 self.rect.x -= 50
+
+    def reloaded(self):
+        self.image = player_image
+        self.image.set_colorkey('white')
+        self.rect = self.image.get_rect()
+        self.rect.center = WIDTH / 2, HEIGHT - 25
 
 
 class Flame(pygame.sprite.Sprite):
@@ -256,27 +302,22 @@ class Hide_Flame(pygame.sprite.Sprite):
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-
         elif player.rect.center[0] == self.rect.centerx + 50 and player.rect.center[1] == self.rect.centery:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-
         elif player.rect.center[1] == self.rect.centery + 50 and player.rect.center[0] == self.rect.centerx:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-
         elif player.rect.center[1] == self.rect.centery - 50 and player.rect.center[0] == self.rect.centerx:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-
         elif player.rect.center == self.rect.center:
             self.hide = True
             self.image = white_image
             self.image.set_colorkey('white')
-
         else:
             self.hide = False
             self.image = self.frames[self.cur_frame]
@@ -309,7 +350,7 @@ class Potion(pygame.sprite.Sprite):
 
         self.image = white_image
         self.image.set_colorkey('white')
-        score.add_points(1000)
+        score.add_points(500)
 
     def reloaded(self):
         if not self.collected:
@@ -375,7 +416,7 @@ class Poison(pygame.sprite.Sprite):
 
         self.image = white_image
         self.image.set_colorkey('white')
-        score.add_points(500)
+        score.add_points(3000)
 
     def change_hide(self):
         if not self.collected:
@@ -408,6 +449,13 @@ class Score:  # Класс счёта
 
         self.points = str(int(self.points) + point).rjust(6, '0')
 
+        if int(self.points) >= 1000:
+            number = int(self.points) // 1000
+
+            life.life = str(int(life.life) + number)
+            self.points = str(int(self.points) - number * 1000)
+            self.points = '0' * (6 - len(self.points)) + self.points
+
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.points, True, 'yellow')  # Рисую счёт - коричневый цвет
         text_w = text.get_width()
@@ -421,10 +469,11 @@ class Score:  # Класс счёта
         screen.blit(text, (text_x, text_y))
 
     def discharge(self):
-        self.points = state_points
+        self.points = '000000'
 
 
 class Life(pygame.sprite.Sprite):
+
     def __init__(self, screen, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -438,7 +487,7 @@ class Life(pygame.sprite.Sprite):
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
-        self.life = '5'
+        self.life = '3'
 
     def update(self, color=(237, 28, 36)):  # Этот метод позволит обновлять счёт
         text = self.font.render(self.life, True, color)  # Рисую счёт - коричневый цвет
@@ -453,7 +502,7 @@ class Life(pygame.sprite.Sprite):
         return int(self.life)
 
     def alive(self):
-        self.life = '5'
+        self.life = '3'
 
 
 class Door(pygame.sprite.Sprite):
@@ -465,14 +514,11 @@ class Door(pygame.sprite.Sprite):
         self.rect.center = x, y
 
     def update(self):
-        global win_bool
-
         if KEY:
             self.image = opening_door_image
             self.image.set_colorkey('green')
             if pygame.sprite.collide_mask(self, player):
-                win_bool = True
-
+                win()
         else:
             self.image = closing_door_image
             self.image.set_colorkey('green')
@@ -517,7 +563,6 @@ class Bat(pygame.sprite.Sprite):
         self.status = status
         if spi == []:
             self.spi = [sheet, columns, rows, x, y, SPEED, status]
-
         else:
             self.spi = spi
 
@@ -531,30 +576,59 @@ class Bat(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self):
-        global bat_image
-
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('white')
         if self.status == 1:
             self.rect.x -= self.SPEED
             if self.rect.x <= -20:
-                self.__init__(bat_image, 3, 1, 0, 510, 20, 2, self.spi)
-
-        elif self.status == 2:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 0, 510, 20, 2, self.spi)
+        if self.status == 2:
             self.rect.x += self.SPEED
             if self.rect.x >= 710:
-                self.__init__(bat_image, 3, 1, 710, 510, 20, 1, self.spi)
-
-        elif self.status == 3:
+                self.__init__(load_image("data/" + "bat.png"), 3, 1, 710, 510, 20, 1, self.spi)
+        if self.status == 3:
             self.rect.x -= self.SPEED
             if self.rect.x <= -20:
-                self.__init__(bat_image, 3, 1, 0, 105, 20, 4, self.spi)
-
-        elif self.status == 4:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 0, 105, 20, 4, self.spi)
+        if self.status == 4:
             self.rect.x += self.SPEED
             if self.rect.x >= 710:
-                self.__init__(bat_image, 3, 1, WIDTH - 50, 105, 20, 3, self.spi)
+                self.__init__(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 20, 3, self.spi)
+        if self.status == 5:
+            self.rect.y += self.SPEED
+            if self.rect.y >= 460:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 105, 460, 20, 6, self.spi)
+        if self.status == 6:
+            self.rect.x += self.SPEED
+            if self.rect.x >= 590:
+                self.__init__(load_image("data/" + "bat.png"), 3, 1, 590, 460, 20, 7, self.spi)
+        if self.status == 7:
+            self.rect.y -= self.SPEED
+            if self.rect.y <= 155:
+                self.__init__(load_image("data/" + "bat.png"), 3, 1, 590, 155, 20, 8, self.spi)
+        if self.status == 8:
+            self.rect.x -= self.SPEED
+            if self.rect.x <= 105:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 105, 155, 20, 5, self.spi)
+        if self.status == 9:
+            self.rect.x += self.SPEED
+            if self.rect.x >= 545:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 545, 205, 20, 10, self.spi)
+        if self.status == 10:
+            self.rect.y += self.SPEED
+            if self.rect.y >= 405:
+                self.__init__(load_image("data/" + "bat.png"), 3, 1, 545, 405, 20, 11, self.spi)
+        if self.status == 11:
+            self.rect.x -= self.SPEED
+            if self.rect.x <= 150:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 150, 405, 20, 12, self.spi)
+        if self.status == 12:
+            self.rect.y -= self.SPEED
+            if self.rect.y <= 205:
+                self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 150, 205, 20, 9, self.spi)
+        if pygame.sprite.collide_mask(self, player):
+            faced()
 
     def reloaded(self):  # возвращение на исходную позицию
         self.__init__(*self.spi)
@@ -566,6 +640,7 @@ pygame.display.set_caption("Across The Road")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
+dop_sprites = pygame.sprite.Group()
 board = Board()
 score = Score(screen)
 
@@ -650,14 +725,22 @@ potion1 = Potion(25, 425)
 potion2 = Potion(725, 125)
 potion3 = Potion(425, 325)
 
+dop_sprites.add(potion1)
+dop_sprites.add(potion2)
+dop_sprites.add(potion3)
+
 heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
 life = Life(screen, score)
 
 key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
 key = Key(choice(key_coord))
 
+dop_sprites.add(key)
+
 boiler_image = pygame.image.load(os.path.join(data_folder, 'boiler.png')).convert()
 boiler = Boiler(choice(boiler_coord))
+
+dop_sprites.add(boiler)
 
 poison_image = pygame.image.load(os.path.join(data_folder, 'dopzelye.png')).convert()
 poison1 = Poison(choice(poison_coord1))
@@ -665,25 +748,37 @@ poison2 = Poison(choice(poison_coord2))
 poison3 = Poison(choice(poison_coord3))
 poison4 = Poison(choice(poison_coord4))
 
+dop_sprites.add(poison1)
+dop_sprites.add(poison2)
+dop_sprites.add(poison3)
+dop_sprites.add(poison4)
+
 opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
 closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
 door = Door(375, 325)
 
-bat_image = load_image("data/" + "bat.png")
+bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 510, 15, 1, [])
+bat2 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 0, 510, 15, 2, [])
+bat3 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 1, [])
+bat4 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 350, 510, 15, 2, [])
 
-bat1 = Bat(bat_image, 3, 1, WIDTH - 50, 510, 20, 1, [])
-bat2 = Bat(bat_image, 3, 1, 0, 510, 20, 2, [])
-bat3 = Bat(bat_image, 3, 1, 350, 510, 15, 1, [])
-bat4 = Bat(bat_image, 3, 1, 350, 510, 15, 2, [])
+bat5 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 15, 3, [])
+bat6 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 0, 105, 15, 4, [])
+bat7 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 3, [])
+bat8 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 350, 105, 15, 4, [])
 
-bat1 = Bat(bat_image, 3, 1, WIDTH - 50, 105, 20, 3, [])
-bat2 = Bat(bat_image, 3, 1, 0, 105, 20, 4, [])
-bat3 = Bat(bat_image, 3, 1, 350, 105, 15, 3, [])
-bat4 = Bat(bat_image, 3, 1, 350, 105, 15, 4, [])
+bat9 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 105, 155, 15, 5, [])
+bat10 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 105, 460, 15, 6, [])
+bat11 = Bat(load_image("data/" + "bat.png"), 3, 1, 590, 460, 15, 7, [])
+bat12 = Bat(load_image("data/" + "bat.png"), 3, 1, 590, 155, 15, 8, [])
+
+bat13 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 205, 15, 9, [])
+bat14 = Bat(load_image("data/" + "bat.png"), 3, 1, 545, 310, 15, 10, [])
+bat15 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 405, 15, 11, [])
+bat16 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 150, 310, 15, 12, [])
 
 all_sprites.add(door)
 all_sprites.add(player)
-all_sprites.add(bat1)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
 all_sprites.add(flame3)
@@ -755,22 +850,35 @@ all_sprites.add(poison2)
 all_sprites.add(poison3)
 all_sprites.add(poison4)
 all_sprites.add(life)
-all_sprites.add(key)
+
+all_sprites.add(bat1)
+all_sprites.add(bat2)
+all_sprites.add(bat3)
+all_sprites.add(bat4)
+all_sprites.add(bat5)
+all_sprites.add(bat6)
+all_sprites.add(bat7)
+all_sprites.add(bat8)
+all_sprites.add(bat9)
+all_sprites.add(bat10)
+all_sprites.add(bat11)
+all_sprites.add(bat12)
+all_sprites.add(bat13)
+all_sprites.add(bat14)
+all_sprites.add(bat15)
+all_sprites.add(bat16)
+
+# Цикл игры
+running = True
 
 
-# Цикл игры all_sprites.add(flame1)
 def second_level(running: bool = True, points: str = '000000'):
     global stop_bool
-    global win_bool
-
     global all_sprites
-    global score
-    global state_points
-
-    # Если предыдущий уровень вернул в игру очки, то они добавляются сюда
-    if points is not None:
-        state_points = points
-        score.points = points
+    global faced_bool
+    global win_bool
+    global KEY
+    global BOILER
 
     while running:
         # Держим цикл на правильной скорости
@@ -782,7 +890,7 @@ def second_level(running: bool = True, points: str = '000000'):
                 exit()
 
             if event.type == pygame.KEYDOWN:
-                if not stop_bool and not win_bool:
+                if not faced_bool and not win_bool and not stop_bool:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
                         player.go_up()
 
@@ -798,27 +906,38 @@ def second_level(running: bool = True, points: str = '000000'):
                     elif event.key == pygame.K_ESCAPE:
                         stop_bool = True
 
-                elif stop_bool:
-                    if event.key == pygame.K_ESCAPE:
-                        stop_bool = False
+                    elif event.key == pygame.K_e:
+                        stop_bool = True
+                        save_bool = True
 
                 elif win_bool:
                     if event.key == pygame.K_SPACE:
-                        return score.points
+                        running = False
+
+                elif faced_bool:
+                    if event.key == pygame.K_SPACE:
+                        return_back()
+                        faced_bool = False
+                        win_bool = False
+                        BOILER = False
+                        KEY = False
 
         screen.fill((123, 34, 52))
 
-        if not stop_bool:
-            # Обновление
+        if not faced_bool and not win_bool and not stop_bool:
             all_sprites.update()
 
-        # Рендеринг
         all_sprites.draw(screen)
         score.update()
-        # Вывод клетчатого поля
+        dop_sprites.update()
+
+        if faced_bool:
+            faced()
 
         if win_bool:
             win()
-
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
+
+
+
