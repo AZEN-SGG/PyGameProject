@@ -639,6 +639,7 @@ pygame.display.set_caption("Across The Road")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
+dop_sprites = pygame.sprite.Group()
 board = Board()
 score = Score(screen)
 
@@ -723,14 +724,22 @@ potion1 = Potion(25, 425)
 potion2 = Potion(725, 125)
 potion3 = Potion(425, 325)
 
+dop_sprites.add(potion1)
+dop_sprites.add(potion2)
+dop_sprites.add(potion3)
+
 heart_image = pygame.image.load(os.path.join(data_folder, 'heart.png')).convert()
 life = Life(screen, score)
 
 key_image = pygame.image.load(os.path.join(data_folder, 'key.png')).convert()
 key = Key(choice(key_coord))
 
+dop_sprites.add(key)
+
 boiler_image = pygame.image.load(os.path.join(data_folder, 'boiler.png')).convert()
 boiler = Boiler(choice(boiler_coord))
+
+dop_sprites.add(boiler)
 
 poison_image = pygame.image.load(os.path.join(data_folder, 'dopzelye.png')).convert()
 poison1 = Poison(choice(poison_coord1))
@@ -738,33 +747,36 @@ poison2 = Poison(choice(poison_coord2))
 poison3 = Poison(choice(poison_coord3))
 poison4 = Poison(choice(poison_coord4))
 
+dop_sprites.add(poison1)
+dop_sprites.add(poison2)
+dop_sprites.add(poison3)
+dop_sprites.add(poison4)
+
 opening_door_image = pygame.image.load(os.path.join(data_folder, 'opening_door.png')).convert()
 closing_door_image = pygame.image.load(os.path.join(data_folder, 'closing_door.png')).convert()
 door = Door(375, 325)
 
-bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 510, 20, 1, [])
-bat2 = Bat(load_image("data/" + "bat.png"), 3, 1, 0, 510, 20, 2, [])
+bat1 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 510, 15, 1, [])
+bat2 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 0, 510, 15, 2, [])
 bat3 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 1, [])
-bat4 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 510, 15, 2, [])
+bat4 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 350, 510, 15, 2, [])
 
-bat5 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 20, 3, [])
-bat6 = Bat(load_image("data/" + "bat.png"), 3, 1, 0, 105, 20, 4, [])
+bat5 = Bat(load_image("data/" + "bat.png"), 3, 1, WIDTH - 50, 105, 15, 3, [])
+bat6 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 0, 105, 15, 4, [])
 bat7 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 3, [])
-bat8 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 105, 15, 4, [])
+bat8 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 350, 105, 15, 4, [])
 
-bat9 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 105, 155, 20, 5, [])
-bat10 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 105, 460, 20, 6, [])
-bat11 = Bat(load_image("data/" + "bat.png"), 3, 1, 590, 460, 20, 7, [])
-bat12 = Bat(load_image("data/" + "bat.png"), 3, 1, 590, 155, 20, 8, [])
+bat9 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 105, 155, 15, 5, [])
+bat10 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 105, 460, 15, 6, [])
+bat11 = Bat(load_image("data/" + "bat.png"), 3, 1, 590, 460, 15, 7, [])
+bat12 = Bat(load_image("data/" + "bat.png"), 3, 1, 590, 155, 15, 8, [])
 
-bat13 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 205, 20, 9, [])
-bat14 = Bat(load_image("data/" + "bat.png"), 3, 1, 545, 310, 20, 10, [])
-bat15 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 405, 20, 11, [])
-bat16 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 150, 310, 20, 12, [])
-
+bat13 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 205, 15, 9, [])
+bat14 = Bat(load_image("data/" + "bat.png"), 3, 1, 545, 310, 15, 10, [])
+bat15 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 405, 15, 11, [])
+bat16 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 150, 310, 15, 12, [])
 
 all_sprites.add(door)
-all_sprites.add(bat1)
 all_sprites.add(player)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
@@ -837,9 +849,25 @@ all_sprites.add(poison2)
 all_sprites.add(poison3)
 all_sprites.add(poison4)
 all_sprites.add(life)
-all_sprites.add(key)
 
-# Цикл игрыall_sprites.add(flame1)
+all_sprites.add(bat1)
+all_sprites.add(bat2)
+all_sprites.add(bat3)
+all_sprites.add(bat4)
+all_sprites.add(bat5)
+all_sprites.add(bat6)
+all_sprites.add(bat7)
+all_sprites.add(bat8)
+all_sprites.add(bat9)
+all_sprites.add(bat10)
+all_sprites.add(bat11)
+all_sprites.add(bat12)
+all_sprites.add(bat13)
+all_sprites.add(bat14)
+all_sprites.add(bat15)
+all_sprites.add(bat16)
+
+# Цикл игры
 running = True
 
 
@@ -848,6 +876,8 @@ def second_level(running: bool = True, points: str = '000000'):
     global all_sprites
     global faced_bool
     global win_bool
+    global KEY
+    global BOILER
 
     while running:
         # Держим цикл на правильной скорости
@@ -898,6 +928,7 @@ def second_level(running: bool = True, points: str = '000000'):
 
         all_sprites.draw(screen)
         score.update()
+        dop_sprites.update()
 
         if faced_bool:
             faced()
@@ -906,5 +937,6 @@ def second_level(running: bool = True, points: str = '000000'):
             win()
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
-second_level(True)
+
+
 
