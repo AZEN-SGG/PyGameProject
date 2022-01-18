@@ -610,14 +610,13 @@ class Bat(pygame.sprite.Sprite):
             self.rect.x -= self.SPEED
             if self.rect.x <= 105:
                 self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 105, 155, 20, 5, self.spi)
-
         if self.status == 9:
             self.rect.x += self.SPEED
             if self.rect.x >= 545:
                 self.__init__(load_image("data/" + "bat_right.png"), 3, 1, 545, 205, 20, 10, self.spi)
         if self.status == 10:
             self.rect.y += self.SPEED
-            if self.rect.x >= 405:
+            if self.rect.y >= 405:
                 self.__init__(load_image("data/" + "bat.png"), 3, 1, 545, 405, 20, 11, self.spi)
         if self.status == 11:
             self.rect.x -= self.SPEED
@@ -763,8 +762,6 @@ bat14 = Bat(load_image("data/" + "bat.png"), 3, 1, 545, 310, 20, 10, [])
 bat15 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 405, 20, 11, [])
 bat16 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 150, 310, 20, 12, [])
 
-bat17 = Bat(load_image("data/" + "bat.png"), 3, 1, 350, 155, 20, 8, [])
-bat18 = Bat(load_image("data/" + "bat_right.png"), 3, 1, 350, 460, 20, 6, [])
 
 all_sprites.add(door)
 all_sprites.add(bat1)
@@ -909,6 +906,5 @@ def second_level(running: bool = True, points: str = '000000'):
             win()
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
-
-
+second_level(True)
 
