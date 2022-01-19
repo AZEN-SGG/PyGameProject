@@ -7,9 +7,6 @@ WIDTH: int = 750
 HEIGHT: int = 650
 FPS: int = 10
 
-game_folder = path.dirname(__file__)
-data_folder = path.join(game_folder, 'data')
-
 boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
 poison_coord1 = [[25, 125], [175, 225], [725, 625]]
 poison_coord2 = [[325, 25], [425, 175], [275, 625]]

@@ -7,8 +7,7 @@ WIDTH: int = 750
 HEIGHT: int = 650
 FPS: int = 30  # Не трогать! На этом всё работает!
 
-game_folder = path.dirname(__file__)
-data_folder = path.join(game_folder, 'data')
+DATA_FOLDER: str = 'data/'
 
 state_points: str = '000000'
 
@@ -49,8 +48,25 @@ def faced(heart):  # Отображает надпись и завершает �
                                                text_w + 20, text_h + 20), 1)
 
 
-def load_image(image: str):
-    return pygame.image.load(path.join(data_folder, image)).convert()
+def load_image(name: str, color_key=None):  # Функция для получения фотографий
+    fullname = path.join(DATA_FOLDER + name)
+    try:
+        image = pygame.image.load(fullname).convert()
+
+    except pygame.error as message:
+        print('Cannot load image:', name)
+        raise SystemExit(message)
+
+    if color_key is not None:
+        if color_key == -1:
+            color_key = image.get_at((0, 0))
+
+        image.set_colorkey(color_key)
+
+    else:
+        image = image.convert_alpha()
+
+    return image
 
 
 # Функция отвечает за запись рекордов, которые происходят при выигрыше последнего третьего уровня

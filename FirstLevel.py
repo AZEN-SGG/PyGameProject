@@ -14,10 +14,6 @@ key_group = pygame.sprite.Group()
 key_star_group = pygame.sprite.Group()
 life_group = pygame.sprite.Group()
 
-# Задаём папку с игрок и папку с файлами
-game_folder = path.dirname(__file__)
-data_folder = path.join(game_folder, 'data')
-
 # Задаём основные переменные работы программы
 faced_bool: bool = False
 win_bool: bool = False
@@ -441,7 +437,7 @@ class Player(pygame.sprite.Sprite):  # Класс игрока
         self.image.set_colorkey('white')
         if self.rect.y == HEIGHT - 50:
             pass
-        
+
         else:
             y = (self.rect.y + 50) // 50
             if matrix[y][self.rect.x // 50] != 'Coral':
