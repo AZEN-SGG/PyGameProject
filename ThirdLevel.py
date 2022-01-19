@@ -16,7 +16,7 @@ faced_bool: bool = False
 win_bool: bool = False
 stop_bool: bool = False
 
-matrix: list = []
+matrix: list = [['' for _ in range(15)] for i in range(13)]
 
 life_group = pygame.sprite.Group()
 
@@ -164,14 +164,6 @@ def get_point(this_point, add_points: int = 500):
 
     score.points = points
     score.update()
-
-
-# Функция создаёт матрицу
-def make_matrix():
-    for y in range(13):
-        matrix.append([])
-        for x in range(15):
-            matrix[y].append('')
 
 
 class Player(pygame.sprite.Sprite):
@@ -516,8 +508,6 @@ class Life(pygame.sprite.Sprite):
         text_y = 10
         screen.blit(text, (text_x, text_y))
 
-
-make_matrix()
 
 pygame.init()
 pygame.mixer.init()

@@ -135,7 +135,7 @@ third_record: str = '                       ' + record[2]
 your_record: str = '                       ' + record[3]
 
 record: list = ['                    Рекорды:', first_record, second_record,
-                third_record, '', '                  Ваш рекорд',
+                third_record, '', '                  Ваш результат',
                 your_record]
 
 start_screen(record, 'RecordsFon.png', 'yellow', 70)
