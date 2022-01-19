@@ -3,12 +3,13 @@ from os import path
 from sys import exit
 from random import choice
 
-WIDTH = 750
-HEIGHT = 650
-FPS = 10
+WIDTH: int = 750
+HEIGHT: int = 650
+FPS: int = 10
 
 game_folder = path.dirname(__file__)
 data_folder = path.join(game_folder, 'data')
+
 boiler_coord = [[175, 25], [225, 125], [725, 225], [275, 525], [275, 225]]
 poison_coord1 = [[25, 125], [175, 225], [725, 625]]
 poison_coord2 = [[325, 25], [425, 175], [275, 625]]
@@ -17,6 +18,7 @@ poison_coord4 = [[175, 525], [25, 325], [75, 525]]
 key_coord = [[675, 125], [125, 125], [125, 525], [575, 475]]
 
 matrix = [['' for _ in range(15)] for i in range(13)]
+
 BOILER = False
 KEY = False
 
@@ -282,7 +284,7 @@ class Flame(pygame.sprite.Sprite):
         self.image.set_colorkey('white')
 
 
-class Hide_Flame(pygame.sprite.Sprite):
+class HideFlame(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y):
         super().__init__(all_sprites)
         matrix[y // 50][x // 50] = 'HideFlame'
@@ -449,10 +451,10 @@ class Poison(pygame.sprite.Sprite):
 
 
 class Score:  # Класс счёта
-    def __init__(self, screen, points: int = 0,
+    def __init__(self, shild, points: int = 0,
                  color=(237, 28, 36)):  # При создании объекта класса надо задать счёт и цвет очков
         self.points = str(points).rjust(6, '0')  # Создаю переменную очки в которую надо записывать счёт
-        self.screen = screen
+        self.screen = shild
         self.color = color
         self.font = pygame.font.Font(None, 45)
         self.status = 1
@@ -481,7 +483,7 @@ class Score:  # Класс счёта
 
 
 class Life(pygame.sprite.Sprite):
-    def __init__(self, screen, color=(237, 28, 36)):
+    def __init__(self, shild, color=(237, 28, 36)):
         pygame.sprite.Sprite.__init__(self)
 
         self.COORDINATS = 675, 25
@@ -490,7 +492,7 @@ class Life(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = 725, 25
 
-        self.screen = screen
+        self.screen = shild
         self.color = color
         self.font = pygame.font.Font(None, 55)
 
@@ -561,7 +563,7 @@ class Key(pygame.sprite.Sprite):
 
 
 class Bat(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y, SPEED, status, spi=[]):
+    def __init__(self, sheet, columns, rows, x, y, speed, status, spi: list = []):
         super().__init__(all_sprites)
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
@@ -569,9 +571,9 @@ class Bat(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         self.image.set_colorkey('white')
         self.rect = self.rect.move(x, y)
-        self.SPEED = SPEED
+        self.SPEED = speed
         self.status = status
-        if spi == []:
+        if not spi:
             self.spi = [sheet, columns, rows, x, y, SPEED, status]
 
         else:

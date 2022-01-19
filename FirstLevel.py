@@ -3,6 +3,7 @@ from os import path
 from random import choice
 from sys import exit
 
+# Задаём Размер окна и частоту кадров
 WIDTH: int = 750
 HEIGHT: int = 650
 FPS: int = 20
@@ -13,9 +14,11 @@ key_group = pygame.sprite.Group()
 key_star_group = pygame.sprite.Group()
 life_group = pygame.sprite.Group()
 
+# Задаём папку с игрок и папку с файлами
 game_folder = path.dirname(__file__)
 data_folder = path.join(game_folder, 'data')
 
+# Задаём основные переменные работы программы
 faced_bool: bool = False
 win_bool: bool = False
 stop_bool: bool = False
@@ -115,6 +118,7 @@ def load_image(name, color_key=None):  # Функция для получени�
     if color_key is not None:
         if color_key == -1:
             color_key = image.get_at((0, 0))
+
         image.set_colorkey(color_key)
 
     else:
@@ -134,7 +138,9 @@ class Shark(pygame.sprite.Sprite):  # Класс акулы
         self.rect = self.rect.move(x, y)
         self.SPEED = speed
         self.status = status
-        if your_list == []:
+        self.spi = your_list
+
+        if not self.spi:
             self.spi = [sheet, columns, rows, x, y, speed, status]
 
         else:
@@ -143,6 +149,7 @@ class Shark(pygame.sprite.Sprite):  # Класс акулы
     def cut_sheet(self, sheet, columns, rows):  # получение изображения
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
+
         for j in range(rows):
             for i in range(columns):
                 frame_location = (self.rect.w * i, self.rect.h * j)
@@ -314,18 +321,14 @@ class Score:  # Класс счёта
         self.points = '000000'
 
 
-class Board:  # Класс доски, для создания тумана
-    def __init__(self):
-        pass
-
-    def rendering(self, need_screen, coordinates):
-        j, i = coordinates
-        j //= 50
-        i //= 50
-        for y in range(HEIGHT // 50):
-            for x in range(WIDTH // 50):
-                if not (abs(y - j) <= 1 and abs(x - i) <= 1):
-                    pygame.draw.rect(need_screen, 'black', (x * 50, y * 50, 50, 50))
+def rendering(need_screen, coordinates):
+    j, i = coordinates
+    j //= 50
+    i //= 50
+    for y in range(HEIGHT // 50):
+        for x in range(WIDTH // 50):
+            if not (abs(y - j) <= 1 and abs(x - i) <= 1):
+                pygame.draw.rect(need_screen, 'black', (x * 50, y * 50, 50, 50))
 
 
 class Coral(pygame.sprite.Sprite):  # Класс коралла (преграда)
@@ -422,14 +425,12 @@ class Player(pygame.sprite.Sprite):  # Класс игрока
     def get_rects(self):  # функция для получения координат
         return self.rect.y, self.rect.x
 
-    def update(self):
-        pass
-
     def go_up(self):  # шаг вверх
         self.image = player_image
         self.image.set_colorkey('white')
         if self.rect.y == 0:
             pass
+
         else:
             y = (self.rect.y - 50) // 50
             if matrix[y][self.rect.x // 50] != 'Coral':
@@ -440,6 +441,7 @@ class Player(pygame.sprite.Sprite):  # Класс игрока
         self.image.set_colorkey('white')
         if self.rect.y == HEIGHT - 50:
             pass
+        
         else:
             y = (self.rect.y + 50) // 50
             if matrix[y][self.rect.x // 50] != 'Coral':
@@ -519,8 +521,6 @@ clock = pygame.time.Clock()
 score = Score(screen)
 
 white_image = load_image('data/white.png')
-
-board = Board()
 
 heart_image = load_image('data/heart.png')
 life = Life(screen, score)
@@ -757,7 +757,7 @@ def first_level(running: bool = True):
             all_sprites.update()
 
         all_sprites.draw(screen)
-        board.rendering(screen, player.get_rects())
+        rendering(screen, player.get_rects())
         score.update()
         life_group.update()
         life_group.draw(screen)
