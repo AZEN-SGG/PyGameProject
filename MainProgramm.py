@@ -6,9 +6,9 @@ import pygame
 from sys import exit
 from os import path
 
-WIDTH = 750
-HEIGHT = 650
-FPS = 20
+WIDTH: int = 750
+HEIGHT: int = 650
+FPS: int = 20
 
 
 # Функция загрузки изображения
@@ -43,11 +43,11 @@ def terminate():
 
 # Функция выводит правила игры
 # Нужно задать имя файла изображения, а также можно указать цвет текста
-def start_screen(text, fon_name: str, color: str = 'yellow'):
+def start_screen(text, fon_name: str, color: str = 'yellow', number: int = 30):
     # Создаём фон
     fon = pygame.transform.scale(load_image(fon_name), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
+    font = pygame.font.Font(None, number)
     text_coord = 50
 
     for line in text:
@@ -92,7 +92,7 @@ clock = pygame.time.Clock()
 
 # Отображаю правила первого уровня
 start_screen(intro_text, 'FirstLevelFon.png')
-something = FirstLevel.first_level(True)
+score = FirstLevel.first_level(True)
 
 intro_text = ['                             Второй Уровень - Путешествие в Ад', '', '', '',
               "                                          ПРАВИЛА УРОВНЯ",
@@ -108,7 +108,7 @@ intro_text = ['                             Второй Уровень - Пут
 
 # Отображаю правила второго уровня
 start_screen(intro_text, 'SecondLevelFon.png')
-something = SecondLevel.second_level(True, something)
+score = SecondLevel.second_level(True, score)
 
 intro_text = ['                             Третий Уровень - Дикий Запад', '', '', '',
               "                                          ПРАВИЛА УРОВНЯ",
@@ -125,8 +125,19 @@ intro_text = ['                             Третий Уровень - Дик
               '  Ваша задача - пройти уровень, собрав наибольшее количество очков']
 
 start_screen(intro_text, 'ThirdLevelFon.png', 'brown')
-record: str = ThirdLevel.third_level(True, something)
 
-start_screen(record, 'RecordsFon.png')
+record: list = ThirdLevel.third_level(True, score)
+
+first_record: str = '                       ' + record[0]
+second_record: str = '                       ' + record[1]
+third_record: str = '                       ' + record[2]
+
+your_record: str = '                       ' + record[3]
+
+record: list = ['                    Рекорды:', first_record, second_record,
+                third_record, '', '                  Ваш рекорд',
+                your_record]
+
+start_screen(record, 'RecordsFon.png', 'yellow', 70)
 
 pygame.quit()

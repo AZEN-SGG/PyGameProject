@@ -57,6 +57,8 @@ def load_image(image: str):
 def record():
     global score
 
+    points = score.points
+
     # Открываем файл с рекордами
     with open('record.txt', 'r', encoding='utf8') as file:
         # Берём оттуда текст
@@ -68,7 +70,7 @@ def record():
     # Превращаем текст в список построчно
     text = [int(x) for x in text]
     # Добавляем наш рекорд в список
-    text.append(int(score.points))
+    text.append(int(points))
     # Сортируем список по возрастанию
     text.sort(reverse=True)
     # Удаляем все элементы до оставшихся трёх самых больших рекордов
@@ -82,11 +84,14 @@ def record():
     for element in text:
         records += str(element).rjust(6, '0') + '\n'
 
-    records = records.rstrip('\n')
+    records: str = records.rstrip('\n')
     file.write(records)
 
     # Закрываем файл
     file.close()
+
+    records: list = records.split('\n')
+    records.append(points)
 
     return records
 
@@ -161,6 +166,7 @@ def get_point(this_point, add_points: int = 500):
     score.update()
 
 
+# Функция создаёт матрицу
 def make_matrix():
     for y in range(13):
         matrix.append([])
@@ -815,7 +821,9 @@ def third_level(running: bool = True, points: str = '000000'):
                 else:
                     if event.key == pygame.K_SPACE:
                         if win_bool:
-                            return record()
+                            your_record: str = record()
+
+                            return your_record
 
                         if faced_bool:
                             if life.life == '0':
@@ -850,6 +858,7 @@ def third_level(running: bool = True, points: str = '000000'):
         score.update()
         life_group.update()
         life_group.draw(screen)
+
         # Вывод клетчатого поля
         if faced_bool:
             faced(life)
