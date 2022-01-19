@@ -574,7 +574,7 @@ class Bat(pygame.sprite.Sprite):
         self.SPEED = speed
         self.status = status
         if not spi:
-            self.spi = [sheet, columns, rows, x, y, SPEED, status]
+            self.spi = [sheet, columns, rows, x, y, speed, status]
 
         else:
             self.spi = spi
@@ -731,21 +731,21 @@ flame45 = Flame(flame_image, 4, 1, 425, 375)
 flame46 = Flame(flame_image, 4, 1, 375, 375)
 flame47 = Flame(flame_image, 4, 1, 225, 375)
 
-flame48 = Hide_Flame(flame_image, 4, 1, 75, 75)
-flame49 = Hide_Flame(flame_image, 4, 1, 125, 75)
-flame50 = Hide_Flame(flame_image, 4, 1, 375, 75)
-flame51 = Hide_Flame(flame_image, 4, 1, 625, 75)
-flame52 = Hide_Flame(flame_image, 4, 1, 675, 75)
-flame53 = Hide_Flame(flame_image, 4, 1, 175, 625)
-flame54 = Hide_Flame(flame_image, 4, 1, 575, 625)
-flame55 = Hide_Flame(flame_image, 4, 1, 75, 325)
-flame56 = Hide_Flame(flame_image, 4, 1, 675, 325)
-flame57 = Hide_Flame(flame_image, 4, 1, 425, 275)
-flame58 = Hide_Flame(flame_image, 4, 1, 475, 275)
-flame59 = Hide_Flame(flame_image, 4, 1, 525, 325)
-flame60 = Hide_Flame(flame_image, 4, 1, 325, 375)
-flame61 = Hide_Flame(flame_image, 4, 1, 275, 375)
-flame62 = Hide_Flame(flame_image, 4, 1, 225, 325)
+flame48 = HideFlame(flame_image, 4, 1, 75, 75)
+flame49 = HideFlame(flame_image, 4, 1, 125, 75)
+flame50 = HideFlame(flame_image, 4, 1, 375, 75)
+flame51 = HideFlame(flame_image, 4, 1, 625, 75)
+flame52 = HideFlame(flame_image, 4, 1, 675, 75)
+flame53 = HideFlame(flame_image, 4, 1, 175, 625)
+flame54 = HideFlame(flame_image, 4, 1, 575, 625)
+flame55 = HideFlame(flame_image, 4, 1, 75, 325)
+flame56 = HideFlame(flame_image, 4, 1, 675, 325)
+flame57 = HideFlame(flame_image, 4, 1, 425, 275)
+flame58 = HideFlame(flame_image, 4, 1, 475, 275)
+flame59 = HideFlame(flame_image, 4, 1, 525, 325)
+flame60 = HideFlame(flame_image, 4, 1, 325, 375)
+flame61 = HideFlame(flame_image, 4, 1, 275, 375)
+flame62 = HideFlame(flame_image, 4, 1, 225, 325)
 
 white_image = load_image('data/white.png')
 
