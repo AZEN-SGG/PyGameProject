@@ -789,13 +789,13 @@ bat_image = load_image("data/bat.png")
 bat_right_image = load_image("data/bat_right.png")
 
 bat1 = Bat(bat_image, 3, 1, WIDTH - 50, 510, 15, 1, [])
-bat2 = Bat(bat_right_image, 3, 1, 0, 510, 15, 2, [])
-bat3 = Bat(bat_image, 3, 1, 350, 510, 15, 1, [])
+bat2 = Bat(bat_right_image, 3, 1, 0, 510, 10, 2, [])
+bat3 = Bat(bat_image, 3, 1, 350, 510, 10, 1, [])
 bat4 = Bat(bat_right_image, 3, 1, 350, 510, 15, 2, [])
 
 bat5 = Bat(bat_image, 3, 1, WIDTH - 50, 105, 15, 3, [])
-bat6 = Bat(bat_right_image, 3, 1, 0, 105, 15, 4, [])
-bat7 = Bat(bat_image, 3, 1, 350, 105, 15, 3, [])
+bat6 = Bat(bat_right_image, 3, 1, 0, 105, 10, 4, [])
+bat7 = Bat(bat_image, 3, 1, 350, 105, 10, 3, [])
 bat8 = Bat(bat_right_image, 3, 1, 350, 105, 15, 4, [])
 
 bat9 = Bat(bat_right_image, 3, 1, 105, 155, 15, 5, [])
