@@ -809,6 +809,7 @@ bat15 = Bat(bat_image, 3, 1, 350, 405, 15, 11, [])
 bat16 = Bat(bat_right_image, 3, 1, 150, 310, 15, 12, [])
 
 all_sprites.add(door)
+all_sprites.add(key)
 all_sprites.add(player)
 all_sprites.add(flame1)
 all_sprites.add(flame2)
