@@ -811,7 +811,7 @@ def third_level(running: bool = True, points: str = '000000'):
                 else:
                     if event.key == pygame.K_SPACE:
                         if win_bool:
-                            your_record: str = record()
+                            your_record: list = record()
 
                             return your_record
 
