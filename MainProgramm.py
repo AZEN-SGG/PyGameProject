@@ -91,7 +91,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 # Отображаю правила первого уровня
-start_screen(intro_text, 'FirstLevelFon.png', '#fc0', 24)
+start_screen(intro_text, 'FirstLevelFon.png', '#ffb300', 24)
 score = FirstLevel.first_level(True)
 
 intro_text = ['', '                                                     Второй Уровень - Путешествие в Ад', '', '', '',
@@ -107,7 +107,7 @@ intro_text = ['', '                                                     Втор
               '                     Ваша задача - пройти уровень, собрав наибольшее количество зелий']
 
 # Отображаю правила второго уровня
-start_screen(intro_text, 'SecondLevelFon.png', 'yellow', 24)
+start_screen(intro_text, 'SecondLevelFon.png', '#ffb300', 24)
 score = SecondLevel.second_level(True, score)
 
 intro_text = ['', '                                                         Третий Уровень - Дикий Запад', '', '',
