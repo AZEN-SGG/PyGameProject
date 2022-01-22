@@ -47,8 +47,18 @@ def win():  # функция победы
     text_y = HEIGHT // 2 - text.get_height() // 2
     text_w = text.get_width()
     text_h = text.get_height()
-    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
-                                            text_w + 20, text_h + 20))
+    pygame.draw.rect(screen, '#00ae1f', (text_x - 10, text_y - 10,
+                                         text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
+
+    font = pygame.font.Font(None, 30)
+    text = font.render("Нажмите пробел, чтобы продолжить", True, 'white')
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT - text.get_height() - 10
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, '#00ae1f', (text_x - 10, text_y - 10,
+                                         text_w + 20, text_h + 20))
     screen.blit(text, (text_x, text_y))
 
 
@@ -95,6 +105,16 @@ def faced():  # Игрок проиграл, отображение надпис
     text = font.render("Игра окончена", True, 'white')
     text_x = WIDTH // 2 - text.get_width() // 2
     text_y = HEIGHT // 2 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,
+                                            text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
+
+    font = pygame.font.Font(None, 30)
+    text = font.render("Нажмите пробел, чтобы продолжить", True, 'white')
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT - text.get_height() - 10
     text_w = text.get_width()
     text_h = text.get_height()
     pygame.draw.rect(screen, (255, 4, 86), (text_x - 10, text_y - 10,

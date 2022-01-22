@@ -38,14 +38,25 @@ def faced(heart):  # Отображает надпись и завершает �
 
     else:
         font = pygame.font.Font(None, 50)
-        text = font.render("Вы проиграли", True, (255, 0, 0))  # Нужно дописать про пробел
+        text = font.render("Вы проиграли", True, 'white')  # Нужно дописать про пробел
         text_x = WIDTH // 2 - text.get_width() // 2
         text_y = HEIGHT // 2 - text.get_height() // 2
         text_w = text.get_width()
         text_h = text.get_height()
         screen.blit(text, (text_x, text_y))
         pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
-                                               text_w + 20, text_h + 20), 1)
+                                               text_w + 20, text_h + 20))
+        screen.blit(text, (text_x, text_y))
+
+        font = pygame.font.Font(None, 30)
+        text = font.render("Нажмите пробел, чтобы продолжить", True, 'white')
+        text_x = WIDTH // 2 - text.get_width() // 2
+        text_y = HEIGHT - text.get_height() - 10
+        text_w = text.get_width()
+        text_h = text.get_height()
+        pygame.draw.rect(screen, (255, 0, 0), (text_x - 10, text_y - 10,
+                                               text_w + 20, text_h + 20))
+        screen.blit(text, (text_x, text_y))
 
 
 def load_image(name: str, color_key=None):  # Функция для получения фотографий
@@ -126,14 +137,25 @@ def win():
     win_bool = True  # При win_bool равном правде все спрайты останавливаются
 
     font = pygame.font.Font(None, 50)
-    text = font.render("Вы выиграли", True, (0, 255, 0))  # Нужно дописать про пробел
+    text = font.render("Вы выиграли", True, 'white')
     text_x = WIDTH // 2 - text.get_width() // 2
     text_y = HEIGHT // 2 - text.get_height() // 2
     text_w = text.get_width()
     text_h = text.get_height()
     screen.blit(text, (text_x, text_y))
-    pygame.draw.rect(screen, (0, 255, 0), (text_x - 10, text_y - 10,
-                                           text_w + 20, text_h + 20), 1)
+    pygame.draw.rect(screen, '#00ae1f', (text_x - 10, text_y - 10,
+                                         text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
+
+    font = pygame.font.Font(None, 30)
+    text = font.render("Нажмите пробел, чтобы продолжить", True, 'white')
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT - text.get_height() - 10
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, '#00ae1f', (text_x - 10, text_y - 10,
+                                         text_w + 20, text_h + 20))
+    screen.blit(text, (text_x, text_y))
 
 
 def add_sprite(sprite):  # Добавление спрайтов
