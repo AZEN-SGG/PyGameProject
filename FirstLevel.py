@@ -716,6 +716,7 @@ all_sprites.add(coral52)
 
 # Цикл игры
 def first_level(running: bool = True):
+
     global KEY
     global KEY_STAR
 
@@ -724,6 +725,12 @@ def first_level(running: bool = True):
     global faced_bool
     global win_bool
     global stop_bool
+    life.life='-1'
+    return_back()
+    faced_bool = False
+    win_bool = False
+    KEY_STAR = False
+    KEY = False
 
     while running:
         # Держим цикл на правильной скорости
