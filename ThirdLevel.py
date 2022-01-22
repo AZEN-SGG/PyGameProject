@@ -87,7 +87,7 @@ def record():
     points = score.points
 
     # Открываем файл с рекордами
-    with open('record.txt', 'r', encoding='utf8') as file:
+    with open('data/record.txt', 'r', encoding='utf8') as file:
         # Берём оттуда текст
         text = file.readlines()
 
@@ -106,7 +106,7 @@ def record():
     records: str = ''
 
     # Открываем файл для записи
-    file = open("record.txt", 'w')
+    file = open("data/record.txt", 'w')
     # Записываем поэлементно
     for element in text:
         records += str(element).rjust(6, '0') + '\n'
